@@ -10,7 +10,7 @@ import InsightFacade from "../../src/controller/InsightFacade";
 import {assert, expect, use} from "chai";
 import chaiAsPromised from "chai-as-promised";
 import {clearDisk, getContentFromArchives, readFileQueries} from "../TestUtil";
-import { readdir } from "fs/promises"
+import {readdir} from "fs/promises";
 
 use(chaiAsPromised);
 
@@ -126,182 +126,202 @@ describe("InsightFacade", function () {
 	});
 });
 
-describe('InsightFacade', function () {
-	const valid_id = "validId"
-	const alt_valid_id = "validId2"
-	const valid_kind = InsightDatasetKind.Sections
-	const valid_m_keys = ["year", "avg", "pass", "fail", "audit"]
-	const valid_s_keys = ["uuid", "id", "title", "instructor", "dept"]
-	const valid_ids = [...valid_m_keys, ...valid_s_keys]
-	let valid_content: string
-	before('read in content', async function () { valid_content = await getContentFromArchives("pair.zip") })
+describe("InsightFacade", function () {
+	const validId = "validId";
+	const altValidID = "validId2";
+	const validKind = InsightDatasetKind.Sections;
+	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
+	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
+	const validIDs = [...validMKeys, ...validSKeys];
+	let validContent: string;
+	before("read in content", async function () {
+		validContent = await getContentFromArchives("pair.zip");
+	});
 
-	const load_valid_dataset = async () => {
-		await clearDisk()
-		await new InsightFacade().addDataset(valid_id, valid_content, valid_kind)
-	}
+	const loadValidDataset = async () => {
+		await clearDisk();
+		await new InsightFacade().addDataset(validId, validContent, validKind);
+	};
 
-	describe('addDataset', function () {
-		beforeEach('clean disk before runs', () => {
-			return clearDisk()
-		})
+	describe("addDataset", function () {
+		beforeEach("clean disk before runs", () => {
+			return clearDisk();
+		});
 
-		it("should not fail with all valid values, and should write dataset to disk immediately after being inserted", async function () {
-			expect(await new InsightFacade().addDataset(valid_id, valid_content, valid_kind)).to.be.deep.equal([valid_id])
-			const files = await readdir("./data")
-			return expect(files.length).to.be.greaterThan(0)
-		})
+		it("should not fail with all valid values, and should write dataset to disk immediately after being inserted",
+			async function () {
+				expect(await new InsightFacade().addDataset(validId, validContent, validKind))
+					.to.be.deep.equal([validId]);
+				const files = await readdir("./data");
+				return expect(files.length).to.be.greaterThan(0);
+			});
 
 		context("checking dataset ID (arg1)", function () {
 			it("should fail when an invalid dataset ID is passed", async function () {
-				const assert_1 = expect(new InsightFacade().addDataset("invalid_id", valid_content, valid_kind)).to.be.rejectedWith(InsightError)
-				const assert_2 = expect(new InsightFacade().addDataset("   ", valid_content, valid_kind)).to.be.rejectedWith(InsightError)
-				const assert_3 = expect(new InsightFacade().addDataset("", valid_content, valid_kind)).to.be.rejectedWith(InsightError)
-				return await Promise.all([assert_1, assert_2, assert_3])
-			})
+				const ASSERT_1 = expect(new InsightFacade().addDataset("invalid_id", validContent, validKind))
+					.to.be.rejectedWith(InsightError);
+				const ASSERT_2 = expect(new InsightFacade().addDataset("   ", validContent, validKind))
+					.to.be.rejectedWith(InsightError);
+				const ASSERT_3 = expect(new InsightFacade().addDataset("", validContent, validKind))
+					.to.be.rejectedWith(InsightError);
+				return await Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
+			});
 
 			it("should fail when a dataset with the same ID has already been added", async function () {
-				await new InsightFacade().addDataset(valid_id, valid_content, valid_kind)
-				const assert_1 = expect(new InsightFacade().addDataset(valid_id, valid_content, valid_kind)).to.be.rejectedWith(InsightError)
-				return await assert_1
-			})
-		})
+				await new InsightFacade().addDataset(validId, validContent, validKind);
+				const ASSERT_1 = expect(new InsightFacade().addDataset(validId, validContent, validKind))
+					.to.be.rejectedWith(InsightError);
+				return await ASSERT_1;
+			});
+		});
 
 		context("checking content zip file (arg2)", function () {
 			it("should reject if content is not a base64 string of a zip file", async function () {
 				return await Promise.all([
 					// invalid characters
-					expect(new InsightFacade().addDataset(valid_id, "-", valid_kind)).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().addDataset(valid_id, ".", valid_kind)).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().addDataset(valid_id, "#", valid_kind)).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().addDataset(valid_id, "$", valid_kind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, "-", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, ".", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, "#", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, "$", validKind)).to.be.rejectedWith(InsightError),
 
 					// valid characters but doesn't make sense as a zip file
-					expect(new InsightFacade().addDataset(valid_id, "abcdef", valid_kind)).to.be.rejectedWith(InsightError)
-				])
-			})
+					expect(new InsightFacade().addDataset(validId, "abcdef", validKind))
+						.to.be.rejectedWith(InsightError)
+				]);
+			});
 
 			it("should reject if content has an empty courses folder", async function () {
-				const empty_course_content = await getContentFromArchives("pair_empty_courses.zip")
-				const assert_1 = expect(new InsightFacade().addDataset(valid_id, empty_course_content, valid_kind)).to.be.rejectedWith(InsightError)
+				const emptyCourseContent = await getContentFromArchives("pair_empty_courses.zip");
+				const ASSERT_1 = expect(new InsightFacade().addDataset(validId, emptyCourseContent, validKind))
+					.to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if a file is not a JSON formatted file", async function () {
-				const yml_content = await getContentFromArchives("pair_literally_yml.zip")
-				const assert_yml = expect(new InsightFacade().addDataset(valid_id, yml_content, valid_kind)).to.be.rejectedWith(InsightError)
+				const YMLContent = await getContentFromArchives("pair_literally_yml.zip");
+				const assertYML = expect(new InsightFacade().addDataset(validId, YMLContent, validKind))
+					.to.be.rejectedWith(InsightError);
 
-				const bad_json_content = await getContentFromArchives("pair_slight_invalid_json.zip")
-				const assert_bad_json = expect(new InsightFacade().addDataset(valid_id, bad_json_content, valid_kind)).to.be.rejectedWith(InsightError)
+				const badJSONContent = await getContentFromArchives("pair_slight_invalid_json.zip");
+				const assertBadJSON = expect(new InsightFacade().addDataset(validId, badJSONContent, validKind))
+					.to.be.rejectedWith(InsightError);
 
-				await Promise.all([assert_yml, assert_bad_json])
-			})
+				await Promise.all([assertYML, assertBadJSON]);
+			});
 
 			it("should be located within a folder called courses/ in the zip's root directory", async function () {
-				const not_in_courses = await getContentFromArchives("pair_not_in_courses.zip")
-				const assert_1 = expect(new InsightFacade().addDataset(valid_id, not_in_courses, valid_kind)).to.be.rejectedWith(InsightError)
+				const NotInCourses = await getContentFromArchives("pair_not_in_courses.zip");
+				const ASSERT_1 = expect(new InsightFacade().addDataset(validId, NotInCourses, validKind))
+					.to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
-		})
+				return await ASSERT_1;
+			});
+		});
 
 		context("checking content JSON fields (arg2)", function () {
 			it("should reject if the results field dne/is not an array", async function () {
-				const assert_1 = getContentFromArchives("pair_result_is_object.zip").then(object_result =>
-					expect(new InsightFacade().addDataset(valid_id, object_result, valid_kind)).to.be.rejectedWith(InsightError))
-				const assert_2 = getContentFromArchives("pair_result_is_string.zip").then(string_result =>
-					expect(new InsightFacade().addDataset(valid_id, string_result, valid_kind)).to.be.rejectedWith(InsightError))
-				const assert_3 = getContentFromArchives("pair_empty_results.zip").then(dne_result =>
-					expect(new InsightFacade().addDataset(valid_id, dne_result, valid_kind)).to.be.rejectedWith(InsightError))
+				const ASSERT_1 = getContentFromArchives("pair_result_is_object.zip").then((object_result) =>
+					expect(new InsightFacade().addDataset(validId, object_result, validKind))
+						.to.be.rejectedWith(InsightError));
+				const ASSERT_2 = getContentFromArchives("pair_result_is_string.zip").then((string_result) =>
+					expect(new InsightFacade().addDataset(validId, string_result, validKind))
+						.to.be.rejectedWith(InsightError));
+				const ASSERT_3 = getContentFromArchives("pair_empty_results.zip").then((dne_result) =>
+					expect(new InsightFacade().addDataset(validId, dne_result, validKind))
+						.to.be.rejectedWith(InsightError));
 
-				return Promise.all([assert_1, assert_2, assert_3])
-			})
+				return Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
+			});
 
-			it("should reject if the results field contains 0 valid sections (does not contain every field)", async function () {
-				const assert_1 = getContentFromArchives("pair_bad_section.zip").then(bad_section_content =>
-					expect(new InsightFacade().addDataset(valid_id, bad_section_content, valid_kind)).to.be.rejectedWith(InsightError))
+			it("should reject if the results field contains 0 valid sections (does not contain every field)",
+				async function () {
+					const ASSERT_1 = getContentFromArchives("pair_bad_section.zip").then((bad_section_content) =>
+						expect(new InsightFacade().addDataset(validId, bad_section_content, validKind))
+							.to.be.rejectedWith(InsightError));
 
-				const assert_2 = getContentFromArchives("pair_some_valid_fields.zip").then(some_valid_fields =>
-					expect(new InsightFacade().addDataset(valid_id, some_valid_fields, valid_kind)).to.be.rejectedWith(InsightError))
-				return await Promise.all([assert_1, assert_2])
-			})
-		})
+					const ASSERT_2 = getContentFromArchives("pair_some_valid_fields.zip").then((some_valid_fields) =>
+						expect(new InsightFacade().addDataset(validId, some_valid_fields, validKind))
+							.to.be.rejectedWith(InsightError));
+					return await Promise.all([ASSERT_1, ASSERT_2]);
+				});
+		});
 
 		it("should reject with invalid kind value (arg3)", async function () {
-			const assert_1 = expect(new InsightFacade().addDataset(valid_id, valid_content, "invalid_kind" as InsightDatasetKind))
-				.to.be.rejectedWith(InsightError)
-			return await assert_1
-		})
-	})
+			const ASSERT_1 = expect(new InsightFacade()
+				.addDataset(validId, validContent, "invalid_kind" as InsightDatasetKind))
+				.to.be.rejectedWith(InsightError);
+			return await ASSERT_1;
+		});
+	});
 
-	describe('removeDataset', function () {
+	describe("removeDataset", function () {
 		beforeEach("add dataset to InsightFacade", async function () {
-			return load_valid_dataset()
-		})
+			return loadValidDataset();
+		});
 
 		it("should fail if the section does not exist", async function () {
-			const assert_1 = expect(new InsightFacade().removeDataset("notExistId")).to.be.rejectedWith(NotFoundError)
-			return await assert_1
-		})
+			const ASSERT_1 = expect(new InsightFacade().removeDataset("notExistId")).to.be.rejectedWith(NotFoundError);
+			return await ASSERT_1;
+		});
 
 		it("should fail if the id passed in is not valid", async function () {
-			const assert_1 = expect(new InsightFacade().removeDataset("invalid_id")).to.be.rejectedWith(InsightError)
-			const assert_2 = expect(new InsightFacade().removeDataset("   ")).to.be.rejectedWith(InsightError)
-			return await Promise.all([assert_1, assert_2])
-		})
+			const ASSERT_1 = expect(new InsightFacade().removeDataset("invalid_id")).to.be.rejectedWith(InsightError);
+			const ASSERT_2 = expect(new InsightFacade().removeDataset("   ")).to.be.rejectedWith(InsightError);
+			return await Promise.all([ASSERT_1, ASSERT_2]);
+		});
 
 		it("should successfully remove the dataset and return the id", async function () {
-			const assert_1 = expect(new InsightFacade().removeDataset(valid_id)).to.eventually.equal(valid_id)
-			await assert_1
-			const assert_2 = expect(new InsightFacade().listDatasets()).to.eventually.deep.equal([])
-			return await assert_2
-		})
-	})
+			const ASSERT_1 = expect(new InsightFacade().removeDataset(validId)).to.eventually.equal(validId);
+			await ASSERT_1;
+			const ASSERT_2 = expect(new InsightFacade().listDatasets()).to.eventually.deep.equal([]);
+			return await ASSERT_2;
+		});
+	});
 
-	describe('listDatasets', function () {
+	describe("listDatasets", function () {
 		it("should list all datasets when there are datasets", async function () {
-			//setup
-			await load_valid_dataset()
-			//test
-			const assert_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([{
-				id: valid_id,
+			// setup
+			await loadValidDataset();
+			// test
+			const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([{
+				id: validId,
 				kind: InsightDatasetKind.Sections,
 				numRows: 64612,
-			}])
-			return await assert_1
-		})
+			}]);
+			return await ASSERT_1;
+		});
 
 		it("should return an empty array when there are no datasets", async function () {
-			//setup
-			await clearDisk()
-			//test
-			const assert_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([])
-			return await assert_1
-		})
-	})
+			// setup
+			await clearDisk();
+			// test
+			const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([]);
+			return await ASSERT_1;
+		});
+	});
 
-	describe('performQueryNoDataset', function () {
-		before('clear the disk', function () {
-			return clearDisk()
-		})
+	describe("performQueryNoDataset", function () {
+		before("clear the disk", function () {
+			return clearDisk();
+		});
 
 		it("should reject if a query references a dataset not added", async function () {
-			const assert_1 = expect(new InsightFacade().performQuery({
-				"WHERE": {},
-				"OPTIONS": {
-					"COLUMNS": [`${valid_id}_dept`],
+			const ASSERT_1 = expect(new InsightFacade().performQuery({
+				WHERE: {},
+				OPTIONS: {
+					COLUMNS: [`${validId}_dept`],
 				}
-			})).to.be.rejectedWith(InsightError)
-			return await assert_1
-		})
-	})
+			})).to.be.rejectedWith(InsightError);
+			return await ASSERT_1;
+		});
+	});
 
-	describe('performQuery', function () {
+	describe("performQuery", function () {
 		before("add dataset to InsightFacade", async function () { // if performQuery mutates the dataset, I will kill myself during class
-			await load_valid_dataset()
-			return await new InsightFacade().addDataset(alt_valid_id, valid_content, valid_kind)
-		})
+			await loadValidDataset();
+			return await new InsightFacade().addDataset(altValidID, validContent, validKind);
+		});
 
 		context("testing with semantically invalid query objects", function () {
 			it("should reject if a query is not an object", async function () {
@@ -311,276 +331,276 @@ describe('InsightFacade', function () {
 					expect(new InsightFacade().performQuery([])).to.be.rejectedWith(InsightError),
 					expect(new InsightFacade().performQuery(null)).to.be.rejectedWith(InsightError),
 					expect(new InsightFacade().performQuery(undefined)).to.be.rejectedWith(InsightError)
-				])
-			})
+				]);
+			});
 
 			it("should reject if there is no where", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"OPTIONS": {
-						"COLUMNS": [`${valid_id}_dept`]
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					OPTIONS: {
+						COLUMNS: [`${validId}_dept`]
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if there is no options", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {}
-				})).to.be.rejectedWith(InsightError)
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {}
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if there is no columns in options", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {}
-				})).to.be.rejectedWith(InsightError)
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {}
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if column is empty array", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": []
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: []
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
-		})
+				return await ASSERT_1;
+			});
+		});
 
-		const valid_query_keys = valid_ids.map((key) => `${valid_id}_${key}`)
+		const ValidQueryKeys = validIDs.map((key) => `${validId}_${key}`);
 		context("testing with logically invalid query objects", function () {
 			it("should reject if a query has more than 5000 results", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [valid_query_keys[0]],
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [ValidQueryKeys[0]],
 					}
-				})).to.be.rejectedWith(ResultTooLargeError)
-				return await assert_1
-			})
+				})).to.be.rejectedWith(ResultTooLargeError);
+				return await ASSERT_1;
+			});
 
 			it("should reject if a query references multiple datasets in OPTIONS-COLUMNS", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [`${valid_id}_dept`, `${alt_valid_id}_dept`],
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [`${validId}_dept`, `${altValidID}_dept`],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 
 			it("should reject if a query references multiple datasets in WHERE CLAUSE", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"IS": {
-							[`${alt_valid_id}_dept`]: "zool"
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						IS: {
+							[`${altValidID}_dept`]: "zool"
 						}
 					},
-					"OPTIONS": {
-						"COLUMNS": [`${valid_id}_dept`],
+					OPTIONS: {
+						COLUMNS: [`${validId}_dept`],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			// this way the case where order and column both have the same invalid id should be covered
 			// this test gives us invariant that column checks query ids also check order ids
 			it("should reject if the ORDER value is not in COLUMNS", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [valid_query_keys[0],],
-						"ORDER": valid_query_keys[1],
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [ValidQueryKeys[0],],
+						ORDER: ValidQueryKeys[1],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if there is an invalid id in COLUMN", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": ["sussybaka",],
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: ["sussybaka",],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				const assert_2 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [valid_id,],
+				const ASSERT_2 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [validId,],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				const assert_3 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [`${valid_id}_sussybaka`,],
+				const ASSERT_3 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [`${validId}_sussybaka`,],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await Promise.all([assert_1, assert_2, assert_3])
-			})
+				return await Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
+			});
 
 			it("should reject if there is a mix of datasets in columns", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {},
-					"OPTIONS": {
-						"COLUMNS": [
-							`${valid_id}_${valid_ids[0]}`,
-							`${alt_valid_id}_${valid_ids[1]}`,
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: [
+							`${validId}_${validIDs[0]}`,
+							`${altValidID}_${validIDs[1]}`,
 						],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
+				return await ASSERT_1;
+			});
 
 			it("should reject if there's a wildcard in the middle of a string", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"IS": {
-							[`${valid_id}_dept`]: "c*sc"
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						IS: {
+							[`${validId}_dept`]: "c*sc"
 						}
 					},
-					"OPTIONS": {
-						"COLUMNS": [`${valid_id}_dept`],
+					OPTIONS: {
+						COLUMNS: [`${validId}_dept`],
 					}
-				})).to.be.rejectedWith(InsightError)
+				})).to.be.rejectedWith(InsightError);
 
-				return await assert_1
-			})
-		})
+				return await ASSERT_1;
+			});
+		});
 
 		context("testing with valid query objects", function () {
 			it("should select all columns effectively", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"EQ": {
-							[`${valid_id}_avg`]: 95
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						EQ: {
+							[`${validId}_avg`]: 95
 						}
 					},
-					"OPTIONS": {
-						"COLUMNS": valid_query_keys,
+					OPTIONS: {
+						COLUMNS: ValidQueryKeys,
 					}
-				})).to.be.fulfilled
-				return await assert_1
-			})
+				})).to.be.fulfilled;
+				return await ASSERT_1;
+			});
 
 			it("should wildcards should work", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"AND": [
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						AND: [
 							{
-								"EQ": {
-									[`${valid_id}_avg`]: 75
+								EQ: {
+									[`${validId}_avg`]: 75
 								}
 							},
 							{
-								"IS": {
-									[`${valid_id}_dept`]: "c*"
+								IS: {
+									[`${validId}_dept`]: "c*"
 								}
 							},
 							{
-								"IS": {
-									[`${valid_id}_instructor`]: "*n"
+								IS: {
+									[`${validId}_instructor`]: "*n"
 								}
 							},
 							{
-								"IS": {
-									[`${valid_id}_title`]: "*u*"
+								IS: {
+									[`${validId}_title`]: "*u*"
 								}
 							}
 						]
 					},
-					"OPTIONS": {
-						"COLUMNS": [valid_query_keys[0]],
+					OPTIONS: {
+						COLUMNS: [ValidQueryKeys[0]],
 					}
-				})).to.be.eventually.of.length(5)
-				return await assert_1
-			})
+				})).to.be.eventually.of.length(5);
+				return await ASSERT_1;
+			});
 
 			it("should have functioning EQ (and OR)", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"OR": [
-							{ "EQ": { [`${valid_id}_audit`]: 5 } },
-							{ "EQ": { [`${valid_id}_fail`]: 20 } }
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						OR: [
+							{EQ: {[`${validId}_audit`]: 5}},
+							{EQ: {[`${validId}_fail`]: 20}}
 						]
 					},
-					"OPTIONS": {
-						"COLUMNS": [
-							valid_query_keys[0]
+					OPTIONS: {
+						COLUMNS: [
+							ValidQueryKeys[0]
 						]
 					}
-				})).to.be.eventually.of.length(214)
-				return await assert_1
-			})
+				})).to.be.eventually.of.length(214);
+				return await ASSERT_1;
+			});
 
 			it("should have functioning GT, EQ (and AND)", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"AND": [
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						AND: [
 							{
-								"GT": {
-									[`${valid_id}_avg`]: 98.57
+								GT: {
+									[`${validId}_avg`]: 98.57
 								}
 							},
 							{
-								"EQ": {
-									[`${valid_id}_year`]: 1900
+								EQ: {
+									[`${validId}_year`]: 1900
 								}
 							}
 						]
 					},
-					"OPTIONS": {
-						"COLUMNS": [
-							`${valid_id}_dept`
+					OPTIONS: {
+						COLUMNS: [
+							`${validId}_dept`
 						]
 					}
-				})).to.be.eventually.of.length(7)
-				return await assert_1
-			})
+				})).to.be.eventually.of.length(7);
+				return await ASSERT_1;
+			});
 
 			it("should have functioning LT, IS (and AND)", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"AND": [
-							{ "LT": { [`${valid_id}_year`]: 1901 } },
-							{ "IS": { [`${valid_id}_dept`]: "zool" } }
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						AND: [
+							{LT: {[`${validId}_year`]: 1901}},
+							{IS: {[`${validId}_dept`]: "zool"}}
 						]
 					},
-					"OPTIONS": { "COLUMNS": [`${valid_id}_dept`] }
-				})).to.be.eventually.of.length(15)
-				return await assert_1
-			})
+					OPTIONS: {COLUMNS: [`${validId}_dept`]}
+				})).to.be.eventually.of.length(15);
+				return await ASSERT_1;
+			});
 
 			it("should have functioning GT (and NOT)", async function () {
-				const assert_1 = expect(new InsightFacade().performQuery({
-					"WHERE": {
-						"NOT": {
-							"LT": {
-								[`${valid_id}_avg`]: 98.57
+				const ASSERT_1 = expect(new InsightFacade().performQuery({
+					WHERE: {
+						NOT: {
+							LT: {
+								[`${validId}_avg`]: 98.57
 							}
 						}
 					},
-					"OPTIONS": {
-						"COLUMNS": [
-							`${valid_id}_dept`
+					OPTIONS: {
+						COLUMNS: [
+							`${validId}_dept`
 						]
 					}
-				})).to.be.eventually.of.length(17)
-				return await assert_1
-			})
-		})
-	})
-})
+				})).to.be.eventually.of.length(17);
+				return await ASSERT_1;
+			});
+		});
+	});
+});
