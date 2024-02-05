@@ -19,6 +19,14 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
+		// validation that query is valid (everything except WHERE clause)
+		// load data from disk (hopefully it has already been parsed by addDataset)
+		const allSections: any[] = [];
+		// generation of the filter function
+		const queryFilterFunc: (section: any) => boolean = (section: any) => false;
+		const filteredSections = allSections.filter(queryFilterFunc); // apply filter function
+		// apply options
+		// return final result
 		return Promise.reject("Not implemented.");
 	}
 
