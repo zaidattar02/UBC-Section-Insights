@@ -51,4 +51,10 @@ export interface SectionQuery {
 	year: number;
 }
 
+export type SectionQueryKeys = keyof SectionQuery;
 
+export type SectionQueryNumericalKeys = "avg" | "pass" | "fail" | "audit" | "year";
+export const SectionQueryNumericalKeyList: SectionQueryNumericalKeys[] = ["avg", "pass", "fail", "audit", "year"];
+
+export type SectionQueryStringKeys = "uuid" | "id" | "title" | "instructor" | "dept";
+export const SectionQueryStringKeyList: SectionQueryStringKeys[] = ["uuid", "id", "title", "instructor", "dept"];
