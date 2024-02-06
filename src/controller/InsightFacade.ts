@@ -138,6 +138,46 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
+	public handleOptions(options: any, datasetName: string, filteredResults: InsightResult[]): InsightResult[] {
+		this.assertTrue(typeof options === "object", "OPTIONS should be an object");
+
+		let optionsObj: any = options as object;
+
+		this.assertTrue(Object.keys(optionsObj).length === 2, "OPTIONS object should only have two keys");
+
+		this.assertTrue(
+			Object.prototype.hasOwnProperty.call(optionsObj, "COLUMNS") &&
+				Object.prototype.hasOwnProperty.call(optionsObj, "ORDER"),
+			"OPTIONS object should only have two keys"
+		);
+
+		this.assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string");
+
+		this.assertTrue(
+			Array.isArray(optionsObj.COLUMNS),
+			"OPTIONS.COLUMNS should only an array of strings or empty array"
+		);
+
+		if (optionsObj.COLUMNS.length) {
+			this.assertTrue(
+				optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
+				"OPTIONS.COLUMNS will be an array of strings only"
+			);
+		}
+		// TODO : Validate Keys format in COLUMNS Object
+		// TODO : Validate Key in ORDER Object
+		// TODO : Return Data
+		return filteredResults;
+	}
+
+	private assertTrue(condition: boolean, msg: string) {
+		if (!condition) {
+			throw new SyntaxError(msg);
+		} else {
+			return;
+		}
+	}
+
 	public async listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
 	}
