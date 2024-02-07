@@ -1,10 +1,9 @@
+
 import {CourseSection} from "./CourseSection";
 import {InsightDatasetKind} from "../controller/IInsightFacade";
 
-//	Interface to define how a dataset should look like
-//	Has an array of section objects(container), and an id for the dataset
 
-export class Dataset{
+export class Dataset {
 	private id: string;
 	private kind: InsightDatasetKind;
 	private sections: CourseSection[];
@@ -15,19 +14,20 @@ export class Dataset{
 		this.sections = [];
 	}
 
-	public getKind(){
+	public getKind() {
 		return this.kind;
 	}
 
-	public getID(){
+	public getID() {
 		return this.id;
 	}
 
-	public addSection(section: CourseSection){
+	public addSection(section: CourseSection) {
 		this.sections.push(section);
 	}
 
-	public getSections(): CourseSection[]{
+	public getSections(): CourseSection[] {
 		return this.sections;
 	}
 }
+

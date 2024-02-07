@@ -34,6 +34,41 @@ export class DatasetProcessor{
 			throw new InsightError("Error loading dataset:");
 		}
 	}
+
+	private async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+		const fileContent = await file.async("string");
+		try {
+			const jsonData = JSON.parse(fileContent);
+			jsonData.result.forEach((sectionData: any) => {
+				if (this.isValidSection(sectionData)) {
+					const section = new CourseSection(
+						sectionData.uuid,
+						sectionData.id,
+						sectionData.title,
+						sectionData.instructor,
+						sectionData.dept,
+						sectionData.avg,
+						sectionData.pass,
+						sectionData.fail,
+						sectionData.audit,
+						sectionData.year
+					);
+					dataset.addSection(section);
+				}
+			});
+		} catch (e) {
+			console.error(`Error parsing file content to JSON: ${e}`);
+			// Depending on your specs, you might want to throw an error here or skip the file
+		}
+	}
+
+
+	//	should this function take in an instance of CourseSection?
+	//	the section overall case, how do I look for that in CourseSection?
+	private isValidSection(section: CourseSection): boolean{
+		return true;
+	}
+
 	// public loadDataset(content: string): Promise<JSZip> {
 	// 	const zip = new JSZip();
 	// 	return zip.loadAsync(content, {base64: true})
@@ -93,33 +128,6 @@ export class DatasetProcessor{
 	// 			throw new InsightError(`Error loading dataset: ${error.message}`);
 	// 		});
 	// }
-
-
-	private async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
-		const fileContent = await file.async("string");
-		const jsonData = JSON.parse(fileContent);
-		jsonData.result.forEach((sectionData: any) => {
-			if (this.isValidSection(sectionData)) {
-				const section = new CourseSection(
-					sectionData.uuid,
-					sectionData.id,
-					sectionData.title,
-					sectionData.instructor,
-					sectionData.dept,
-					sectionData.avg,
-					sectionData.pass,
-					sectionData.fail,
-					sectionData.audit,
-					sectionData.year
-				);
-				dataset.addSection(section);
-			}
-		});
-	}
-
-	private isValidSection(section: any): boolean{
-		return true;
-	}
 
 	// public loadDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 	// 	const zip = new JSZip();
