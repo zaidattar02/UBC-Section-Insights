@@ -151,7 +151,7 @@ describe("InsightFacade", function () {
 			return clearDisk();
 		});
 
-		it("should not fail with all valid values, and should write dataset to disk immediately after being inserted", async function () {
+		it("should not fail with valid values, writing dataset to disk post-insertion", async function () {
 			expect(await new InsightFacade().addDataset(validId, validContent, validKind)).to.be.deep.equal([validId]);
 			const files = await readdir("./data");
 			return expect(files.length).to.be.greaterThan(0);
@@ -250,7 +250,7 @@ describe("InsightFacade", function () {
 				return Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
 			});
 
-			it("should reject if the results field contains 0 valid sections (does not contain every field)", async function () {
+			it("should reject if 'results' lacks valid sections (missing fields).", async function () {
 				const ASSERT_1 = getContentFromArchives("pair_bad_section.zip").then((bad_section_content) =>
 					expect(new InsightFacade().addDataset(validId, bad_section_content, validKind)).to.be.rejectedWith(
 						InsightError
@@ -693,3 +693,4 @@ describe("handleOptions", function () {
 		expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
 	});
 });
+

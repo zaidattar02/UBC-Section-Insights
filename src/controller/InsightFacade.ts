@@ -139,29 +139,29 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public handleOptions(options: any, datasetName: string, filteredResults: InsightResult[]): InsightResult[] {
-		this.assertTrue(typeof options === "object", "OPTIONS should be an object");
+		this.assertTrue(typeof options === "object", "OPTIONS should be an object",SyntaxError);
 
 		let optionsObj: any = options as object;
 
-		this.assertTrue(Object.keys(optionsObj).length === 2, "OPTIONS object should only have two keys");
+		this.assertTrue(Object.keys(optionsObj).length === 2, "OPTIONS object should only have two keys",SyntaxError);
 
 		this.assertTrue(
 			Object.prototype.hasOwnProperty.call(optionsObj, "COLUMNS") &&
 				Object.prototype.hasOwnProperty.call(optionsObj, "ORDER"),
-			"OPTIONS object should only have two keys"
+			"OPTIONS object should only have two keys",SyntaxError
 		);
 
-		this.assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string");
+		this.assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string",SyntaxError);
 
 		this.assertTrue(
 			Array.isArray(optionsObj.COLUMNS),
-			"OPTIONS.COLUMNS should only an array of strings or empty array"
+			"OPTIONS.COLUMNS should only an array of strings or empty array",SyntaxError
 		);
 
 		if (optionsObj.COLUMNS.length) {
 			this.assertTrue(
 				optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
-				"OPTIONS.COLUMNS will be an array of strings only"
+				"OPTIONS.COLUMNS will be an array of strings only",SyntaxError
 			);
 		}
 		// TODO : Validate Keys format in COLUMNS Object
@@ -170,13 +170,23 @@ export default class InsightFacade implements IInsightFacade {
 		return filteredResults;
 	}
 
-	private assertTrue(condition: boolean, msg: string) {
-		if (!condition) {
-			throw new SyntaxError(msg);
-		} else {
-			return;
+	private assertTrue(condition: boolean, msg: string,ErrorType: new (message?: string) => Error) {
+		this.throwErrorOnAssertion(true,condition,msg,ErrorType);
+	}
+
+	private assertFalse(condition: boolean, msg: string,ErrorType: new (message?: string) => Error) {
+		this.throwErrorOnAssertion(false,condition,msg,ErrorType);
+	}
+
+	private throwErrorOnAssertion(assertion: boolean,condition: boolean, msg: string,
+		ErrorType: new (message?: string) => Error) {
+		if (assertion !== condition) {
+			const error = new ErrorType(msg);
+			error.message = msg;
+			throw error;
 		}
 	}
+
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
