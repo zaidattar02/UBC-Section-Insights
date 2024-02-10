@@ -11,6 +11,10 @@ export class CourseSection {
 	private audit: number;
 	private year: number;
 
+	//  validate here
+	//	check specifications
+	//	cast year as a number
+	//	helper functions for consistent cases
 	constructor(
 		uuid: string,
 		id: string,
@@ -21,7 +25,7 @@ export class CourseSection {
 		pass: number,
 		fail: number,
 		audit: number,
-		year: number
+		year: number,
 	) {
 		this.uuid = uuid;
 		this.id = id;

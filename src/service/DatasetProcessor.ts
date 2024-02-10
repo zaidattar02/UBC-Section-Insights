@@ -4,43 +4,62 @@ import {Dataset} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 
-export class DatasetProcessor{
-	public async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+//	Ask TA
+//	modeling the section, how to deal with processing, parsing
+//	Section overall case, check project spec DONE
+//	How to deal with year not being a number, returns NaN
+//	How to deal with validation in constructor
+//  Process file or Parse? DONE
+//	Dataset has an array of CourseSections
+//	Also has a function addSection --> is this how I save the dataset locally? as in after parsing?
+//	After implementing this file, do I create an instance of this class in InsightFacade?
+//	Need to check for duplicate ids and kind
+//	Abstract class and make methods static in TS
+//	export abstract class Dataprocessor
+//	public static methods
+
+export abstract class DatasetProcessor{
+	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
 			const coursesFolder = data.folder("courses");
+			//	reject instead since you are in a promise
 			if (!coursesFolder) {
 				throw new InsightError("Invalid Data");
 			}
-
+			//	how to convert JS object into JSON
+			//	convert JS object into JSON object, and save that representation to disk
 			const dataset = new Dataset(id, kind);
 			const filePromises: Array<Promise<void>> = [];
-
+			//	function that returns error if it's not json
 			coursesFolder.forEach((relativePath, file) => {
 				if (relativePath.endsWith(".json")) {
 					const filePromise = this.processFile(file, dataset);
 					filePromises.push(filePromise);
 				}
 			});
-
 			await Promise.all(filePromises);
 			if (dataset.getSections().length === 0) {
 				throw new InsightError("No valid sections found in the dataset");
 			}
-
+			//  save this dataset as a JSON file to save it back without checks and validations
+			//	save one file per dataset
+			//	try to take this dataset object, convert the section file into JSON and then save the whole dataset
 			return dataset;
 		} catch (error) {
 			throw new InsightError("Error loading dataset:");
 		}
 	}
 
-	private async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+	//	Process a single file at a time
+	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
 			jsonData.result.forEach((sectionData: any) => {
 				if (this.isValidSection(sectionData)) {
+					//	have conditional logic to check sectionData.section for overall and do result of condition
 					const section = new CourseSection(
 						sectionData.uuid,
 						sectionData.id,
@@ -51,7 +70,7 @@ export class DatasetProcessor{
 						sectionData.pass,
 						sectionData.fail,
 						sectionData.audit,
-						sectionData.year
+						sectionData.year,
 					);
 					dataset.addSection(section);
 				}
@@ -62,10 +81,44 @@ export class DatasetProcessor{
 		}
 	}
 
+	//	Process all files in the zip
+	// private async Parse(zip: JSZip, dataset: Dataset): Promise<void> {
+	// 	const promises = Object.keys(zip.files)
+	// 		.filter((relativePath) => relativePath.endsWith(".json"))
+	// 		.map(async (relativePath) => {
+	// 			const fileContent = await zip.file(relativePath)!.async("string");
+	// 			try {
+	// 				const courseData = JSON.parse(fileContent);
+	// 				courseData.result.forEach((sectionData: any) => {
+	// 					if (this.isValidSection(sectionData)) {
+	// 						const section = new CourseSection(
+	// 							sectionData.uuid,
+	// 							sectionData.id,
+	// 							sectionData.title,
+	// 							sectionData.instructor,
+	// 							sectionData.dept,
+	// 							sectionData.avg,
+	// 							sectionData.pass,
+	// 							sectionData.fail,
+	// 							sectionData.audit,
+	// 							sectionData.year
+	// 						);
+	// 						dataset.addSection(section);
+	// 					}
+	// 				});
+	// 			} catch (error) {
+	// 				console.error(`Error processing file ${relativePath}: ${error}`);
+	// 			}
+	// 		});
+	//
+	// 	await Promise.all(promises); //	waits until all JSON files have been processed
+	// }
 
 	//	should this function take in an instance of CourseSection?
 	//	the section overall case, how do I look for that in CourseSection?
-	private isValidSection(section: CourseSection): boolean{
+	//	should the validation be in the constructor class of CourseSection instead?
+	//	dont need it here after constructor
+	public static isValidSection(section: CourseSection): boolean{
 		return true;
 	}
 
@@ -177,37 +230,4 @@ export class DatasetProcessor{
 	// }
 
 //
-// 	// private async Parse(zip: JSZip, dataset: Dataset): Promise<void> {
-// 	// 	const promises = Object.keys(zip.files)
-// 	// 		.filter((relativePath) => relativePath.endsWith(".json"))
-// 	// 		.map(async (relativePath) => {
-// 	// 			const fileContent = await zip.file(relativePath)!.async("string");
-// 	// 			try {
-// 	// 				const courseData = JSON.parse(fileContent);
-// 	// 				courseData.result.forEach((sectionData: any) => {
-// 	// 					if (this.isValidSection(sectionData)) {
-// 	// 						const section = new CourseSection(
-// 	// 							sectionData.uuid,
-// 	// 							sectionData.id.toString(), // Ensure 'id' is treated as a string
-// 	// 							sectionData.title,
-// 	// 							sectionData.instructor,
-// 	// 							sectionData.dept,
-// 	// 							sectionData.avg,
-// 	// 							sectionData.pass,
-// 	// 							sectionData.fail,
-// 	// 							sectionData.audit,
-// 	// 							sectionData.year, // Handle year appropriately
-// 	// 						);
-// 	// 						dataset.addSection(section);
-// 	// 					}
-// 	// 				});
-// 	// 			} catch (error) {
-// 	// 				console.error(`Error processing file ${relativePath}: ${error}`);
-// 	// 			}
-// 	// 		});
-// 	//
-// 	// 	await Promise.all(promises);
-// 	// }
-//
-
 }
