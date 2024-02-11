@@ -138,10 +138,10 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
-	public handleOptions(options: any, datasetName: string, filteredResults: InsightResult[]): InsightResult[] {
+	public handleOptions(options: unknown, datasetName: string, unprocessedResults: InsightResult[]): InsightResult[] {
 		this.assertTrue(typeof options === "object", "OPTIONS should be an object",SyntaxError);
 
-		let optionsObj: any = options as object;
+		let optionsObj: { [key: string]: object } = options as { [key: string]: object };
 
 		this.assertTrue(Object.keys(optionsObj).length === 2, "OPTIONS object should only have two keys",SyntaxError);
 
@@ -154,20 +154,13 @@ export default class InsightFacade implements IInsightFacade {
 		this.assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string",SyntaxError);
 
 		this.assertTrue(
-			Array.isArray(optionsObj.COLUMNS),
-			"OPTIONS.COLUMNS should only an array of strings or empty array",SyntaxError
-		);
-
-		if (optionsObj.COLUMNS.length) {
-			this.assertTrue(
-				optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
-				"OPTIONS.COLUMNS will be an array of strings only",SyntaxError
-			);
-		}
+			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
+			"OPTIONS.COLUMNS will be an array of strings only",SyntaxError
+		  );
 		// TODO : Validate Keys format in COLUMNS Object
 		// TODO : Validate Key in ORDER Object
 		// TODO : Return Data
-		return filteredResults;
+		return unprocessedResults;
 	}
 
 	private assertTrue(condition: boolean, msg: string,ErrorType: new (message?: string) => Error) {
