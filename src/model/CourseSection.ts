@@ -14,7 +14,7 @@ export class CourseSection {
 	//  validate here
 	//	check specifications
 	//	cast year as a number
-	//	helper functions for consistent cases
+	//	helper functions for consistent cases i.e always string, always number
 	constructor(
 		uuid: string,
 		id: string,
@@ -27,16 +27,34 @@ export class CourseSection {
 		audit: number,
 		year: number,
 	) {
-		this.uuid = uuid;
-		this.id = id;
-		this.title = title;
-		this.instructor = instructor;
-		this.dept = dept;
-		this.avg = avg;
-		this.pass = pass;
-		this.fail = fail;
-		this.audit = audit;
-		this.year = year;
+		this.uuid = this.alwaysString(uuid);
+		this.id = this.alwaysString(id);
+		this.title = this.alwaysString(title);
+		this.instructor = this.alwaysString(instructor);
+		this.dept = this.alwaysString(dept);
+		this.avg = this.alwaysNumber(avg);
+		this.pass = this.alwaysNumber(pass);
+		this.fail = this.alwaysNumber(fail);
+		this.audit = this.alwaysNumber(audit);
+		this.year = this.alwaysNumber(year);
+	}
+
+	private alwaysString(value: any): string{
+		if(typeof value !== "string"){
+			return String(value);
+		}
+		return value;
+	}
+
+	private alwaysNumber(value: any): number {
+		if (typeof value !== "number") {
+			const numberValue = Number(value);
+			if (isNaN(numberValue)) {
+				throw new Error("Cannot cast to number");
+			}
+			return numberValue;
+		}
+		return value;
 	}
 }
 

@@ -1,7 +1,7 @@
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult} from "./IInsightFacade";
-import JSZip from "jszip";
-import {CourseSection} from "../model/CourseSection";
 import {Dataset} from "../model/Dataset";
+import {DatasetProcessor} from "../service/DatasetProcessor";
+import fs from "fs-extra";
 
 
 /**
@@ -13,39 +13,68 @@ import {Dataset} from "../model/Dataset";
 //	TO DO
 //	use fs to read and write to file, you dont need to store anything locally?
 //	helper method to validate and check if its json, and anything else before you add
-// 	JSZIP will do parsing
 // 	fs extra saving and loading to and from disk ALSO removeDataSet
 // 	listdataset doesn't need fs extra, you should save sections as an object
 // 	create a list of datasets
-//	Dual representation both NEED TO BE UP TO DATE REMOVE ADD ETC
-//	list of datasets here and one in the disk
-//	to check for duplicates, check list
+//	Dual representation both NEED TO BE UP TO DATE IN REMOVEDATASET AND ADDDATASET
+//	list of datasets here(private variable data) and one in the disk
+//	to check for duplicates, check list of datasets
 export default class InsightFacade implements IInsightFacade {
-	//	priv Dataset here
-	private data: Dataset[];
+	private datasets: Map<string,Dataset>;
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
-		this.data = [];
-		// initalize Dataset
+		this.datasets = new Map();
+		this.loadDatasetsFromDisk().catch((error) => {
+			console.error("Failed to load datasets from disk:", error);
+		});
+		console.log("loaded from disk");
+		//  initalize Dataset
 		//	check the actual disk for datasets
 		//	disk is the backup, everything will be saved
 		//	list is local that erases when program crashes
-		//	dont need persistance to test
-		//	list of datasets here
 		//	use disk in adddataset to save into that disk
 		//	same with remove
-		//	fs-extra docs
+	}
+
+	private async loadDatasetsFromDisk(): Promise<void> {
+		//	Do I need to add another check to see if its a json file here?
+		try {
+			await fs.ensureDir("./data");
+			const files = await fs.readdir("./data"); // Get a list of dataset files
+			const loadPromises = files.map(async (file) => {
+				const filePath = `./data/${file}`;
+				const datasetJsonStr = await fs.readFile(filePath, "utf8");
+				const dataset = JSON.parse(datasetJsonStr);
+				this.datasets.set(dataset.id, dataset);
+			});
+			await Promise.all(loadPromises);
+		} catch (error) {
+			console.error("Failed to load datasets from disk:", error);
+			// Handle more errors?
+		}
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		//	Initialize DatasetProcessor and pass in arguments from addDataset parameters
-		// return Promise.reject("Not implemented.");
 		if (id === undefined || id === null || id.trim() === "") {
 			return Promise.reject(new InsightError("Invalid ID"));
+			//	change to throw new InsightError?
 		}
-		return Promise.reject(new InsightError("Not implemented"));
-		//	build without persistence, test with c0, then implement persistence
+		console.log("checked id");
+		if(kind !== InsightDatasetKind.Sections){
+			return Promise.reject(new InsightError("Invalid Dataset Kind"));
+		}
+		if(this.datasets.has(id)){
+			throw new InsightError("Dataset already exists");
+		}
+		try{
+			const dataset = await DatasetProcessor.ProcessDataset(id,content,kind);
+			this.datasets.set(id,dataset);
 
+			return Array.from(this.datasets.keys());
+		} catch(error){
+			throw new InsightError(`Failed to add dataset: ${error}`);
+		}
 	}
 
 	public async removeDataset(id: string): Promise<string> {
