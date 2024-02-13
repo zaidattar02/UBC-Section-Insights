@@ -27,7 +27,6 @@ export default class InsightFacade implements IInsightFacade {
 		this.loadDatasetsFromDisk().catch((error) => {
 			console.error("Failed to load datasets from disk:", error);
 		});
-		console.log("loaded from disk");
 		//  initalize Dataset
 		//	check the actual disk for datasets
 		//	disk is the backup, everything will be saved
@@ -37,7 +36,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	private async loadDatasetsFromDisk(): Promise<void> {
-		//	Do I need to add another check to see if its a json file here?
 		try {
 			await fs.ensureDir("./data");
 			const files = await fs.readdir("./data"); // Get a list of dataset files
@@ -50,15 +48,15 @@ export default class InsightFacade implements IInsightFacade {
 			await Promise.all(loadPromises);
 		} catch (error) {
 			console.error("Failed to load datasets from disk:", error);
-			// Handle more errors?
+			//	skip it if isn't a valid file
+			return;
 		}
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		//	Initialize DatasetProcessor and pass in arguments from addDataset parameters
-		if (id === undefined || id === null || id.trim() === "") {
-			return Promise.reject(new InsightError("Invalid ID"));
-			//	change to throw new InsightError?
+		if (!id || id.trim().length === 0 || id.includes("_")) {
+			throw new InsightError("Invalid ID");
 		}
 		console.log("checked id");
 		if(kind !== InsightDatasetKind.Sections){
@@ -86,6 +84,18 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		const insightDatasets: InsightDataset[] = [];
+
+		// Iterate through all datasets in the map
+		this.datasets.forEach((dataset, id) => {
+			// Create an InsightDataset object for each one
+			const insightDataset: InsightDataset = {
+				id: dataset.getID(),
+				kind: dataset.getKind(),
+				numRows: dataset.getSections().length
+			};
+			insightDatasets.push(insightDataset);
+		});
+		return Promise.resolve(insightDatasets);
 	}
 }

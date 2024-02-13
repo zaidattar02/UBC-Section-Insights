@@ -16,66 +16,21 @@ import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 
 
 export abstract class DatasetProcessor{
-	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
-		console.log("attempting to load");
-		try {
-			const zip = await JSZip.loadAsync(content, {base64: true});
-			const coursesFolder = zip.folder("courses");
-			if (!coursesFolder || Object.keys(coursesFolder.files).length === 0) {
-				throw new InsightError("Invalid Data: No courses directory or it is empty");
-			}
-
-			const dataset = new Dataset(id, kind);
-			const filePromises = [];
-			for (let relativePath in coursesFolder.files) {
-				if (relativePath.endsWith(".json")) {
-					let file = coursesFolder.files[relativePath];
-					filePromises.push(this.processFile(file, dataset));
-				}
-			}
-			await Promise.all(filePromises);
-			console.log("awaited promises");
-			if (dataset.getSections().length === 0) {
-				throw new InsightError("No valid sections found in the dataset");
-			}
-			//  save this dataset as a JSON file to save it back without checks and validations
-			//	save one file per dataset
-			//	try to take this dataset object, convert the section file into JSON and then save the whole dataset
-			console.log("about to save");
-			await fs.ensureDir("./data");
-			const datasetJsonStr = JSON.stringify(dataset,null,4);
-			const datasetPath = `./data/${id}.json`;
-			await fs.writeFile(datasetPath,datasetJsonStr);
-			console.log("writing disk");
-			return dataset;
-		} catch (error) {
-			throw new InsightError(`Error loading dataset: ${error}`);
-		}
-	}
 	// public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 	// 	console.log("attempting to load");
 	// 	try {
-	// 		const zip = new JSZip();
-	// 		const data = await zip.loadAsync(content, {base64: true});
-	// 		const coursesFolder = data.folder("courses");
-	// 		if (!coursesFolder) {
-	// 			throw new InsightError("Invalid Data");
+	// 		const zip = await JSZip.loadAsync(content, {base64: true});
+	// 		const coursesFolder = zip.folder("courses");
+	// 		if (!coursesFolder || Object.keys(coursesFolder.files).length === 0) {
+	// 			throw new InsightError("Invalid Data: No courses directory or it is empty");
 	// 		}
-	// 		//	how to convert JS object into JSON
-	// 		//	convert JS object into JSON object, and save that representation to disk
+	//
 	// 		const dataset = new Dataset(id, kind);
-	// 		const filePromises: Array<Promise<void>> = [];
-	// 		//	function that returns error if it's not json
-	// 		coursesFolder.forEach((relativePath, file) => {
-	// 			console.log(relativePath);
-	// 			if (relativePath.endsWith(".json")) {
-	// 				console.log("is a json");
-	// 				const filePromise = this.processFile(file, dataset);
-	// 				filePromises.push(filePromise);
-	// 				console.log("pushed promises to file");
-	// 			}
-	// 		});
-	// 		console.log("loaded the data");
+	// 		const filePromises = [];
+	// 		for (let relativePath in coursesFolder.files) {
+	// 			let file = coursesFolder.files[relativePath];
+	// 			filePromises.push(this.processFile(file, dataset));
+	// 		}
 	// 		await Promise.all(filePromises);
 	// 		console.log("awaited promises");
 	// 		if (dataset.getSections().length === 0) {
@@ -84,23 +39,58 @@ export abstract class DatasetProcessor{
 	// 		//  save this dataset as a JSON file to save it back without checks and validations
 	// 		//	save one file per dataset
 	// 		//	try to take this dataset object, convert the section file into JSON and then save the whole dataset
-	// 		console.log("about to save");
 	// 		await fs.ensureDir("./data");
 	// 		const datasetJsonStr = JSON.stringify(dataset,null,4);
 	// 		const datasetPath = `./data/${id}.json`;
 	// 		await fs.writeFile(datasetPath,datasetJsonStr);
-	// 		console.log("writing disk");
 	// 		return dataset;
 	// 	} catch (error) {
 	// 		throw new InsightError(`Error loading dataset: ${error}`);
 	// 	}
 	// }
 
+	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+		console.log("attempting to load");
+		try {
+			const zip = new JSZip();
+			const data = await zip.loadAsync(content, {base64: true});
+			const coursesFolder = data.folder("courses");
+			if (!coursesFolder) {
+				throw new InsightError("Invalid Data");
+			}
+			const dataset = new Dataset(id, kind);
+			const filePromises: any[] = [];
+			coursesFolder.forEach((relativePath, file) => {
+				const filePromise = this.processFile(file, dataset);
+				filePromises.push(filePromise);
+			});
+			await Promise.all(filePromises);
+			if (dataset.getSections().length === 0) {
+				throw new InsightError("No valid sections found in the dataset");
+			}
+			//	convert JS object into JSON object, and save that representation to disk
+			//  save this dataset as a JSON file to save it back without checks and validations
+			//	save one file per dataset
+			//	try to take this dataset object, convert the section file into JSON and then save the whole dataset
+			await fs.ensureDir("./data");
+			const datasetJsonStr = JSON.stringify(dataset,null,4);
+			const datasetPath = `./data/${id}.json`;
+			await fs.writeFile(datasetPath,datasetJsonStr);
+			return dataset;
+		} catch (error) {
+			throw new InsightError(`Error loading dataset: ${error}`);
+		}
+	}
+
 	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
-			console.log("parsing");
+			//	check if there is at least one valid section in file
+			// if (!this.hasValidSection(jsonData.result)) {
+			// 	console.error("No valid section found in file.");
+			// 	return; // Skip this file as it doesn't contain any valid section
+			// }
 			jsonData.result.forEach((sectionData: any) => {
 				if (sectionData.section === "overall") {
 					sectionData.year = 1900;
@@ -125,8 +115,19 @@ export abstract class DatasetProcessor{
 			});
 		} catch (e) {
 			console.error(`Error parsing file content to JSON: ${e}`);
-			// Add additional logic? Skip a file or throw an error?
+			//	Is return enough to skip the logic for current non JSON file i.e skipping the CourseSection that is invalid
+			return;
 		}
+	}
+
+
+	private static hasValidSection(sections: any[]): boolean {
+		const validKeys = ["uuid", "id", "title", "instructor", "dept", "avg", "pass", "fail", "audit", "year"];
+
+		// Check if at least one section has all valid keys
+		return sections.some((section) =>
+			validKeys.every((key) => Object.hasOwn(section,key))
+		);
 	}
 
 	// public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
