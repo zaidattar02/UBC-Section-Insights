@@ -76,6 +76,7 @@ export abstract class DatasetProcessor{
 			const datasetJsonStr = JSON.stringify(dataset,null,4);
 			const datasetPath = `./data/${id}.json`;
 			await fs.writeFile(datasetPath,datasetJsonStr);
+			console.log("saved");
 			return dataset;
 		} catch (error) {
 			throw new InsightError(`Error loading dataset: ${error}`);
@@ -87,10 +88,9 @@ export abstract class DatasetProcessor{
 		try {
 			const jsonData = JSON.parse(fileContent);
 			//	check if there is at least one valid section in file
-			// if (!this.hasValidSection(jsonData.result)) {
-			// 	console.error("No valid section found in file.");
-			// 	return; // Skip this file as it doesn't contain any valid section
-			// }
+			if (!this.hasValidSection(jsonData.result)) {
+				return; // Skip this file as it doesn't contain any valid section
+			}
 			jsonData.result.forEach((sectionData: any) => {
 				if (sectionData.section === "overall") {
 					sectionData.year = 1900;
@@ -115,20 +115,24 @@ export abstract class DatasetProcessor{
 			});
 		} catch (e) {
 			console.error(`Error parsing file content to JSON: ${e}`);
-			//	Is return enough to skip the logic for current non JSON file i.e skipping the CourseSection that is invalid
 			return;
+			// return Promise.reject(new InsightError("Not a JSON file"));
 		}
 	}
 
-
 	private static hasValidSection(sections: any[]): boolean {
-		const validKeys = ["uuid", "id", "title", "instructor", "dept", "avg", "pass", "fail", "audit", "year"];
-
+		const validKeys = ["id","Course", "Title", "Professor", "Subject", "Avg", "Pass", "Fail", "Audit", "Year"];
 		// Check if at least one section has all valid keys
 		return sections.some((section) =>
 			validKeys.every((key) => Object.hasOwn(section,key))
 		);
 	}
+
+
+	// private static hasValidSection(sections: any[]): boolean {
+	// 	const validKeys = ["uuid", "id", "Title", "Instructor", "Dept", "Avg", "Pass", "Fail", "Audit", "Year"];
+	// 	return sections.includes(validKeys);
+	// }
 
 	// public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 	// 	console.log("Attempting to load dataset");

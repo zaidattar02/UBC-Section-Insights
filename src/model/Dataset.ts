@@ -1,6 +1,8 @@
 
-import {CourseSection} from "./CourseSection";
+// import {CourseSection} from "./CourseSection";
+
 import {InsightDatasetKind} from "../controller/IInsightFacade";
+import {CourseSection} from "./CourseSection";
 
 
 export class Dataset {
