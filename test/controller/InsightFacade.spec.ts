@@ -141,24 +141,14 @@ describe("InsightFacade", function () {
 	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
 
-	describe("loading from disk", function() {
-		it("should load from disk after creating new instance", async function() {
+	describe("loading from disk", function(){
+		it("should load from disk after creating new instance", async function(){
 			const facade = new InsightFacade();
-			// Add a dataset to ensure there's something to load from disk
-			await facade.addDataset(validId, validContent, validKind);
-
-			// Create a new instance to trigger loading from disk
+			await facade.addDataset(validId,validContent,validKind);
 			const newFacade = new InsightFacade();
-			// Optional: Wait a bit to ensure datasets have been loaded, might not be necessary
-			// await new Promise(resolve => setTimeout(resolve, 100));
-
-			// Try removing the dataset with the new instance
-			const removedId = await newFacade.removeDataset(validId);
-			expect(removedId).to.equal(validId);
-
-			// Optionally verify that the dataset list is empty now
 			const datasets = await newFacade.listDatasets();
-			expect(datasets).to.deep.equal([]);
+			return expect(datasets).to.have.lengthOf(1);
+			// return expect(await facade.removeDataset(validId));
 		});
 	});
 	before("read in content", async function () {

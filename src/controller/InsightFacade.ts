@@ -77,8 +77,10 @@ export default class InsightFacade implements IInsightFacade {
 			try {
 				const filePath = `./data/${file}`;
 				const datasetJsonStr = await fs.readFile(filePath, "utf8");
-				const dataset = JSON.parse(datasetJsonStr);
-				this.datasets.set(dataset.id, dataset);
+				// const dataset = JSON.parse(datasetJsonStr);
+				// this.datasets.set(dataset.id, dataset);
+				const dataset = Dataset.fromObject(JSON.parse(datasetJsonStr));
+				this.datasets.set(dataset.getID(), dataset);
 			} catch (error) {
 				console.error(`Failed to load dataset from file ${file}:`, error);
 				// Skip this file and continue with the rest

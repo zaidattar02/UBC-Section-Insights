@@ -16,6 +16,27 @@ export class Dataset {
 		this.sections = [];
 	}
 
+	public static fromObject(obj: any): Dataset {
+		const dataset = new Dataset(obj.id, obj.kind);
+		// Assuming obj.sections is an array of section objects
+		obj.sections.forEach((sectionObj: any) => {
+			const section = new CourseSection(
+				sectionObj.uuid,
+				sectionObj.id,
+				sectionObj.title,
+				sectionObj.instructor,
+				sectionObj.dept,
+				sectionObj.avg,
+				sectionObj.pass,
+				sectionObj.fail,
+				sectionObj.audit,
+				sectionObj.year
+			);
+			dataset.addSection(section);
+		});
+		return dataset;
+	}
+
 	public getKind() {
 		return this.kind;
 	}
