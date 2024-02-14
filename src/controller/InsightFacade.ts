@@ -35,7 +35,6 @@ export default class InsightFacade implements IInsightFacade {
 	private datasets: Map<string,Dataset>;
 	private datasetsLoaded;
 	constructor() {
-		console.log("InsightFacadeImpl::init()");
 		this.datasets = new Map();
 		this.datasetsLoaded = this.loadDatasetsFromDisk().catch((error) => {
 			console.error("Failed to load datasets from disk:", error);
