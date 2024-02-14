@@ -11,7 +11,9 @@ import {DatasetProcessor} from "../service/DatasetProcessor";
 import fs from "fs-extra";
 import {
 	CourseSection, CourseSectionNumericalKeyList,
-	CourseSectionNumericalKeys, CourseSectionStringKeyList, CourseSectionStringKeys
+	CourseSectionNumericalKeys, CourseSectionStringKeyList, CourseSectionStringKeys,
+	CourseSelectionKey,
+	CourseSelectionKeyList
 } from "../model/CourseSection";
 
 /**
@@ -247,7 +249,7 @@ export default class InsightFacade implements IInsightFacade {
 		"OPTIONS should be an object and have the property \"COLUMNS\"", InsightError);
 		const columns = (options as {COLUMNS: unknown}).COLUMNS;
 		InsightFacade.assertTrue(Array.isArray(columns) && columns.length > 0,
-			"OPTIONS.COLUMNS will be an array of strings only", InsightError);
+			"OPTIONS.COLUMNS should be a nonempty array", InsightError);
 		const firstColumn = (columns as unknown[])[0];
 		InsightFacade.assertTrue(typeof firstColumn === "string",
 			"First element of OPTIONS.COLUMNS will be a string only", InsightError);
@@ -270,6 +272,7 @@ export default class InsightFacade implements IInsightFacade {
 		const validQuery = query as {WHERE: unknown, OPTIONS: unknown};
 
 		// load data from disk (hopefully it has already been parsed by addDataset)
+		// this is very cringe but required because of bad design (EBNF)
 		const datasetName = InsightFacade.inferDataSetName(validQuery.OPTIONS);
 		const potentialDataset = this.datasets.get(datasetName);
 		if(potentialDataset === undefined) {
@@ -288,31 +291,55 @@ export default class InsightFacade implements IInsightFacade {
 		return filteredWithOptions;
 	}
 
-	public handleOptions(options: unknown, datasetName: string, unprocessedResults: CourseSection[]): InsightResult[] {
-		InsightFacade.assertTrue(typeof options === "object", "OPTIONS should be an object",SyntaxError);
-
-		let optionsObj: {[key: string]: object} = options as {[key: string]: object};
-
-		InsightFacade.assertTrue(Object.keys(optionsObj).length === 2,
-			"OPTIONS object should only have two keys",SyntaxError);
-
-		InsightFacade.assertTrue(
-			Object.prototype.hasOwnProperty.call(optionsObj, "COLUMNS") &&
-			Object.prototype.hasOwnProperty.call(optionsObj, "ORDER"),
-			"OPTIONS object should only have two keys",SyntaxError
-		);
+	public handleOptions(options: unknown, datasetName: string, rawCourseSections: CourseSection[]): InsightResult[] {
+		InsightFacade.assertTrue(typeof options === "object" && options != null &&
+			Object.keys(options).length === 2 &&
+			Object.prototype.hasOwnProperty.call(options, "COLUMNS") &&
+			Object.prototype.hasOwnProperty.call(options, "ORDER"),
+		"OPTIONS should be an object with two keys, COLUMNS and ORDER", InsightError);
+		const optionsObj = options as {COLUMNS: unknown, ORDER: unknown};
 
 		InsightFacade.assertTrue(typeof optionsObj.ORDER === "string",
-			"OPTIONS.ORDER should only be a string",SyntaxError);
+			"OPTIONS.ORDER should only be a string", InsightError);
+		InsightFacade.assertTrue( Array.isArray(optionsObj.COLUMNS) &&
+			optionsObj.COLUMNS.every((c) => typeof c === "string"),
+		"OPTIONS.COLUMNS should be an array of strings", InsightError );
+		const optionsObjInternalValidated = optionsObj as {COLUMNS: string[], ORDER: string};
 
-		InsightFacade.assertTrue(
-			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
-			"OPTIONS.COLUMNS will be an array of strings only",SyntaxError
-		);
-		// TODO : Validate Keys format in COLUMNS Object
-		// TODO : Validate Key in ORDER Object
-		// TODO : Return Data
-		return [];
+		// Select the columns
+		const selectColumns = optionsObjInternalValidated.COLUMNS.map((c)=>{
+			const p = c.split("_");
+			InsightFacade.assertTrue(p.length === 2 && p[0] === datasetName &&
+				p[1] in CourseSelectionKeyList, "Invalid Key in COLUMNS", InsightError);
+			return p[1] as CourseSelectionKey;
+		});
+		const correctColumns: Array<Partial<CourseSection>> = rawCourseSections.map((s) => {
+			const obj: Partial<CourseSection> = {};
+			selectColumns.forEach((c) => {
+				obj[c] = s[c];
+			});
+			return obj;
+		});
+
+		// Sort the results based on ORDER
+		const splitOrderField = optionsObjInternalValidated.ORDER.split("_");
+		InsightFacade.assertTrue(splitOrderField.length === 2 && splitOrderField[0] === datasetName &&
+			splitOrderField[1] in CourseSelectionKeyList, "Invalid Key in ORDER", InsightError);
+		const orderField = splitOrderField[1] as CourseSelectionKey;
+		const correctColumnsAndOrder = correctColumns.sort((a, b) => {
+			if (a[orderField] < b[orderField]) {
+				return -1;
+			}
+			if (a[orderField] > b[orderField]) {
+				return 1;
+			}
+			return 0;
+		});
+
+		return correctColumnsAndOrder.map((c)=>{
+			const obj: InsightResult = {};
+			return obj;
+		});
 	}
 
 	private static assertTrue(condition: boolean, msg: string,ErrorType: new (message?: string) => Error) {

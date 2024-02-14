@@ -81,6 +81,9 @@ export const CourseSectionNumericalKeyList: CourseSectionNumericalKeys[] = ["avg
 export type CourseSectionStringKeys = "uuid" | "id" | "title" | "instructor" | "dept";
 export const CourseSectionStringKeyList: CourseSectionStringKeys[] = ["uuid", "id", "title", "instructor", "dept"];
 
+export type CourseSelectionKey = keyof CourseSection;
+export const CourseSelectionKeyList = [...CourseSectionNumericalKeyList, ...CourseSectionStringKeyList];
+
 export interface SectionRaw {
 	tier_eighty_five: number;
 	tier_ninety:      number;
