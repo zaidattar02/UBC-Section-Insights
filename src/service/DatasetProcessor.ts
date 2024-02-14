@@ -50,7 +50,6 @@ export abstract class DatasetProcessor{
 	// }
 
 	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
-		console.log("attempting to load");
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -76,7 +75,6 @@ export abstract class DatasetProcessor{
 			const datasetJsonStr = JSON.stringify(dataset,null,4);
 			const datasetPath = `./data/${id}.json`;
 			await fs.writeFile(datasetPath,datasetJsonStr);
-			console.log("saved");
 			return dataset;
 		} catch (error) {
 			throw new InsightError(`Error loading dataset: ${error}`);
