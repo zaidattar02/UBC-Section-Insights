@@ -141,18 +141,6 @@ export default class InsightFacade implements IInsightFacade {
 		return key === "IS";
 	}
 
-	private static isLogicalComparison(key: string): boolean {
-		return key === "AND" || key === "OR" || key === "NOT";
-	}
-
-	private static isMComparison(key: string): boolean {
-		return key === "GT" || key === "LT" || key === "EQ";
-	}
-
-	private static isSComparison(key: string): boolean {
-		return key === "IS";
-	}
-
 	private static handle_comparison(innerVal: unknown, unifiedDatasetName: string, rootFilterObjKey: string):
 		(section: SectionQuery) => boolean {
 		assert(typeof innerVal === "object", "Inner object of GT should be an object");
