@@ -75,6 +75,12 @@ export class CourseSection {
 	}
 }
 
+export type CourseSectionNumericalKeys = "avg" | "pass" | "fail" | "audit" | "year";
+export const CourseSectionNumericalKeyList: CourseSectionNumericalKeys[] = ["avg", "pass", "fail", "audit", "year"];
+
+export type CourseSectionStringKeys = "uuid" | "id" | "title" | "instructor" | "dept";
+export const CourseSectionStringKeyList: CourseSectionStringKeys[] = ["uuid", "id", "title", "instructor", "dept"];
+
 export interface SectionRaw {
 	tier_eighty_five: number;
 	tier_ninety:      number;
@@ -113,24 +119,3 @@ export interface SectionRaw {
 	Campus:           string;
 	Subject:          string;
 }
-
-export interface SectionQuery {
-	uuid: string;
-	id: string;
-	title: string;
-	instructor: string;
-	dept: string;
-	avg: number;
-	pass: number;
-	fail: number;
-	audit: number;
-	year: number;
-}
-
-export type SectionQueryKeys = keyof SectionQuery;
-
-export type SectionQueryNumericalKeys = "avg" | "pass" | "fail" | "audit" | "year";
-export const SectionQueryNumericalKeyList: SectionQueryNumericalKeys[] = ["avg", "pass", "fail", "audit", "year"];
-
-export type SectionQueryStringKeys = "uuid" | "id" | "title" | "instructor" | "dept";
-export const SectionQueryStringKeyList: SectionQueryStringKeys[] = ["uuid", "id", "title", "instructor", "dept"];

@@ -11,6 +11,7 @@ import {assert, expect, use} from "chai";
 import chaiAsPromised = require("chai-as-promised");
 import {clearDisk, getContentFromArchives, readFileQueries} from "../TestUtil";
 import {readdir} from "fs/promises";
+import {CourseSection} from "../../src/model/CourseSection";
 
 use(chaiAsPromised);
 
@@ -724,7 +725,7 @@ describe("handleOptions", function () {
 
 	it("should return filteredSections when OPTIONS are valid", () => {
 		const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
-		const filteredSections = [{}];
+		const filteredSections: CourseSection[] = [{} as CourseSection];
 
 		expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
 	});
