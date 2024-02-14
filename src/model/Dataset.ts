@@ -18,7 +18,6 @@ export class Dataset {
 
 	public static fromObject(obj: any): Dataset {
 		const dataset = new Dataset(obj.id, obj.kind);
-		// Assuming obj.sections is an array of section objects
 		obj.sections.forEach((sectionObj: any) => {
 			const section = new CourseSection(
 				sectionObj.uuid,

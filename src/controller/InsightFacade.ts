@@ -40,12 +40,6 @@ export default class InsightFacade implements IInsightFacade {
 		this.datasetsLoaded = this.loadDatasetsFromDisk().catch((error) => {
 			console.error("Failed to load datasets from disk:", error);
 		});
-		//  initalize Dataset
-		//	check the actual disk for datasets
-		//	disk is the backup, everything will be saved
-		//	list is local that erases when program crashes
-		//	use disk in adddataset to save into that disk
-		//	same with remove
 	}
 
 	//	test method and make sure it loads after new instance.
@@ -69,6 +63,7 @@ export default class InsightFacade implements IInsightFacade {
 	// 		return;
 	// 	}
 	// }
+	//	debug addDataset and loadDataset w bp at points w correct datset values
 
 	private async loadDatasetsFromDisk(): Promise<void> {
 		await fs.ensureDir("./data");
@@ -90,7 +85,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		//	Initialize DatasetProcessor and pass in arguments from addDataset parameters
 		if (!id || id.trim().length === 0 || id.includes("_")) {
 			throw new InsightError("Invalid ID");
 		}

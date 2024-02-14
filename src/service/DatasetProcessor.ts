@@ -97,16 +97,16 @@ export abstract class DatasetProcessor{
 				}
 				try{
 					const section = new CourseSection(
-						sectionData.uuid,
 						sectionData.id,
-						sectionData.title,
-						sectionData.instructor,
-						sectionData.dept,
-						sectionData.avg,
-						sectionData.pass,
-						sectionData.fail,
-						sectionData.audit,
-						sectionData.year,
+						sectionData.Course,
+						sectionData.Title,
+						sectionData.Professor,
+						sectionData.Subject,
+						sectionData.Avg,
+						sectionData.Pass,
+						sectionData.Fail,
+						sectionData.Audit,
+						sectionData.Year,
 					);
 					dataset.addSection(section);
 				} catch(e){

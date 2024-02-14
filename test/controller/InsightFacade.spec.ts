@@ -304,17 +304,17 @@ describe("InsightFacade", function () {
 	});
 
 	describe("listDatasets", function () {
-		// it("should list all datasets when there are datasets", async function () {
-		// 	// setup
-		// 	await loadValidDataset();
-		// 	// test
-		// 	const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([{
-		// 		id: validId,
-		// 		kind: InsightDatasetKind.Sections,
-		// 		numRows: 64612,
-		// 	}]);
-		// 	return await ASSERT_1;
-		// });
+		it("should list all datasets when there are datasets", async function () {
+			// setup
+			await loadValidDataset();
+			// test
+			const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([{
+				id: validId,
+				kind: InsightDatasetKind.Sections,
+				numRows: 64612,
+			}]);
+			return await ASSERT_1;
+		});
 		it("should list all datasets when there are datasets", async function () {
 			// setup
 			const insightFacade = new InsightFacade();
