@@ -21,6 +21,12 @@ export interface ITestQuery {
 	expected: any;
 }
 
+// describe("InsightFacade", function() {
+// 	it("should load datasets from disk on initialization", async function() {
+// 		const facade = new InsightFacade();
+// 	});
+// });
+
 describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
@@ -137,6 +143,17 @@ describe("InsightFacade", function () {
 	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
 	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
+
+	describe("loading from disk", function(){
+		it("should load from disk after creating new instance", async function(){
+			const facade = new InsightFacade();
+			await facade.addDataset(validId,validContent,validKind);
+			const newFacade = new InsightFacade();
+			const datasets = await newFacade.listDatasets();
+			return expect(datasets).to.have.lengthOf(1);
+			// return expect(await facade.removeDataset(validId));
+		});
+	});
 	before("read in content", async function () {
 		validContent = await getContentFromArchives("pair.zip");
 	});
@@ -171,11 +188,17 @@ describe("InsightFacade", function () {
 				return await Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
 			});
 
+			// it("should fail when a dataset with the same ID has already been added", async function () {
+			// 	await new InsightFacade().addDataset(validId, validContent, validKind);
+			// 	const ASSERT_1 = expect(new InsightFacade().addDataset(validId, validContent, validKind))
+			// 		.to.be.rejectedWith(InsightError);
+			// 	return await ASSERT_1;
+			// });
 			it("should fail when a dataset with the same ID has already been added", async function () {
-				await new InsightFacade().addDataset(validId, validContent, validKind);
-				const ASSERT_1 = expect(
-					new InsightFacade().addDataset(validId, validContent, validKind)
-				).to.be.rejectedWith(InsightError);
+				const insightFacade = new InsightFacade();
+				await insightFacade.addDataset(validId, validContent, validKind);
+				const ASSERT_1 = expect(insightFacade.addDataset(validId, validContent, validKind))
+					.to.be.rejectedWith(InsightError);
 				return await ASSERT_1;
 			});
 		});
@@ -311,6 +334,19 @@ describe("InsightFacade", function () {
 				},
 			]);
 			return await ASSERT_1;
+		});
+		it("should list all datasets when there are datasets", async function () {
+			// setup
+			const insightFacade = new InsightFacade();
+			await insightFacade.addDataset(validId, validContent, InsightDatasetKind.Sections);
+
+			// test
+			const datasets = await insightFacade.listDatasets();
+			expect(datasets).to.have.lengthOf(1);
+			const dataset = datasets[0];
+			expect(dataset.id).to.equal(validId);
+			expect(dataset.kind).to.equal(InsightDatasetKind.Sections);
+			expect(dataset.numRows).to.equal(64612);
 		});
 
 		it("should return an empty array when there are no datasets", async function () {
