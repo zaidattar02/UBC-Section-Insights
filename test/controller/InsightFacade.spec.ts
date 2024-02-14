@@ -22,12 +22,6 @@ export interface ITestQuery {
 	expected: any;
 }
 
-// describe("InsightFacade", function() {
-// 	it("should load datasets from disk on initialization", async function() {
-// 		const facade = new InsightFacade();
-// 	});
-// });
-
 describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
@@ -93,16 +87,13 @@ describe("InsightFacade", function () {
 				expect.fail(`Failed to read one or more test queries. ${e}`);
 			}
 
-			validQueries.forEach(function (test: any) {
+			validQueries.forEach(function (test) {
 				it(`${test.title}`, function () {
-					return facade
-						.performQuery(test.input)
-						.then((result) => {
-							assert.fail("Write your assertions here!");
-						})
-						.catch((err: any) => {
-							assert.fail(`performQuery threw unexpected error: ${err}`);
-						});
+					if(test.errorExpected) {
+						return expect(facade.performQuery(test.input)).to.be.rejectedWith(test.expected);
+					} else {
+						return expect(facade.performQuery(test.input)).to.eventually.deep.equal(test.expected);
+					}
 				});
 			});
 		});
@@ -338,11 +329,10 @@ describe("InsightFacade", function () {
 		});
 		it("should list all datasets when there are datasets", async function () {
 			// setup
-			const insightFacade = new InsightFacade();
-			await insightFacade.addDataset(validId, validContent, InsightDatasetKind.Sections);
+			await loadValidDataset();
 
 			// test
-			const datasets = await insightFacade.listDatasets();
+			const datasets = await new InsightFacade().listDatasets();
 			expect(datasets).to.have.lengthOf(1);
 			const dataset = datasets[0];
 			expect(dataset.id).to.equal(validId);
@@ -688,46 +678,49 @@ describe("InsightFacade", function () {
 	});
 });
 
-describe("handleOptions", function () {
-	let facade: InsightFacade;
-	beforeEach(function () {
-		// This section resets the insightFacade instance
-		// This runs before each test
-		facade = new InsightFacade();
-	});
-	it("should throw a SyntaxError when OPTIONS is not an object", () => {
-		expect(() => facade.handleOptions("not an object", "courses", [])).to.throw(SyntaxError);
-	});
-	it("should throw a SyntaxError when OPTIONS object has more than two keys", () => {
-		const options = {key1: "value1", key2: "value2", key3: "value3"};
-		expect(() => facade.handleOptions(options, "courses", [])).to.throw(SyntaxError);
-	});
+describe("InsightFacade Whitebox", function () {
+	describe("handleOptions", function () {
+		let facade: InsightFacade;
+		beforeEach(function () {
+			// This section resets the insightFacade instance
+			// This runs before each test
+			facade = new InsightFacade();
+		});
+		it("should throw a InsightError when OPTIONS is not an object", () => {
+			expect(() => facade.handleOptions("not an object", "courses", [])).to.throw(InsightError);
+		});
+		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
+			const options = {key1: "value1", key2: "value2", key3: "value3"};
+			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+		});
 
-	it("should throw a SyntaxError when OPTIONS Query is invalid", () => {
-		const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
-		expect(() => facade.handleOptions(options, "courses", [])).to.throw(SyntaxError);
-	});
+		it("should throw a InsightError when OPTIONS Query is invalid", () => {
+			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
+			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+		});
 
-	it("should throw a SyntaxError when OPTIONS.ORDER is not a string", () => {
-		const options: any = {COLUMNS: [], ORDER: 42};
-		expect(() => facade.handleOptions(options, "courses", [])).to.throw(SyntaxError);
-	});
+		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
+			const options: any = {COLUMNS: [], ORDER: 42};
+			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+		});
 
-	it("should throw a SyntaxError when OPTIONS.COLUMNS is not an array of strings", () => {
-		const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
-		expect(() => facade.handleOptions(options, "courses", [])).to.throw(SyntaxError);
-	});
+		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
+			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
+			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+		});
 
-	it("should throw a SyntaxError when OPTIONS.COLUMNS contains a non-string value", () => {
-		const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
-		expect(() => facade.handleOptions(options, "courses", [])).to.throw(SyntaxError);
-	});
+		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
+			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
+			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+		});
 
-	it("should return filteredSections when OPTIONS are valid", () => {
-		const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
-		const filteredSections: CourseSection[] = [{} as CourseSection];
+		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset
 
-		expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
+		// it("should return filteredSections when OPTIONS are valid", () => {
+		// 	const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
+		// 	const filteredSections: CourseSection[] = [{} as CourseSection];
+
+		// 	expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
+		// });
 	});
 });
-
