@@ -88,7 +88,6 @@ export default class InsightFacade implements IInsightFacade {
 		if (!id || id.trim().length === 0 || id.includes("_")) {
 			throw new InsightError("Invalid ID");
 		}
-		console.log("checked id");
 		if(kind !== InsightDatasetKind.Sections){
 			return Promise.reject(new InsightError("Invalid Dataset Kind"));
 		}
@@ -112,17 +111,13 @@ export default class InsightFacade implements IInsightFacade {
 		}
 		//	has method might be wrong too
 		//	maybe loading when writing new instance is wrong.
-		console.log(this.datasets.keys());
 		if (!this.datasets.has(id)) {
 			return Promise.reject(new NotFoundError(`Dataset with id ${id} does not exist`));
 		}
 		try {
 			this.datasets.delete(id);
-			console.log("deleted from map");
 			const datasetPath = `./data/${id}.json`;
 			await fs.remove(datasetPath);
-			console.log(id);
-
 			return id;
 		} catch (error) {
 			console.error("Failed to remove dataset:", error);
