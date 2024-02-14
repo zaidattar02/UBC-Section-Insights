@@ -153,6 +153,57 @@ export default class InsightFacade implements IInsightFacade {
 		return key === "IS";
 	}
 
+	private static handle_comparison(innerVal: unknown, unifiedDatasetName: string, rootFilterObjKey: string):
+		(section: SectionQuery) => boolean {
+		assert(typeof innerVal === "object", "Inner object of GT should be an object");
+		const innerObj = innerVal as object;
+		const innerObjKVs = Object.entries(innerObj);
+		assert(innerObjKVs.length === 1, "Inner object of GT should only have one key");
+		const [dataKeyFull, dataVal] = innerObjKVs[0];
+
+		const splitDataKeyFull = dataKeyFull.split("_");
+		assert(
+			splitDataKeyFull.length === 2,
+			"Key of inner object of GT should be in the form of 'key'_'value'" + dataKeyFull
+		);
+		const [dataSetName, dataKey] = splitDataKeyFull;
+		assert(dataSetName === unifiedDatasetName, "Must only query one dataset");
+
+		// MCOMPARISON
+		if(InsightFacade.isMComparison(rootFilterObjKey)) {
+			assert(dataKey in SectionQueryNumericalKeyList, "Key of inner object of GT should be a valid key");
+			const dataKeyNumerical = dataKey as SectionQueryNumericalKeys;
+			assert(typeof dataVal === "number", "Key of inner object of GT should be a string");
+			const dataValNum = dataVal as number;
+
+			switch(rootFilterObjKey) {
+				case "GT":
+					return (section: SectionQuery) => {
+						return section[dataKeyNumerical] > dataValNum;
+					};
+				case "LT":
+					return (section: SectionQuery) => {
+						return section[dataKeyNumerical] < dataValNum;
+					};
+				case "EQ":
+					return (section: SectionQuery) => {
+						return section[dataKeyNumerical] === dataValNum;
+					};
+				default:
+					throw new SyntaxError("Code should be unreachable.");
+			}
+		} else if(InsightFacade.isSComparison(rootFilterObjKey)) { // SCOMPARISON
+			assert(dataKey in SectionQueryStringKeyList, "Key of inner object of GT should be a valid key");
+			const dataKeyString = dataKey as SectionQueryStringKeys;
+			assert(typeof dataVal === "string", "Key of inner object of GT should be a string");
+			const dataValStr = dataVal as string;
+			return (section: SectionQuery) => {
+				return section[dataKeyString].includes(dataValStr);
+			};
+		}
+		throw new SyntaxError("Code should be unreachable.");
+	}
+
 	private static generateQueryFunction(filter: unknown, unifiedDatasetName: string):
 		(section: SectionQuery) => boolean {
 		assert(typeof filter === "object", "Filter object should be an object");
@@ -163,52 +214,7 @@ export default class InsightFacade implements IInsightFacade {
 		const innerVal: unknown = (filterobj as {[key: string]: unknown})[rootFilterObjKey];
 		// Comparisons
 		if(InsightFacade.isMComparison(rootFilterObjKey) || InsightFacade.isSComparison(rootFilterObjKey)) {
-			assert(typeof innerVal === "object", "Inner object of GT should be an object");
-			const innerObj = innerVal as object;
-			const innerObjKVs = Object.entries(innerObj);
-			assert(innerObjKVs.length === 1, "Inner object of GT should only have one key");
-			const [dataKeyFull, dataVal] = innerObjKVs[0];
-
-			const splitDataKeyFull = dataKeyFull.split("_");
-			assert(
-				splitDataKeyFull.length === 2,
-				"Key of inner object of GT should be in the form of 'key'_'value'" + dataKeyFull
-			);
-			const [dataSetName, dataKey] = splitDataKeyFull;
-			assert(dataSetName === unifiedDatasetName, "Must only query one dataset");
-
-			// MCOMPARISON
-			if(InsightFacade.isMComparison(rootFilterObjKey)) {
-				assert(dataKey in SectionQueryNumericalKeyList, "Key of inner object of GT should be a valid key");
-				const dataKeyNumerical = dataKey as SectionQueryNumericalKeys;
-				assert(typeof dataVal === "number", "Key of inner object of GT should be a string");
-				const dataValNum = dataVal as number;
-
-				switch(rootFilterObjKey) {
-					case "GT":
-						return (section: SectionQuery) => {
-							return section[dataKeyNumerical] > dataValNum;
-						};
-					case "LT":
-						return (section: SectionQuery) => {
-							return section[dataKeyNumerical] < dataValNum;
-						};
-					case "EQ":
-						return (section: SectionQuery) => {
-							return section[dataKeyNumerical] === dataValNum;
-						};
-					default:
-						throw new SyntaxError("Code should be unreachable.");
-				}
-			} else if(InsightFacade.isSComparison(rootFilterObjKey)) { // SCOMPARISON
-				assert(dataKey in SectionQueryStringKeyList, "Key of inner object of GT should be a valid key");
-				const dataKeyString = dataKey as SectionQueryStringKeys;
-				assert(typeof dataVal === "string", "Key of inner object of GT should be a string");
-				const dataValStr = dataVal as string;
-				return (section: SectionQuery) => {
-					return section[dataKeyString].includes(dataValStr);
-				};
-			}
+			return InsightFacade.handle_comparison(innerVal, unifiedDatasetName, rootFilterObjKey);
 		}
 
 		// LOGICCOMPARISON
@@ -259,7 +265,7 @@ export default class InsightFacade implements IInsightFacade {
 	public handleOptions(options: unknown, datasetName: string, unprocessedResults: InsightResult[]): InsightResult[] {
 		this.assertTrue(typeof options === "object", "OPTIONS should be an object",SyntaxError);
 
-		let optionsObj: { [key: string]: object } = options as { [key: string]: object };
+		let optionsObj: {[key: string]: object} = options as {[key: string]: object};
 
 		this.assertTrue(Object.keys(optionsObj).length === 2, "OPTIONS object should only have two keys",SyntaxError);
 
@@ -274,7 +280,7 @@ export default class InsightFacade implements IInsightFacade {
 		this.assertTrue(
 			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((column: any) => typeof column === "string"),
 			"OPTIONS.COLUMNS will be an array of strings only",SyntaxError
-		  );
+		);
 		// TODO : Validate Keys format in COLUMNS Object
 		// TODO : Validate Key in ORDER Object
 		// TODO : Return Data
