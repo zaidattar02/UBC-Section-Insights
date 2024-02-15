@@ -349,18 +349,13 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		const insightDatasets: InsightDataset[] = [];
 		// Iterate through all datasets in the map
 		const ds = await this.getDatasets();
-		ds.forEach((dataset, id) => {
-			// Create an InsightDataset object for each one
-			const insightDataset: InsightDataset = {
-				id: dataset.getID(),
-				kind: dataset.getKind(),
-				numRows: dataset.getSections().length
-			};
-			insightDatasets.push(insightDataset);
-		});
-		return Promise.resolve(insightDatasets);
+		const insightDatasets: InsightDataset[] = Array.from(ds.entries()).map(([id, dataset]): InsightDataset => ({
+			id: dataset.getID(),
+			kind: dataset.getKind(),
+			numRows: dataset.getSections().length
+		}));
+		return insightDatasets;
 	}
 }
