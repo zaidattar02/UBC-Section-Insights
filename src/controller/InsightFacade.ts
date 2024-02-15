@@ -31,7 +31,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	private async loadDatasetsFromDisk(): Promise<Map<string, Dataset>> {
-		fs.ensureDirSync("./data");
+		await fs.ensureDir("./data");
 		const files = await fs.readdir("./data"); // Get a list of dataset files
 
 		const ds = new Map<string, Dataset>();
