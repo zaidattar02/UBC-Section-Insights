@@ -16,31 +16,33 @@ import {assertTrue} from "../service/Assertions";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-	private datasets: Promise<Map<string, Dataset>>;
+	private datasets: Map<string, Dataset>;
+	private datasetsLoaded: Promise<void>;
 	constructor() {
-		try {
-			this.datasets = this.loadDatasetsFromDisk();
-		} catch (e) {
-			console.error("Failed to load datasets from disk:", e);
-			this.datasets = Promise.resolve(new Map<string, Dataset>());
-		}
+		this.datasets = new Map<string, Dataset>();
+		this.datasetsLoaded = new Promise((resolve, reject) => {
+			this.loadDatasetsFromDisk().then((res) => {
+				this.datasets = res;
+			}).catch((e)=>{
+				console.error("Failed to load datasets from disk:", e);
+				this.datasets = new Map<string, Dataset>();
+			}).finally(resolve);
+		});
 	}
 
-	private async getDatasets(): Promise<Map<string, Dataset>> {
-		return this.datasets;
+	private waitForDatasetsLoaded(): Promise<void> {
+		return this.datasetsLoaded;
 	}
 
 	private async loadDatasetsFromDisk(): Promise<Map<string, Dataset>> {
-		fs.ensureDirSync("./data");
+		await fs.ensureDir("./data");
 		const files = await fs.readdir("./data"); // Get a list of dataset files
 
 		const ds = new Map<string, Dataset>();
-		const p = files.map((file) => {
+		const loadPromises = files.map(async (file) => {
 			try {
 				const filePath = `./data/${file}`;
-				const datasetJsonStr = fs.readFileSync(filePath, "utf8");
-				// const dataset = JSON.parse(datasetJsonStr);
-				// ds.set(dataset.id, dataset);
+				const datasetJsonStr = await fs.readFile(filePath, "utf8");
 				const dataset = Dataset.fromObject(JSON.parse(datasetJsonStr));
 				ds.set(dataset.getID(), dataset);
 			} catch (error) {
@@ -48,11 +50,12 @@ export default class InsightFacade implements IInsightFacade {
 				// Skip this file and continue with the rest
 			}
 		});
-		await Promise.all(p);
+		await Promise.all(loadPromises);
 		return ds;
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+		await this.waitForDatasetsLoaded();
 		if (!id || id.trim().length === 0 || id.includes("_")) {
 			throw new InsightError("Invalid ID");
 		}
@@ -60,32 +63,31 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("Invalid Dataset Kind"));
 		}
 
-		const ds = await this.getDatasets();
-		if (ds.has(id)) {
+		if (this.datasets.has(id)) {
 			throw new InsightError("Dataset already exists");
 		}
 		try {
 			const dataset = await DatasetProcessor.ProcessDataset(id, content, kind);
-			ds.set(id, dataset);
+			this.datasets.set(id, dataset);
 
-			return Array.from(ds.keys());
+			return Array.from(this.datasets.keys());
 		} catch (error) {
 			throw new InsightError(`Failed to add dataset: ${error}`);
 		}
 	}
 
 	public async removeDataset(id: string): Promise<string> {
+		await this.waitForDatasetsLoaded();
 		if (!id || /^\s*$/.test(id) || id.includes("_")) {
 			return Promise.reject(new InsightError("Invalid ID"));
 		}
 		//	has method might be wrong too
 		//	maybe loading when writing new instance is wrong.
-		const ds = await this.getDatasets();
-		if (!ds.has(id)) {
+		if (!this.datasets.has(id)) {
 			return Promise.reject(new NotFoundError(`Dataset with id ${id} does not exist`));
 		}
 		try {
-			ds.delete(id);
+			this.datasets.delete(id);
 			const datasetPath = `./data/${id}.json`;
 			await fs.remove(datasetPath);
 			return id;
@@ -251,6 +253,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
+		await this.waitForDatasetsLoaded();
 		// validation that query is top level valid
 		assertTrue(
 			typeof query === "object" && query != null &&
@@ -263,9 +266,8 @@ export default class InsightFacade implements IInsightFacade {
 
 		// load data from disk (hopefully it has already been parsed by addDataset)
 		// this is very cringe but required because of bad design (EBNF)
-		const ds = await this.getDatasets();
 		const datasetName = InsightFacade.inferDataSetName(validQuery.OPTIONS);
-		const potentialDataset = ds.get(datasetName);
+		const potentialDataset = this.datasets.get(datasetName);
 		if (potentialDataset === undefined) {
 			throw new InsightError("Dataset does not exist");
 		}
@@ -350,12 +352,13 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		// Iterate through all datasets in the map
-		const ds = await this.getDatasets();
-		const insightDatasets: InsightDataset[] = Array.from(ds.entries()).map(([id, dataset]): InsightDataset => ({
-			id: dataset.getID(),
-			kind: dataset.getKind(),
-			numRows: dataset.getSections().length
-		}));
+		await this.waitForDatasetsLoaded();
+		const insightDatasets: InsightDataset[] = Array.from(this.datasets.entries())
+			.map(([id, dataset]): InsightDataset => ({
+				id: dataset.getID(),
+				kind: dataset.getKind(),
+				numRows: dataset.getSections().length
+			}));
 		return insightDatasets;
 	}
 }
