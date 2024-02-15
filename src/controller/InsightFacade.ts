@@ -35,10 +35,10 @@ export default class InsightFacade implements IInsightFacade {
 		const files = await fs.readdir("./data"); // Get a list of dataset files
 
 		const ds = new Map<string, Dataset>();
-		const p = files.map((file) => {
+		const p = files.map(async (file) => {
 			try {
 				const filePath = `./data/${file}`;
-				const datasetJsonStr = fs.readFileSync(filePath, "utf8");
+				const datasetJsonStr = await fs.readFile(filePath, "utf8");
 				// const dataset = JSON.parse(datasetJsonStr);
 				// ds.set(dataset.id, dataset);
 				const dataset = Dataset.fromObject(JSON.parse(datasetJsonStr));
