@@ -6,8 +6,12 @@ export function assertFalse(condition: boolean, msg: string, ErrorType: new (mes
 	throwErrorOnAssertion(false, condition, msg, ErrorType);
 }
 
-export function throwErrorOnAssertion(assertion: boolean, condition: boolean, msg: string,
-	ErrorType: new (message?: string) => Error) {
+export function throwErrorOnAssertion(
+	assertion: boolean,
+	condition: boolean,
+	msg: string,
+	ErrorType: new (message?: string) => Error
+) {
 	if (assertion !== condition) {
 		const error = new ErrorType(msg);
 		error.message = msg;

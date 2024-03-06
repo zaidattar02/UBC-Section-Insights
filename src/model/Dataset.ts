@@ -1,24 +1,45 @@
-
 // import {CourseSection} from "./CourseSection";
 
 import {InsightDatasetKind} from "../controller/IInsightFacade";
 import {CourseSection} from "./CourseSection";
-
+import {Room} from "./Room";
 
 export class Dataset {
 	private id: string;
 	private kind: InsightDatasetKind;
-	private sections: CourseSection[];
+	private entries: Array<CourseSection | Room>;
 
 	constructor(id: string, kind: InsightDatasetKind) {
 		this.id = id;
 		this.kind = kind;
-		this.sections = [];
+		this.entries = [];
 	}
+
+	// To handle the rooms as well
+	// public static fromObject(obj: any): Dataset {
+	// 	const dataset = new Dataset(obj.id, obj.kind);
+	// 	obj.entries.forEach((entryObj: any) => {
+	// 		let entries: IDatasetEntry;
+	// 		if (obj.kind === InsightDatasetKind.Rooms) {
+	// 			entries = new Room(
+	// 				entryObj.fullname,
+	// 				entryObj.shortname,
+	// 				// ...
+	// 			);
+	// 		} else {
+	// 			entries = new CourseSection(
+	// 				entryObj.uuid,
+	// 				// ...
+	// 			);
+	// 		}
+	// 		dataset.addEntry(entries);
+	// 	});
+	// 	return dataset;
+	// }
 
 	public static fromObject(obj: any): Dataset {
 		const dataset = new Dataset(obj.id, obj.kind);
-		obj.sections.forEach((sectionObj: any) => {
+		obj.entries.forEach((sectionObj: any) => {
 			const section = new CourseSection(
 				sectionObj.uuid,
 				sectionObj.id,
@@ -44,12 +65,19 @@ export class Dataset {
 		return this.id;
 	}
 
-	public addSection(section: CourseSection) {
-		this.sections.push(section);
+	public isRoom(): this is Room{
+		return this.kind === InsightDatasetKind.Rooms;
 	}
 
-	public getSections(): CourseSection[] {
-		return this.sections;
+	public isSection(): this is CourseSection{
+		return this.kind === InsightDatasetKind.Sections;
+	}
+
+	public addSection(section: CourseSection | Room) {
+		this.entries.push(section);
+	}
+
+	public getSections(): Array<CourseSection | Room> {
+		return this.entries;
 	}
 }
-

@@ -89,7 +89,7 @@ describe("InsightFacade", function () {
 
 			validQueries.forEach(function (test) {
 				it(`${test.title}`, function () {
-					if(test.errorExpected) {
+					if (test.errorExpected) {
 						return expect(facade.performQuery(test.input)).to.be.rejectedWith(test.expected);
 					} else {
 						return expect(facade.performQuery(test.input)).to.eventually.deep.equal(test.expected);
@@ -136,10 +136,10 @@ describe("InsightFacade", function () {
 	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
 
-	describe("loading from disk", function(){
-		it("should load from disk after creating new instance", async function(){
+	describe("loading from disk", function () {
+		it("should load from disk after creating new instance", async function () {
 			const facade = new InsightFacade();
-			await facade.addDataset(validId,validContent,validKind);
+			await facade.addDataset(validId, validContent, validKind);
 			const newFacade = new InsightFacade();
 			const datasets = await newFacade.listDatasets();
 			return expect(datasets).to.have.lengthOf(1);
@@ -189,8 +189,9 @@ describe("InsightFacade", function () {
 			it("should fail when a dataset with the same ID has already been added", async function () {
 				const insightFacade = new InsightFacade();
 				await insightFacade.addDataset(validId, validContent, validKind);
-				const ASSERT_1 = expect(insightFacade.addDataset(validId, validContent, validKind))
-					.to.be.rejectedWith(InsightError);
+				const ASSERT_1 = expect(insightFacade.addDataset(validId, validContent, validKind)).to.be.rejectedWith(
+					InsightError
+				);
 				return await ASSERT_1;
 			});
 		});
