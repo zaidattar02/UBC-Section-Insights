@@ -681,38 +681,32 @@ describe("InsightFacade", function () {
 
 describe("InsightFacade Whitebox", function () {
 	describe("handleOptions", function () {
-		let facade: InsightFacade;
-		beforeEach(function () {
-			// This section resets the insightFacade instance
-			// This runs before each test
-			facade = new InsightFacade();
-		});
 		it("should throw a InsightError when OPTIONS is not an object", () => {
-			expect(() => facade.handleOptions("not an object", "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions("not an object", "courses", [])).to.throw(InsightError);
 		});
 		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
 			const options = {key1: "value1", key2: "value2", key3: "value3"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions(options, "courses", [])).to.throw(InsightError);
 		});
 
 		it("should throw a InsightError when OPTIONS Query is invalid", () => {
 			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions(options, "courses", [])).to.throw(InsightError);
 		});
 
 		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
 			const options: any = {COLUMNS: [], ORDER: 42};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions(options, "courses", [])).to.throw(InsightError);
 		});
 
 		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
 			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions(options, "courses", [])).to.throw(InsightError);
 		});
 
 		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
 			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+			expect(() => InsightFacade.handleOptions(options, "courses", [])).to.throw(InsightError);
 		});
 
 		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset

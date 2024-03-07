@@ -1,5 +1,3 @@
-import {IDatasetEntry} from "./IDatasetEntry";
-
 export class Room{
 	private fullname: string;
 	private shortname: string;
@@ -67,3 +65,13 @@ export class Room{
 		return value;
 	}
 }
+
+export type RoomNumericalKeys = "lat" | "lon" | "seats";
+export const RoomNumericalKeyList: string[] = ["lat", "lon", "seats"];
+
+export type RoomStringKeys = "fullname" | "shortname" | "number" | "name" | "address" | "type" | "furniture" | "href";
+export const RoomStringKeyList: string[] = ["fullname", "shortname", "number", "name",
+	"address", "type", "furniture", "href"];
+
+export type RoomKey = keyof Room;
+export type RoomKeyList = RoomNumericalKeys | RoomStringKeys;

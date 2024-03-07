@@ -4,10 +4,24 @@ import {InsightDatasetKind} from "../controller/IInsightFacade";
 import {CourseSection} from "./CourseSection";
 import {Room} from "./Room";
 
+export type IDatasetEntry = CourseSection | Room;
+
+interface CourseSectionDataSet {
+	id: string;
+	kind: InsightDatasetKind.Sections;
+	entries: CourseSection[];
+}
+
+interface RoomDataSet {
+	id: string;
+	kind: InsightDatasetKind.Rooms;
+	entries: Room[];
+}
+
 export class Dataset {
 	private id: string;
 	private kind: InsightDatasetKind;
-	private entries: Array<CourseSection | Room>;
+	private entries: IDatasetEntry[];
 
 	constructor(id: string, kind: InsightDatasetKind) {
 		this.id = id;
@@ -65,19 +79,19 @@ export class Dataset {
 		return this.id;
 	}
 
-	public isRoom(): this is Room{
+	public isRoom(): this is RoomDataSet {
 		return this.kind === InsightDatasetKind.Rooms;
 	}
 
-	public isSection(): this is CourseSection{
+	public isSection(): this is CourseSectionDataSet {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addSection(section: CourseSection | Room) {
+	public addSection(section: IDatasetEntry) {
 		this.entries.push(section);
 	}
 
-	public getSections(): Array<CourseSection | Room> {
+	public getSections(): IDatasetEntry[] {
 		return this.entries;
 	}
 }

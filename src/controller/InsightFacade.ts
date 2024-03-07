@@ -7,19 +7,16 @@ import {
 	NotFoundError,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import {Dataset} from "../model/Dataset";
+import {Dataset, IDatasetEntry} from "../model/Dataset";
 import {DatasetProcessor} from "../service/DatasetProcessor";
 import fs from "fs-extra";
 import {
 	CourseSection,
-	CourseSectionNumericalKeyList,
-	CourseSectionNumericalKeys,
-	CourseSectionStringKeyList,
-	CourseSectionStringKeys,
 	CourseSelectionKey,
 	CourseSelectionKeyList,
 } from "../model/CourseSection";
 import {assertTrue} from "../service/Assertions";
+import {generateQueryFilterFunction} from "../service/GenerateQueryFilter";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -111,162 +108,6 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	private static isLogicalComparison(key: string): boolean {
-		return key === "AND" || key === "OR";
-	}
-
-	private static isMComparison(key: string): boolean {
-		return key === "GT" || key === "LT" || key === "EQ";
-	}
-
-	private static isSComparison(key: string): boolean {
-		return key === "IS";
-	}
-
-	private static handle_m_comparison(dataKey: string, dataVal: unknown, rootFilterObjKey: string) {
-		assertTrue(
-			CourseSectionNumericalKeyList.includes(dataKey),
-			`Key of inner object of Comparison should be a valid key, is of key "${dataKey}"`,
-			InsightError
-		);
-		const dataKeyNumerical = dataKey as CourseSectionNumericalKeys;
-		assertTrue(typeof dataVal === "number", "Key of inner object of Comparison should be a string", InsightError);
-		const dataValNum = dataVal as number;
-
-		switch (rootFilterObjKey) {
-			case "GT":
-				return (section: CourseSection) => section[dataKeyNumerical] > dataValNum;
-			case "LT":
-				return (section: CourseSection) => section[dataKeyNumerical] < dataValNum;
-			case "EQ":
-				return (section: CourseSection) => section[dataKeyNumerical] === dataValNum;
-			default:
-				throw new SyntaxError("Code should be unreachable: Invalid MComparison Key");
-		}
-	}
-
-	private static handle_s_comparison(dataKey: string, dataVal: unknown, rootFilterObjKey: string) {
-		assertTrue(
-			CourseSectionStringKeyList.includes(dataKey),
-			"Key of inner object of Comparison should be a valid key",
-			InsightError
-		);
-		const dataKeyString = dataKey as CourseSectionStringKeys;
-		assertTrue(typeof dataVal === "string", "Key of inner object of Comparison should be a string", InsightError);
-		const dataValStr = dataVal as string;
-
-		const isFrontWildcard = dataValStr.startsWith("*"),
-			isEndWildcard = dataValStr.endsWith("*");
-		let dataValStrNoWildcards: string;
-		if (isFrontWildcard && isEndWildcard) {
-			dataValStrNoWildcards = dataValStr.slice(1, -1);
-		} else if (isFrontWildcard) {
-			dataValStrNoWildcards = dataValStr.slice(1);
-		} else if (isEndWildcard) {
-			dataValStrNoWildcards = dataValStr.slice(0, -1);
-		} else {
-			dataValStrNoWildcards = dataValStr;
-		}
-
-		assertTrue(dataValStrNoWildcards.includes("*") === false, "Invalid wildcard placement", InsightError);
-
-		if (isFrontWildcard && isEndWildcard) {
-			return (section: CourseSection) => section[dataKeyString].includes(dataValStrNoWildcards);
-		} else if (isFrontWildcard) {
-			return (section: CourseSection) => section[dataKeyString].endsWith(dataValStrNoWildcards);
-		} else if (isEndWildcard) {
-			return (section: CourseSection) => section[dataKeyString].startsWith(dataValStrNoWildcards);
-		} else {
-			return (section: CourseSection) => section[dataKeyString] === dataValStr;
-		}
-	}
-
-	private static handle_comparison(
-		innerVal: unknown,
-		unifiedDatasetName: string,
-		rootFilterObjKey: string
-	): (section: CourseSection) => boolean {
-		assertTrue(typeof innerVal === "object", "Inner object of Comparison should be an object", InsightError);
-		const innerObj = innerVal as object;
-		const innerObjKVs = Object.entries(innerObj);
-		assertTrue(innerObjKVs.length === 1, "Inner object of Comparison should only have one key", InsightError);
-		const [dataKeyFull, dataVal] = innerObjKVs[0];
-
-		const splitDataKeyFull = dataKeyFull.split("_");
-		assertTrue(
-			splitDataKeyFull.length === 2,
-			"Key of inner object of Comparison should be in the form of 'key'_'value'" + dataKeyFull,
-			InsightError
-		);
-		const [dataSetName, dataKey] = splitDataKeyFull;
-		assertTrue(dataSetName === unifiedDatasetName, "Must only query one dataset", InsightError);
-
-		// MCOMPARISON
-		if (InsightFacade.isMComparison(rootFilterObjKey)) {
-			return InsightFacade.handle_m_comparison(dataKey, dataVal, rootFilterObjKey);
-		} else if (InsightFacade.isSComparison(rootFilterObjKey)) {
-			// SCOMPARISON
-			return InsightFacade.handle_s_comparison(dataKey, dataVal, rootFilterObjKey);
-		}
-		throw new SyntaxError(`Code should be unreachable: Invalid Comparison Key, ${rootFilterObjKey}`);
-	}
-
-	private static generateQueryFilterFunction(
-		filter: unknown,
-		unifiedDatasetName: string
-	): (section: CourseSection) => boolean {
-		assertTrue(typeof filter === "object", "Filter object should be an object", InsightError);
-		const filterobj: object = filter as object;
-
-		if (Object.keys(filterobj).length === 0) {
-			return () => true;
-		}
-
-		assertTrue(Object.keys(filterobj).length === 1, "Filter object should only have at most one key", InsightError); // throw an error later
-		const rootFilterObjKey = Object.keys(filterobj)[0];
-
-		const innerVal: unknown = (filterobj as {[key: string]: unknown})[rootFilterObjKey];
-		// Comparisons
-		if (InsightFacade.isMComparison(rootFilterObjKey) || InsightFacade.isSComparison(rootFilterObjKey)) {
-			return InsightFacade.handle_comparison(innerVal, unifiedDatasetName, rootFilterObjKey);
-		}
-
-		// LOGICCOMPARISON
-		if (InsightFacade.isLogicalComparison(rootFilterObjKey)) {
-			assertTrue(
-				typeof innerVal === "object" && Array.isArray(innerVal),
-				"Inner object of AND should be an array",
-				InsightError
-			);
-			const innerArray = innerVal as unknown[];
-			const innerArrayFuncs = innerArray.map((filterElement) =>
-				InsightFacade.generateQueryFilterFunction(filterElement, unifiedDatasetName)
-			);
-			switch (rootFilterObjKey) {
-				case "AND":
-					return (section: CourseSection) => {
-						return innerArrayFuncs.every((f) => f(section));
-					};
-				case "OR":
-					return (section: CourseSection) => {
-						return innerArrayFuncs.some((f) => f(section));
-					};
-				default:
-					throw new SyntaxError("Code should be unreachable: Invalid Logical Comparison Key");
-			}
-		}
-
-		// negation
-		if (rootFilterObjKey === "NOT") {
-			const f = InsightFacade.generateQueryFilterFunction(innerVal, unifiedDatasetName);
-			return (section: CourseSection) => {
-				return !f(section);
-			};
-		}
-
-		throw new InsightError("Invalid Query Command");
-	}
-
 	private static inferDataSetName(options: unknown): string {
 		assertTrue(
 			typeof options === "object" && options != null && Object.prototype.hasOwnProperty.call(options, "COLUMNS"),
@@ -316,13 +157,12 @@ export default class InsightFacade implements IInsightFacade {
 		if (potentialDataset === undefined) {
 			throw new InsightError("Dataset does not exist");
 		}
-		const allSections: CourseSection[] = potentialDataset.getSections();
 
 		// Handle WHERE Clause
-		const queryFilterFunc = InsightFacade.generateQueryFilterFunction(validQuery.WHERE, datasetName);
-		const filteredSections = allSections.filter(queryFilterFunc);
+		const queryFilterFunc = generateQueryFilterFunction(validQuery.WHERE, potentialDataset.getKind(), datasetName);
+		const filteredSections = potentialDataset.getSections().filter(queryFilterFunc);
 		// Handle OPTIONS Clause
-		const filteredWithOptions = this.handleOptions(validQuery.OPTIONS, datasetName, filteredSections);
+		const filteredWithOptions = InsightFacade.handleOptions(validQuery.OPTIONS, datasetName, filteredSections);
 
 		// force end checks
 		if (filteredSections.length > 5000) {
@@ -337,11 +177,8 @@ export default class InsightFacade implements IInsightFacade {
 		return out;
 	}
 
-	public handleOptions(
-		options: unknown,
-		datasetName: string,
-		rawCourseSections: CourseSection[]
-	): Array<Partial<CourseSection>> {
+	public static handleOptions(options: unknown, datasetName: string, rawCourseSections: IDatasetEntry[]):
+		Array<Partial<IDatasetEntry>> {
 		assertTrue(
 			typeof options === "object" &&
 				options != null &&
@@ -359,8 +196,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 		assertTrue(
 			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
-			"OPTIONS.COLUMNS should be an array of strings",
-			InsightError
+			"OPTIONS.COLUMNS should be an array of strings", InsightError
 		);
 		const optionsObjInternalValidated = optionsObj as {COLUMNS: string[]; ORDER?: string};
 
@@ -369,17 +205,14 @@ export default class InsightFacade implements IInsightFacade {
 			const colParts = col.split("_");
 			assertTrue(
 				colParts.length === 2 && colParts[0] === datasetName && CourseSelectionKeyList.includes(colParts[1]),
-				`Invalid Key in COLUMNS, "${col}"`,
-				InsightError
+				`Invalid Key in COLUMNS, "${col}"`, InsightError
 			);
 			return colParts[1] as CourseSelectionKey;
 		});
 
 		let out: Array<Partial<CourseSection>> = rawCourseSections.map((s) => {
 			const obj: Partial<CourseSection> = {};
-			selectColumns.forEach((c) => {
-				obj[c] = s[c];
-			});
+			selectColumns.forEach((c) => obj[c] = s[c]);
 			return obj;
 		});
 
@@ -387,23 +220,14 @@ export default class InsightFacade implements IInsightFacade {
 		if (optionsObjInternalValidated.ORDER !== undefined) {
 			const splitOrderField = optionsObjInternalValidated.ORDER.split("_");
 			assertTrue(
-				splitOrderField.length === 2 &&
-					splitOrderField[0] === datasetName &&
+				splitOrderField.length === 2 && splitOrderField[0] === datasetName &&
 					CourseSelectionKeyList.includes(splitOrderField[1]),
 				"Invalid Key in ORDER",
 				InsightError
 			);
 			const orderField = splitOrderField[1] as CourseSelectionKey;
 			assertTrue(selectColumns.includes(orderField), "ORDER key must be in COLUMNS", InsightError);
-			out = out.sort((a, b) => {
-				if (a[orderField] < b[orderField]) {
-					return -1;
-				}
-				if (a[orderField] > b[orderField]) {
-					return 1;
-				}
-				return 0;
-			});
+			out = out.sort((a, b) => a[orderField] < b[orderField] ? -1 : a[orderField] > b[orderField] ? 1 : 0);
 		}
 
 		return out;
