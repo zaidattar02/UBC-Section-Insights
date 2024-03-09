@@ -30,7 +30,7 @@ export abstract class DatasetProcessor {
 				filePromises.push(filePromise);
 			});
 			await Promise.all(filePromises);
-			if (dataset.getSections().length === 0) {
+			if (dataset.getEntries().length === 0) {
 				throw new InsightError("No valid sections found in the dataset");
 			}
 			//	convert JS object into JSON object, and save that representation to disk
@@ -71,7 +71,7 @@ export abstract class DatasetProcessor {
 						sectionData.Audit,
 						sectionData.Year
 					);
-					dataset.addSection(section);
+					dataset.addEntries(section);
 				} catch (e) {
 					console.error(`Invalid section data in file: ${e}`);
 				}

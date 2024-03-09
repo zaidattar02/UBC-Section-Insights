@@ -74,4 +74,4 @@ export const RoomStringKeyList: string[] = ["fullname", "shortname", "number", "
 	"address", "type", "furniture", "href"];
 
 export type RoomKey = keyof Room;
-export type RoomKeyList = RoomNumericalKeys | RoomStringKeys;
+export const RoomKeyList = [...RoomNumericalKeyList, ...RoomStringKeyList];

@@ -5,18 +5,24 @@ import {
 	InsightError,
 	InsightResult,
 	NotFoundError,
-	ResultTooLargeError,
 } from "./IInsightFacade";
 import {Dataset, IDatasetEntry} from "../model/Dataset";
 import {DatasetProcessor} from "../service/DatasetProcessor";
 import fs from "fs-extra";
 import {
 	CourseSection,
-	CourseSelectionKey,
 	CourseSelectionKeyList,
 } from "../model/CourseSection";
 import {assertTrue} from "../service/Assertions";
-import {generateQueryFilterFunction} from "../service/GenerateQueryFilter";
+import {RoomKeyList} from "../model/Room";
+import {createHash} from "crypto";
+import {QueryDataset} from "../model/QueryDataset";
+
+
+interface TransformationDataset {
+	underlyingData: Array<Partial<IDatasetEntry>>;
+	appliedData?: Array<{[k: string]: string}>;
+}
 
 /**
  * This is the main programmatic entry point for the project.
@@ -141,96 +147,27 @@ export default class InsightFacade implements IInsightFacade {
 		// validation that query is top level valid
 		assertTrue(
 			typeof query === "object" &&
-				query != null &&
-				Object.keys(query as object).length === 2 &&
+			query != null &&
+			((Object.keys(query as object).length === 2 &&
 				Object.prototype.hasOwnProperty.call(query, "WHERE") &&
-				Object.prototype.hasOwnProperty.call(query, "OPTIONS"),
-			'Query should be an object with only have two keys, "WHERE" and "OPTIONS"',
+				Object.prototype.hasOwnProperty.call(query, "OPTIONS")) ||
+				(Object.keys(query as object).length === 3 &&
+					Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+					Object.prototype.hasOwnProperty.call(query, "OPTIONS") &&
+					Object.prototype.hasOwnProperty.call(query, "TRANSFORMATIONS"))),
+			'Query should be an object with keys "WHERE" and "OPTIONS" (and potentially "TRANSFORMATIONS")',
 			InsightError
 		);
-		const validQuery = query as {WHERE: unknown; OPTIONS: unknown};
+		const validQuery = query as {WHERE: unknown; OPTIONS: unknown, TRANSFORMATIONS?: unknown};
 
 		// load data from disk (hopefully it has already been parsed by addDataset)
 		// this is very cringe but required because of bad design (EBNF)
-		const datasetName = InsightFacade.inferDataSetName(validQuery.OPTIONS);
-		const potentialDataset = this.datasets.get(datasetName);
-		if (potentialDataset === undefined) {
-			throw new InsightError("Dataset does not exist");
+		const dataset = new QueryDataset(this.datasets.get(InsightFacade.inferDataSetName(validQuery.OPTIONS)));
+		dataset.queryWhere(validQuery.WHERE);
+		if(validQuery.TRANSFORMATIONS !== undefined) {
+			dataset.queryTransformations(validQuery.TRANSFORMATIONS);
 		}
-
-		// Handle WHERE Clause
-		const queryFilterFunc = generateQueryFilterFunction(validQuery.WHERE, potentialDataset.getKind(), datasetName);
-		const filteredSections = potentialDataset.getSections().filter(queryFilterFunc);
-		// Handle OPTIONS Clause
-		const filteredWithOptions = InsightFacade.handleOptions(validQuery.OPTIONS, datasetName, filteredSections);
-
-		// force end checks
-		if (filteredSections.length > 5000) {
-			throw new ResultTooLargeError("Query returned more than 5000 results");
-		}
-
-		// convert to InsightResult
-		const out: InsightResult[] = filteredWithOptions.map((section) =>
-			Object.entries(section).reduce((acc, [key, value]) => ({...acc, [`${datasetName}_${key}`]: value}), {})
-		);
-		// return final result
-		return out;
-	}
-
-	public static handleOptions(options: unknown, datasetName: string, rawCourseSections: IDatasetEntry[]):
-		Array<Partial<IDatasetEntry>> {
-		assertTrue(
-			typeof options === "object" &&
-				options != null &&
-				((Object.keys(options).length === 1 && Object.prototype.hasOwnProperty.call(options, "COLUMNS")) ||
-					(Object.keys(options).length === 2 &&
-						Object.prototype.hasOwnProperty.call(options, "COLUMNS") &&
-						Object.prototype.hasOwnProperty.call(options, "ORDER"))),
-			"OPTIONS should be an object with two keys, COLUMNS and ORDER",
-			InsightError
-		);
-		const optionsObj = options as {COLUMNS: unknown; ORDER?: unknown};
-
-		if (optionsObj.ORDER !== undefined) {
-			assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string", InsightError);
-		}
-		assertTrue(
-			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
-			"OPTIONS.COLUMNS should be an array of strings", InsightError
-		);
-		const optionsObjInternalValidated = optionsObj as {COLUMNS: string[]; ORDER?: string};
-
-		// Select the columns
-		const selectColumns = optionsObjInternalValidated.COLUMNS.map((col) => {
-			const colParts = col.split("_");
-			assertTrue(
-				colParts.length === 2 && colParts[0] === datasetName && CourseSelectionKeyList.includes(colParts[1]),
-				`Invalid Key in COLUMNS, "${col}"`, InsightError
-			);
-			return colParts[1] as CourseSelectionKey;
-		});
-
-		let out: Array<Partial<CourseSection>> = rawCourseSections.map((s) => {
-			const obj: Partial<CourseSection> = {};
-			selectColumns.forEach((c) => obj[c] = s[c]);
-			return obj;
-		});
-
-		// Sort the results based on ORDER
-		if (optionsObjInternalValidated.ORDER !== undefined) {
-			const splitOrderField = optionsObjInternalValidated.ORDER.split("_");
-			assertTrue(
-				splitOrderField.length === 2 && splitOrderField[0] === datasetName &&
-					CourseSelectionKeyList.includes(splitOrderField[1]),
-				"Invalid Key in ORDER",
-				InsightError
-			);
-			const orderField = splitOrderField[1] as CourseSelectionKey;
-			assertTrue(selectColumns.includes(orderField), "ORDER key must be in COLUMNS", InsightError);
-			out = out.sort((a, b) => a[orderField] < b[orderField] ? -1 : a[orderField] > b[orderField] ? 1 : 0);
-		}
-
-		return out;
+		return dataset.exportWithOptions(validQuery.OPTIONS);
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
@@ -240,7 +177,7 @@ export default class InsightFacade implements IInsightFacade {
 			([id, dataset]): InsightDataset => ({
 				id: dataset.getID(),
 				kind: dataset.getKind(),
-				numRows: dataset.getSections().length,
+				numRows: dataset.getEntries().length,
 			})
 		);
 		return insightDatasets;

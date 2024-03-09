@@ -1,10 +1,7 @@
-// import {CourseSection} from "./CourseSection";
-
-import {InsightDatasetKind} from "../controller/IInsightFacade";
+import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
+import {assertTrue} from "../service/Assertions";
 import {CourseSection} from "./CourseSection";
 import {Room} from "./Room";
-
-export type IDatasetEntry = CourseSection | Room;
 
 interface CourseSectionDataSet {
 	id: string;
@@ -18,9 +15,11 @@ interface RoomDataSet {
 	entries: Room[];
 }
 
+export type IDatasetEntry = CourseSection | Room;
+
 export class Dataset {
-	private id: string;
-	private kind: InsightDatasetKind;
+	protected id: string;
+	protected kind: InsightDatasetKind;
 	private entries: IDatasetEntry[];
 
 	constructor(id: string, kind: InsightDatasetKind) {
@@ -29,45 +28,37 @@ export class Dataset {
 		this.entries = [];
 	}
 
-	// To handle the rooms as well
-	// public static fromObject(obj: any): Dataset {
-	// 	const dataset = new Dataset(obj.id, obj.kind);
-	// 	obj.entries.forEach((entryObj: any) => {
-	// 		let entries: IDatasetEntry;
-	// 		if (obj.kind === InsightDatasetKind.Rooms) {
-	// 			entries = new Room(
-	// 				entryObj.fullname,
-	// 				entryObj.shortname,
-	// 				// ...
-	// 			);
-	// 		} else {
-	// 			entries = new CourseSection(
-	// 				entryObj.uuid,
-	// 				// ...
-	// 			);
-	// 		}
-	// 		dataset.addEntry(entries);
-	// 	});
-	// 	return dataset;
-	// }
+	public static fromObject(raw_obj: unknown): Dataset {
+		assertTrue(typeof raw_obj === "object" && raw_obj !== null, "Invalid object", InsightError);
+		const obj = raw_obj as any;
+		assertTrue(typeof obj.id === "string", "Invalid id", InsightError);
+		assertTrue(typeof obj.kind === "string" && Object.values(InsightDatasetKind).includes(obj.kind),
+			"Invalid kind", InsightError);
+		assertTrue(Array.isArray(obj.entries), "Invalid entries", InsightError);
+		const validatedObject = obj as {id: string, kind: InsightDatasetKind, entries: unknown[]};
 
-	public static fromObject(obj: any): Dataset {
-		const dataset = new Dataset(obj.id, obj.kind);
-		obj.entries.forEach((sectionObj: any) => {
-			const section = new CourseSection(
-				sectionObj.uuid,
-				sectionObj.id,
-				sectionObj.title,
-				sectionObj.instructor,
-				sectionObj.dept,
-				sectionObj.avg,
-				sectionObj.pass,
-				sectionObj.fail,
-				sectionObj.audit,
-				sectionObj.year
-			);
-			dataset.addSection(section);
-		});
+		const dataset = new Dataset(validatedObject.id, validatedObject.kind);
+		if (validatedObject.kind === InsightDatasetKind.Rooms) {
+			throw new Error("Not implemented");
+		} else if (validatedObject.kind === InsightDatasetKind.Sections) {
+			validatedObject.entries.forEach((sectionObj: any) => {
+				const section = new CourseSection(
+					sectionObj.uuid,
+					sectionObj.id,
+					sectionObj.title,
+					sectionObj.instructor,
+					sectionObj.dept,
+					sectionObj.avg,
+					sectionObj.pass,
+					sectionObj.fail,
+					sectionObj.audit,
+					sectionObj.year
+				);
+				dataset.addEntries(section);
+			});
+		} else {
+			throw new Error("Invalid kind");
+		}
 		return dataset;
 	}
 
@@ -87,11 +78,11 @@ export class Dataset {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addSection(section: IDatasetEntry) {
+	public addEntries(section: IDatasetEntry) {
 		this.entries.push(section);
 	}
 
-	public getSections(): IDatasetEntry[] {
+	public getEntries(): IDatasetEntry[] {
 		return this.entries;
 	}
 }
