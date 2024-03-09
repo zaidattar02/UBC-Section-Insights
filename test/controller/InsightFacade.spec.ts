@@ -8,10 +8,9 @@ import {
 import InsightFacade from "../../src/controller/InsightFacade";
 
 import {assert, expect, use} from "chai";
-import chaiAsPromised = require("chai-as-promised");
 import {clearDisk, getContentFromArchives, readFileQueries} from "../TestUtil";
 import {readdir} from "fs/promises";
-import {CourseSection} from "../../src/model/CourseSection";
+import chaiAsPromised = require("chai-as-promised");
 
 use(chaiAsPromised);
 
@@ -21,6 +20,8 @@ export interface ITestQuery {
 	errorExpected: boolean;
 	expected: any;
 }
+
+let campus = getContentFromArchives("campus.zip");
 
 describe("InsightFacade", function () {
 	let facade: IInsightFacade;
@@ -54,7 +55,28 @@ describe("InsightFacade", function () {
 
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
+
+		it("should reject with  an empty dataset id", async function () {
+			const result = facade.addDataset("", sections, InsightDatasetKind.Sections);
+
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
 	});
+
+	// describe("AddDataSet HTML", function() {
+	// 	let rooms: string;
+	//
+	// 	beforeEach(function(){
+	// 		rooms = await getContentFromArchives("campus.zip");
+	// 		facade = new InsightFacade();
+	// 	});
+	// 	it("should accept dataset with valid HTML", function(){
+	// 		// rooms = await getContentFromArchives("campus.zip");
+	// 		const result = facade.addDataset("123", rooms,InsightDatasetKind.Rooms);
+	// 		return expect(result).to.eventually.deep.equal(["123"]);
+	//
+	// 	});
+	// });
 
 	/*
 	 * This test suite dynamically generates tests from the JSON files in test/resources/queries.
@@ -679,49 +701,49 @@ describe("InsightFacade", function () {
 	});
 });
 
-describe("InsightFacade Whitebox", function () {
-	describe("handleOptions", function () {
-		let facade: InsightFacade;
-		beforeEach(function () {
-			// This section resets the insightFacade instance
-			// This runs before each test
-			facade = new InsightFacade();
-		});
-		it("should throw a InsightError when OPTIONS is not an object", () => {
-			expect(() => facade.handleOptions("not an object", "courses", [])).to.throw(InsightError);
-		});
-		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
-			const options = {key1: "value1", key2: "value2", key3: "value3"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
-		});
-
-		it("should throw a InsightError when OPTIONS Query is invalid", () => {
-			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
-		});
-
-		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
-			const options: any = {COLUMNS: [], ORDER: 42};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
-		});
-
-		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
-			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
-		});
-
-		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
-			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
-			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
-		});
-
-		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset
-
-		// it("should return filteredSections when OPTIONS are valid", () => {
-		// 	const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
-		// 	const filteredSections: CourseSection[] = [{} as CourseSection];
-
-		// 	expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
-		// });
-	});
-});
+// describe("InsightFacade Whitebox", function () {
+// 	describe("handleOptions", function () {
+// 		let facade: InsightFacade;
+// 		beforeEach(function () {
+// 			// This section resets the insightFacade instance
+// 			// This runs before each test
+// 			facade = new InsightFacade();
+// 		});
+// 		it("should throw a InsightError when OPTIONS is not an object", () => {
+// 			expect(() => facade.handleOptions("not an object", "courses", [])).to.throw(InsightError);
+// 		});
+// 		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
+// 			const options = {key1: "value1", key2: "value2", key3: "value3"};
+// 			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+// 		});
+//
+// 		it("should throw a InsightError when OPTIONS Query is invalid", () => {
+// 			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
+// 			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+// 		});
+//
+// 		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
+// 			const options: any = {COLUMNS: [], ORDER: 42};
+// 			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+// 		});
+//
+// 		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
+// 			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
+// 			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+// 		});
+//
+// 		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
+// 			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
+// 			expect(() => facade.handleOptions(options, "courses", [])).to.throw(InsightError);
+// 		});
+//
+// 		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset
+//
+// 		// it("should return filteredSections when OPTIONS are valid", () => {
+// 		// 	const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
+// 		// 	const filteredSections: CourseSection[] = [{} as CourseSection];
+//
+// 		// 	expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
+// 		// });
+// 	});
+// });

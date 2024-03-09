@@ -15,47 +15,65 @@ export class Dataset {
 		this.entries = [];
 	}
 
-	// To handle the rooms as well
+	public static fromObject(obj: any): Dataset {
+		const dataset = new Dataset(obj.id, obj.kind);
+		if (obj.kind === InsightDatasetKind.Sections) {
+			obj.entries.forEach((entryObj: any) => {
+				const entry = new CourseSection(
+					entryObj.uuid,
+					entryObj.id,
+					entryObj.title,
+					entryObj.instructor,
+					entryObj.dept,
+					entryObj.avg,
+					entryObj.pass,
+					entryObj.fail,
+					entryObj.audit,
+					entryObj.year
+				);
+				dataset.addEntry(entry);
+			});
+		} else if (obj.kind === InsightDatasetKind.Rooms) {
+			obj.entries.forEach((entryObj: any) => {
+				const entry = new Room(
+					entryObj.fullname,
+					entryObj.shortname,
+					entryObj.number,
+					entryObj.name,
+					entryObj.address,
+					entryObj.lat,
+					entryObj.lon,
+					entryObj.seats,
+					entryObj.type,
+					entryObj.furniture,
+					entryObj.href
+				);
+				dataset.addEntry(entry);
+			});
+		}
+		return dataset;
+	}
+
+
 	// public static fromObject(obj: any): Dataset {
 	// 	const dataset = new Dataset(obj.id, obj.kind);
-	// 	obj.entries.forEach((entryObj: any) => {
-	// 		let entries: IDatasetEntry;
-	// 		if (obj.kind === InsightDatasetKind.Rooms) {
-	// 			entries = new Room(
-	// 				entryObj.fullname,
-	// 				entryObj.shortname,
-	// 				// ...
-	// 			);
-	// 		} else {
-	// 			entries = new CourseSection(
-	// 				entryObj.uuid,
-	// 				// ...
-	// 			);
-	// 		}
-	// 		dataset.addEntry(entries);
+	// 	obj.entries.forEach((sectionObj: any) => {
+	// 		const section = new CourseSection(
+	// 			sectionObj.uuid,
+	// 			sectionObj.id,
+	// 			sectionObj.title,
+	// 			sectionObj.instructor,
+	// 			sectionObj.dept,
+	// 			sectionObj.avg,
+	// 			sectionObj.pass,
+	// 			sectionObj.fail,
+	// 			sectionObj.audit,
+	// 			sectionObj.year
+	// 		);
+	// 		dataset.addEntry(section);
 	// 	});
 	// 	return dataset;
 	// }
-
-	public static fromObject(obj: any): Dataset {
-		const dataset = new Dataset(obj.id, obj.kind);
-		obj.entries.forEach((sectionObj: any) => {
-			const section = new CourseSection(
-				sectionObj.uuid,
-				sectionObj.id,
-				sectionObj.title,
-				sectionObj.instructor,
-				sectionObj.dept,
-				sectionObj.avg,
-				sectionObj.pass,
-				sectionObj.fail,
-				sectionObj.audit,
-				sectionObj.year
-			);
-			dataset.addSection(section);
-		});
-		return dataset;
-	}
 
 	public getKind() {
 		return this.kind;
@@ -73,11 +91,11 @@ export class Dataset {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addSection(section: CourseSection | Room) {
-		this.entries.push(section);
+	public addEntry(entry: CourseSection | Room) {
+		this.entries.push(entry);
 	}
 
-	public getSections(): Array<CourseSection | Room> {
+	public getEntries(): Array<CourseSection | Room> {
 		return this.entries;
 	}
 }

@@ -1,5 +1,3 @@
-import {IDatasetEntry} from "./IDatasetEntry";
-
 export class Room{
 	private fullname: string;
 	private shortname: string;

@@ -73,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
 		if (!id || id.trim().length === 0 || id.includes("_")) {
 			throw new InsightError("Invalid ID");
 		}
-		if (kind !== InsightDatasetKind.Sections) {
+		if (kind !== InsightDatasetKind.Sections && kind !== InsightDatasetKind.Rooms) {
 			return Promise.reject(new InsightError("Invalid Dataset Kind"));
 		}
 
@@ -81,13 +81,28 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("Dataset already exists");
 		}
 		try {
-			const dataset = await DatasetProcessor.ProcessDataset(id, content, kind);
-			this.datasets.set(id, dataset);
+			let dataset: Dataset;
+			if (kind === InsightDatasetKind.Sections) {
+				dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
+			} else if (kind === InsightDatasetKind.Rooms) {
+				dataset = await DatasetProcessor.ProcessDatasetRoom(id, content, kind);
+			} else {
+				throw new InsightError("Invalid Dataset Kind");
+			}
 
+			this.datasets.set(id, dataset);
 			return Array.from(this.datasets.keys());
 		} catch (error) {
 			throw new InsightError(`Failed to add dataset: ${error}`);
 		}
+		// try {
+		// 	const dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
+		// 	this.datasets.set(id, dataset);
+		//
+		// 	return Array.from(this.datasets.keys());
+		// } catch (error) {
+		// 	throw new InsightError(`Failed to add dataset: ${error}`);
+		// }
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -296,118 +311,122 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		await this.waitForDatasetsLoaded();
-		// validation that query is top level valid
-		assertTrue(
-			typeof query === "object" &&
-				query != null &&
-				Object.keys(query as object).length === 2 &&
-				Object.prototype.hasOwnProperty.call(query, "WHERE") &&
-				Object.prototype.hasOwnProperty.call(query, "OPTIONS"),
-			'Query should be an object with only have two keys, "WHERE" and "OPTIONS"',
-			InsightError
-		);
-		const validQuery = query as {WHERE: unknown; OPTIONS: unknown};
-
-		// load data from disk (hopefully it has already been parsed by addDataset)
-		// this is very cringe but required because of bad design (EBNF)
-		const datasetName = InsightFacade.inferDataSetName(validQuery.OPTIONS);
-		const potentialDataset = this.datasets.get(datasetName);
-		if (potentialDataset === undefined) {
-			throw new InsightError("Dataset does not exist");
-		}
-		const allSections: CourseSection[] = potentialDataset.getSections();
-
-		// Handle WHERE Clause
-		const queryFilterFunc = InsightFacade.generateQueryFilterFunction(validQuery.WHERE, datasetName);
-		const filteredSections = allSections.filter(queryFilterFunc);
-		// Handle OPTIONS Clause
-		const filteredWithOptions = this.handleOptions(validQuery.OPTIONS, datasetName, filteredSections);
-
-		// force end checks
-		if (filteredSections.length > 5000) {
-			throw new ResultTooLargeError("Query returned more than 5000 results");
-		}
-
-		// convert to InsightResult
-		const out: InsightResult[] = filteredWithOptions.map((section) =>
-			Object.entries(section).reduce((acc, [key, value]) => ({...acc, [`${datasetName}_${key}`]: value}), {})
-		);
-		// return final result
-		return out;
+		return Promise.reject(new InsightError("Not implemented"));
 	}
 
-	public handleOptions(
-		options: unknown,
-		datasetName: string,
-		rawCourseSections: CourseSection[]
-	): Array<Partial<CourseSection>> {
-		assertTrue(
-			typeof options === "object" &&
-				options != null &&
-				((Object.keys(options).length === 1 && Object.prototype.hasOwnProperty.call(options, "COLUMNS")) ||
-					(Object.keys(options).length === 2 &&
-						Object.prototype.hasOwnProperty.call(options, "COLUMNS") &&
-						Object.prototype.hasOwnProperty.call(options, "ORDER"))),
-			"OPTIONS should be an object with two keys, COLUMNS and ORDER",
-			InsightError
-		);
-		const optionsObj = options as {COLUMNS: unknown; ORDER?: unknown};
+	// public async performQuery(query: unknown): Promise<InsightResult[]> {
+	// 	await this.waitForDatasetsLoaded();
+	// 	// validation that query is top level valid
+	// 	assertTrue(
+	// 		typeof query === "object" &&
+	// 			query != null &&
+	// 			Object.keys(query as object).length === 2 &&
+	// 			Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+	// 			Object.prototype.hasOwnProperty.call(query, "OPTIONS"),
+	// 		'Query should be an object with only have two keys, "WHERE" and "OPTIONS"',
+	// 		InsightError
+	// 	);
+	// 	const validQuery = query as {WHERE: unknown; OPTIONS: unknown};
+	//
+	// 	// load data from disk (hopefully it has already been parsed by addDataset)
+	// 	// this is very cringe but required because of bad design (EBNF)
+	// 	const datasetName = InsightFacade.inferDataSetName(validQuery.OPTIONS);
+	// 	const potentialDataset = this.datasets.get(datasetName);
+	// 	if (potentialDataset === undefined) {
+	// 		throw new InsightError("Dataset does not exist");
+	// 	}
+	// 	const allSections: CourseSection[] = potentialDataset.getEntries();
+	//
+	// 	// Handle WHERE Clause
+	// 	const queryFilterFunc = InsightFacade.generateQueryFilterFunction(validQuery.WHERE, datasetName);
+	// 	const filteredSections = allSections.filter(queryFilterFunc);
+	// 	// Handle OPTIONS Clause
+	// 	const filteredWithOptions = this.handleOptions(validQuery.OPTIONS, datasetName, filteredSections);
+	//
+	// 	// force end checks
+	// 	if (filteredSections.length > 5000) {
+	// 		throw new ResultTooLargeError("Query returned more than 5000 results");
+	// 	}
+	//
+	// 	// convert to InsightResult
+	// 	const out: InsightResult[] = filteredWithOptions.map((section) =>
+	// 		Object.entries(section).reduce((acc, [key, value]) => ({...acc, [`${datasetName}_${key}`]: value}), {})
+	// 	);
+	// 	// return final result
+	// 	return out;
+	// }
 
-		if (optionsObj.ORDER !== undefined) {
-			assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string", InsightError);
-		}
-		assertTrue(
-			Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
-			"OPTIONS.COLUMNS should be an array of strings",
-			InsightError
-		);
-		const optionsObjInternalValidated = optionsObj as {COLUMNS: string[]; ORDER?: string};
-
-		// Select the columns
-		const selectColumns = optionsObjInternalValidated.COLUMNS.map((col) => {
-			const colParts = col.split("_");
-			assertTrue(
-				colParts.length === 2 && colParts[0] === datasetName && CourseSelectionKeyList.includes(colParts[1]),
-				`Invalid Key in COLUMNS, "${col}"`,
-				InsightError
-			);
-			return colParts[1] as CourseSelectionKey;
-		});
-
-		let out: Array<Partial<CourseSection>> = rawCourseSections.map((s) => {
-			const obj: Partial<CourseSection> = {};
-			selectColumns.forEach((c) => {
-				obj[c] = s[c];
-			});
-			return obj;
-		});
-
-		// Sort the results based on ORDER
-		if (optionsObjInternalValidated.ORDER !== undefined) {
-			const splitOrderField = optionsObjInternalValidated.ORDER.split("_");
-			assertTrue(
-				splitOrderField.length === 2 &&
-					splitOrderField[0] === datasetName &&
-					CourseSelectionKeyList.includes(splitOrderField[1]),
-				"Invalid Key in ORDER",
-				InsightError
-			);
-			const orderField = splitOrderField[1] as CourseSelectionKey;
-			assertTrue(selectColumns.includes(orderField), "ORDER key must be in COLUMNS", InsightError);
-			out = out.sort((a, b) => {
-				if (a[orderField] < b[orderField]) {
-					return -1;
-				}
-				if (a[orderField] > b[orderField]) {
-					return 1;
-				}
-				return 0;
-			});
-		}
-
-		return out;
-	}
+	// public handleOptions(
+	// 	options: unknown,
+	// 	datasetName: string,
+	// 	rawCourseSections: CourseSection[]
+	// ): Array<Partial<CourseSection>> {
+	// 	assertTrue(
+	// 		typeof options === "object" &&
+	// 			options != null &&
+	// 			((Object.keys(options).length === 1 && Object.prototype.hasOwnProperty.call(options, "COLUMNS")) ||
+	// 				(Object.keys(options).length === 2 &&
+	// 					Object.prototype.hasOwnProperty.call(options, "COLUMNS") &&
+	// 					Object.prototype.hasOwnProperty.call(options, "ORDER"))),
+	// 		"OPTIONS should be an object with two keys, COLUMNS and ORDER",
+	// 		InsightError
+	// 	);
+	// 	const optionsObj = options as {COLUMNS: unknown; ORDER?: unknown};
+	//
+	// 	if (optionsObj.ORDER !== undefined) {
+	// 		assertTrue(typeof optionsObj.ORDER === "string", "OPTIONS.ORDER should only be a string", InsightError);
+	// 	}
+	// 	assertTrue(
+	// 		Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
+	// 		"OPTIONS.COLUMNS should be an array of strings",
+	// 		InsightError
+	// 	);
+	// 	const optionsObjInternalValidated = optionsObj as {COLUMNS: string[]; ORDER?: string};
+	//
+	// 	// Select the columns
+	// 	const selectColumns = optionsObjInternalValidated.COLUMNS.map((col) => {
+	// 		const colParts = col.split("_");
+	// 		assertTrue(
+	// 			colParts.length === 2 && colParts[0] === datasetName && CourseSelectionKeyList.includes(colParts[1]),
+	// 			`Invalid Key in COLUMNS, "${col}"`,
+	// 			InsightError
+	// 		);
+	// 		return colParts[1] as CourseSelectionKey;
+	// 	});
+	//
+	// 	let out: Array<Partial<CourseSection>> = rawCourseSections.map((s) => {
+	// 		const obj: Partial<CourseSection> = {};
+	// 		selectColumns.forEach((c) => {
+	// 			obj[c] = s[c];
+	// 		});
+	// 		return obj;
+	// 	});
+	//
+	// 	// Sort the results based on ORDER
+	// 	if (optionsObjInternalValidated.ORDER !== undefined) {
+	// 		const splitOrderField = optionsObjInternalValidated.ORDER.split("_");
+	// 		assertTrue(
+	// 			splitOrderField.length === 2 &&
+	// 				splitOrderField[0] === datasetName &&
+	// 				CourseSelectionKeyList.includes(splitOrderField[1]),
+	// 			"Invalid Key in ORDER",
+	// 			InsightError
+	// 		);
+	// 		const orderField = splitOrderField[1] as CourseSelectionKey;
+	// 		assertTrue(selectColumns.includes(orderField), "ORDER key must be in COLUMNS", InsightError);
+	// 		out = out.sort((a, b) => {
+	// 			if (a[orderField] < b[orderField]) {
+	// 				return -1;
+	// 			}
+	// 			if (a[orderField] > b[orderField]) {
+	// 				return 1;
+	// 			}
+	// 			return 0;
+	// 		});
+	// 	}
+	//
+	// 	return out;
+	// }
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		// Iterate through all datasets in the map
@@ -416,7 +435,7 @@ export default class InsightFacade implements IInsightFacade {
 			([id, dataset]): InsightDataset => ({
 				id: dataset.getID(),
 				kind: dataset.getKind(),
-				numRows: dataset.getSections().length,
+				numRows: dataset.getEntries().length,
 			})
 		);
 		return insightDatasets;
