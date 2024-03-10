@@ -15,45 +15,42 @@ export class Dataset {
 		this.entries = [];
 	}
 
-	// To handle the rooms as well
-	// public static fromObject(obj: any): Dataset {
-	// 	const dataset = new Dataset(obj.id, obj.kind);
-	// 	obj.entries.forEach((entryObj: any) => {
-	// 		let entries: IDatasetEntry;
-	// 		if (obj.kind === InsightDatasetKind.Rooms) {
-	// 			entries = new Room(
-	// 				entryObj.fullname,
-	// 				entryObj.shortname,
-	// 				// ...
-	// 			);
-	// 		} else {
-	// 			entries = new CourseSection(
-	// 				entryObj.uuid,
-	// 				// ...
-	// 			);
-	// 		}
-	// 		dataset.addEntry(entries);
-	// 	});
-	// 	return dataset;
-	// }
-
 	public static fromObject(obj: any): Dataset {
 		const dataset = new Dataset(obj.id, obj.kind);
-		obj.entries.forEach((sectionObj: any) => {
-			const section = new CourseSection(
-				sectionObj.uuid,
-				sectionObj.id,
-				sectionObj.title,
-				sectionObj.instructor,
-				sectionObj.dept,
-				sectionObj.avg,
-				sectionObj.pass,
-				sectionObj.fail,
-				sectionObj.audit,
-				sectionObj.year
-			);
-			dataset.addSection(section);
-		});
+		if (obj.kind == InsightDatasetKind.Rooms) {
+			obj.entries.forEach((entry: any) => {
+			const room = new Room(
+					entry.fullName,
+					entry.shortname,
+					entry.number,
+					entry.name,
+					entry.address,
+					entry.lat,
+					entry.lon,
+					entry.seats,
+					entry.type,
+					entry.furniture,
+					entry.href
+				);
+				dataset.addEntry(room);
+			});
+		} else {
+			obj.entries.forEach((entry: any) => {
+				const section = new CourseSection(
+					entry.uuid,
+					entry.id,
+					entry.title,
+					entry.instructor,
+					entry.dept,
+					entry.avg,
+					entry.pass,
+					entry.fail,
+					entry.audit,
+					entry.year
+				);
+				dataset.addEntry(section);
+			});
+		}
 		return dataset;
 	}
 
@@ -65,15 +62,15 @@ export class Dataset {
 		return this.id;
 	}
 
-	public isRoom(): this is Room{
+	public isRoom(): this is Room {
 		return this.kind === InsightDatasetKind.Rooms;
 	}
 
-	public isSection(): this is CourseSection{
+	public isSection(): this is CourseSection {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addSection(section: CourseSection | Room) {
+	public addEntry(section: CourseSection | Room) {
 		this.entries.push(section);
 	}
 

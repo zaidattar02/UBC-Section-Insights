@@ -9,6 +9,7 @@
 		"node": ">= 18 < 19"
 	},
 	"dependencies": {
+		"@types/parse5": "^7.0.0",
 		"decimal.js": "10.4.3",
 		"express": "4.18.2",
 		"fs-extra": "11.1.0",
