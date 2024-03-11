@@ -3,6 +3,7 @@ import {CourseSection} from "../model/CourseSection";
 import {Dataset} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
+import {Room} from "../model/Room";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -14,7 +15,9 @@ import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 //	public static methods
 
 export abstract class DatasetProcessor {
-	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+	public static async ProcessDataset(
+		id: string, content: string, kind: InsightDatasetKind
+	): Promise<Dataset<CourseSection | Room>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -23,14 +26,14 @@ export abstract class DatasetProcessor {
 				throw new InsightError("Invalid Data");
 			}
 			// if
-			const dataset = new Dataset(id, kind);
+			const dataset = new Dataset<CourseSection | Room>(id, kind);
 			const filePromises: any[] = [];
 			coursesFolder.forEach((relativePath, file) => {
 				const filePromise = this.processFile(file, dataset);
 				filePromises.push(filePromise);
 			});
 			await Promise.all(filePromises);
-			if (dataset.getSections().length === 0) {
+			if (dataset.getEntries().length === 0) {
 				throw new InsightError("No valid sections found in the dataset");
 			}
 			//	convert JS object into JSON object, and save that representation to disk
@@ -46,7 +49,7 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
@@ -71,7 +74,7 @@ export abstract class DatasetProcessor {
 						sectionData.Audit,
 						sectionData.Year
 					);
-					dataset.addSection(section);
+					dataset.addEntry(section);
 				} catch (e) {
 					console.error(`Invalid section data in file: ${e}`);
 				}

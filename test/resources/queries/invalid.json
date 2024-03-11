@@ -1,0 +1,416 @@
+[
+    {
+        "title": "Bad Query Datatype",
+        "tests": [
+            {
+                "title": "Empty Object Query",
+                "input": {},
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Null Query",
+                "input": null,
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Number Query",
+                "input": 10,
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "String Query",
+                "input": "bad_query",
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Array Query",
+                "input": [],
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Bad Query WHERE/OPTIONS Shape",
+        "tests": [
+            {
+                "title": "Query missing WHERE",
+                "input": {
+                    "OPTIONS": {
+                        "COLUMNS": ["section_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Query missing OPTIONS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "courses_avg": 97
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Empty OPTIONS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "courses_avg": 97
+                        }
+                    },
+                    "OPTIONS": {}
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Empty COLUMN in OPTIONS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "courses_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMN": []
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Object Order no Keys",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP"
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Object Order no Direction",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "keys": [
+                                "sections_avg"
+                            ]
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Object Order empty keys",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP",
+                            "keys": []
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Bad Query TRANSFORMATION Shape",
+        "tests": [
+            {
+                "title": "Empty APPLY",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": ["sections_dept"],
+                        "APPLY": []
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Empty GROUP",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": [],
+                        "APPLY": [{
+                            "maxSeats": {
+                                "MAX": "sections_seats"
+                            }
+                        }]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Empty TRANSFORMATION",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {}
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "BAD TRANSFORMATION",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": null
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Bad Column Keys",
+        "tests": [
+            {
+                "title": "Random Column Name",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sussybaka"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Valid Database, Bad key",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Valid Database, Bad Key",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_sussybaka"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Many Datasets/Wrong Datasets due to...",
+        "tests": [
+            {
+                "title": "...Referenced in COLUMNS and ORDER",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["rooms_number"]
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "...Referenced in COLUMNS and WHERE",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "rooms_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "...Referenced in COLUMNS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept", "rooms_number"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "ORDER value is not in COLUMNS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_avg"]
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "ResultTooLargeError working",
+        "tests": [
+            {
+                "title": "Too Many Results",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "ResultTooLargeError"
+            }
+        ]
+    },
+    {
+        "title": "Wildcard Issues",
+        "tests": [
+            {
+                "title": "Bad Wildcard",
+                "input": {
+                    "WHERE": {
+                        "IS": {
+                            "sections_dept": "c*sc"
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Aggregation Issues",
+        "tests": [
+            {
+                "title": "Request Aggregation for non-numerical value",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept", "maxDept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": ["sections_avg"],
+                        "APPLY": [{
+                            "maxDept": {
+                                "MAX": "sections_dept"
+                            }
+                        }]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    }
+]
