@@ -35,7 +35,7 @@
         ]
     },
     {
-        "title": "Bad Query Shape",
+        "title": "Bad Query WHERE/OPTIONS Shape",
         "tests": [
             {
                 "title": "Query missing WHERE",
@@ -87,30 +87,148 @@
                 "errorExpected": true,
                 "expected": "InsightError"
             },
-
-
-            
             {
-                "title": "",
-                "input": {},
+                "title": "Object Order no Keys",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP"
+                        }
+                    }
+                },
                 "errorExpected": true,
                 "expected": "InsightError"
             },
             {
-                "title": "",
-                "input": {},
+                "title": "Object Order no Direction",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "keys": [
+                                "sections_avg"
+                            ]
+                        }
+                    }
+                },
                 "errorExpected": true,
                 "expected": "InsightError"
             },
             {
-                "title": "",
-                "input": {},
+                "title": "Object Order empty keys",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP",
+                            "keys": []
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Bad Query TRANSFORMATION Shape",
+        "tests": [
+            {
+                "title": "Empty APPLY",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": ["sections_dept"],
+                        "APPLY": []
+                    }
+                },
                 "errorExpected": true,
                 "expected": "InsightError"
             },
             {
-                "title": "",
-                "input": {},
+                "title": "Empty GROUP",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": [],
+                        "APPLY": [{
+                            "maxSeats": {
+                                "MAX": "sections_seats"
+                            }
+                        }]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Empty TRANSFORMATION",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {}
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "BAD TRANSFORMATION",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": null
+                },
                 "errorExpected": true,
                 "expected": "InsightError"
             }
@@ -260,6 +378,34 @@
                     },
                     "OPTIONS": {
                         "COLUMNS": ["sections_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            }
+        ]
+    },
+    {
+        "title": "Aggregation Issues",
+        "tests": [
+            {
+                "title": "Request Aggregation for non-numerical value",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": ["sections_dept", "maxDept"],
+                        "ORDER": {
+                            "dir": "DOWN",
+                            "keys": ["sections_dept"]
+                        }
+                    },
+                    "TRANSFORMATION": {
+                        "GROUP": ["sections_avg"],
+                        "APPLY": [{
+                            "maxDept": {
+                                "MAX": "sections_dept"
+                            }
+                        }]
                     }
                 },
                 "errorExpected": true,

@@ -4,7 +4,7 @@ import {InsightDatasetKind, InsightError, ResultTooLargeError, InsightResult} fr
 import {createHash} from "crypto";
 
 import {RoomKeyList} from "./Room";
-import {CourseSelectionKey, CourseSelectionKeyList} from "./CourseSection";
+import {CourseSection, CourseSelectionKeyList} from "./CourseSection";
 import {assertTrue} from "../service/Assertions";
 import Decimal from "decimal.js";
 
@@ -14,7 +14,7 @@ const utilConvertToDecimal = (v: any) => new Decimal(v);
 
 // we make it partial in order to store shared_properties from grouping
 interface QueryEntry {
-	entry_properties: Partial<IDatasetEntry>;
+	data_properties: Partial<IDatasetEntry>;
 	derived_properties: Record<string, number>;
 }
 
@@ -25,65 +25,55 @@ export class QueryDataset extends Dataset {
 	constructor(d: Dataset) {
 		super(d.getID(), d.getKind());
 		this.query_entries = d.getEntries().map((e) => ({
-			entry_properties: e,
+			data_properties: e,
 			derived_properties: {}
 		}));
 	}
 
 	/**
 	 * @param WHERE Filter Query Object
-	 * @requires this.query_entries.entry_properties to be of type Required<IDatasetEntry>
+	 * @requires this.query_entries.data_properties to be of type Required<IDatasetEntry>
 	 */
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction(WHERE, this.kind, this.id);
-		const out = this.query_entries.filter((e) => filterFunction(e.entry_properties as IDatasetEntry));
-		if (out.length > 5000) {
-			throw new ResultTooLargeError("Query returned more than 5000 results");
-		}
+		const out = this.query_entries.filter((e) => filterFunction(e.data_properties as IDatasetEntry));
 		this.query_entries = out;
 	}
 
 	/**
 	 * @param raw_transformation Transformation Query Object
-	 * @requires this.query_entries.entry_properties to be of type Required<IDatasetEntry>
+	 * @requires this.query_entries.data_properties to be of type Required<IDatasetEntry>
 	 */
 	public queryTransformations(raw_transformation: unknown): void {
 		const transformation = this.validateTransformation(raw_transformation);
 		const groups = this.makeGroups(transformation.GROUP);
 		const applyQuery = this.validateApply(transformation.APPLY);
 		this.query_entries = Array.from(groups.entries()).map(([_hash, group]) => {
-			let o: QueryEntry = {entry_properties: group.shared_properties, derived_properties: {}};
+			let o: QueryEntry = {data_properties: group.shared_properties, derived_properties: {}};
 			for (const {applykey, applytoken, datasetKey} of applyQuery) {
 				const values = group.instances.map((i) => i[datasetKey as keyof IDatasetEntry]);
-				let decimalValues: Decimal[];
 				switch (applytoken) {
 					case "MAX":
 						assertTrue(values.every(utilIsNumber),
 							"MAX must be applied to a key with a numerical value", InsightError);
-						decimalValues = values.map(utilConvertToDecimal);
-						o.derived_properties[applykey] = Decimal.max(...decimalValues).toNumber();
+						o.derived_properties[applykey] = Decimal.max(...values.map(utilConvertToDecimal)).toNumber();
 						break;
 					case "MIN":
 						assertTrue(values.every(utilIsNumber),
 							"MIN must be applied to a key with a numerical value", InsightError);
-						decimalValues = values.map(utilConvertToDecimal);
-						o.derived_properties[applykey] = Decimal.min(...decimalValues).toNumber();
+						o.derived_properties[applykey] = Decimal.min(...values.map(utilConvertToDecimal)).toNumber();
 						break;
 					case "AVG":
 						assertTrue(values.every(utilIsNumber),
 							"AVG must be applied to a key with a numerical value", InsightError);
-						decimalValues = values.map(utilConvertToDecimal);
-						o.derived_properties[applykey] = Number(decimalValues
-							.reduce((a, b) => a.add(b), new Decimal(0))
-							.dividedBy(values.length)
-							.toFixed(2));
+						o.derived_properties[applykey] = Number((Number(values.map(utilConvertToDecimal)
+							.reduce((a, b) => a.add(b), new Decimal(0))) / values.length).toFixed(2));
 						break;
 					case "SUM":
 						assertTrue(values.every(utilIsNumber),
 							"SUM must be applied to a key with a numerical value", InsightError);
-						decimalValues = values.map(utilConvertToDecimal);
-						o.derived_properties[applykey] = Number(decimalValues
+						o.derived_properties[applykey] = Number(values.map(utilConvertToDecimal)
 							.reduce((a, b) => a.add(b), new Decimal(0))
 							.toFixed(2)
 						);
@@ -112,16 +102,16 @@ export class QueryDataset extends Dataset {
 		});
 		this.query_entries.forEach((d) => {
 			let gp: Partial<IDatasetEntry> = {};
-			UNSAFEtransformationGroupsKeyOnly.forEach((g) => gp[g] = d[g]);
+			UNSAFEtransformationGroupsKeyOnly.forEach((g) => gp[g] = d.data_properties[g]);
 			const groupHash = createHash("md5")
 				.update(JSON.stringify(Object.values(gp)))
 				.digest("hex");
 			if (!groups.has(groupHash)) {
-				groups.set(groupHash, {shared_properties: gp, instances: [d.entry_properties as IDatasetEntry]});
+				groups.set(groupHash, {shared_properties: gp, instances: [d.data_properties as IDatasetEntry]});
 			} else {
 				const cringe = groups.get(groupHash);
 				if (cringe !== undefined) {
-					cringe.instances.push(d.entry_properties as IDatasetEntry);
+					cringe.instances.push(d.data_properties as IDatasetEntry);
 				}
 			}
 		});
@@ -129,6 +119,9 @@ export class QueryDataset extends Dataset {
 	}
 
 	public exportWithOptions(raw_options: unknown): InsightResult[] {
+		if (this.query_entries.length > 5000) {
+			throw new ResultTooLargeError("Query returned more than 5000 results");
+		}
 		const options = this.validateOptions(raw_options);
 		this.options_filterColumns(options.COLUMNS);
 
@@ -137,7 +130,7 @@ export class QueryDataset extends Dataset {
 		}
 		return this.query_entries.map((qe) => {
 			let out: InsightResult = {};
-			Object.entries(qe.entry_properties)
+			Object.entries(qe.data_properties)
 				.forEach(([k, v]) => out[`${this.id}_${k}`] = v as string | number);
 			Object.entries(qe.derived_properties)
 				.forEach(([k, v]) => out[k] = v);
@@ -170,10 +163,10 @@ export class QueryDataset extends Dataset {
 
 		this.query_entries = this.query_entries.map((s) => {
 			const ep: Partial<IDatasetEntry> = {};
-			columnKeys.forEach((c) => ep[c] = s.entry_properties[c]);
+			columnKeys.forEach((c) => ep[c] = s.data_properties[c]);
 			const dp: Record<string, number> = {};
 			applyKeys.forEach((ak) => dp[ak] = s.derived_properties[ak]);
-			return {entry_properties: ep, derived_properties: dp};
+			return {data_properties: ep, derived_properties: dp};
 		});
 	}
 
@@ -192,7 +185,7 @@ export class QueryDataset extends Dataset {
 	private stringOrderingFunctionGenerator(orderField: string) {
 		const field = orderField.split("_")[1] as keyof IDatasetEntry;
 		return (a: QueryEntry,b: QueryEntry): number => {
-			if (a.entry_properties[field] > b.entry_properties[field]) {
+			if (a.data_properties[field] > b.data_properties[field]) {
 				return 1;
 			} else {
 				return -1;
@@ -216,7 +209,7 @@ export class QueryDataset extends Dataset {
 					assertTrue(a.derived_properties[orderField] !== undefined &&
 						b.derived_properties[orderField] !== undefined,
 					`ORDER key "${orderkey}" must be in
-					${JSON.stringify(a.derived_properties)}, ${JSON.stringify(b.entry_properties)}`, InsightError);
+					${JSON.stringify(a.derived_properties)}, ${JSON.stringify(b.data_properties)}`, InsightError);
 					if (a.derived_properties[orderField] < b.derived_properties[orderField]) {
 						return -1 * orderingMultiplier;
 					}
@@ -234,14 +227,14 @@ export class QueryDataset extends Dataset {
 						`ORDER key "${orderkey}" must be in COLUMNS (${options.COLUMNS})`, InsightError); // additional invariant from EBNF
 					const orderField = splitOrderField[1] as keyof IDatasetEntry;
 
-					assertTrue(a.entry_properties[orderField] !== undefined &&
-						b.entry_properties[orderField] !== undefined,
+					assertTrue(a.data_properties[orderField] !== undefined &&
+						b.data_properties[orderField] !== undefined,
 					`ORDER key "${orderkey}" must be in
-					${JSON.stringify(a.entry_properties)}, ${JSON.stringify(b.entry_properties)}`, InsightError);
-					if (a.entry_properties[orderField] < b.entry_properties[orderField]) {
+					${JSON.stringify(a.data_properties)}, ${JSON.stringify(b.data_properties)}`, InsightError);
+					if (a.data_properties[orderField] < b.data_properties[orderField]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.entry_properties[orderField] > b.entry_properties[orderField]) {
+					if (a.data_properties[orderField] > b.data_properties[orderField]) {
 						return 1 * orderingMultiplier;
 					}
 				} else {
@@ -268,8 +261,8 @@ export class QueryDataset extends Dataset {
 
 	private validateApply(raw_apply: unknown[]) {
 		return raw_apply.map((raw_apply_entry) => {
-			assertTrue(!(typeof raw_apply_entry === "object" && raw_apply_entry != null &&
-				Object.keys(raw_apply_entry).length === 1 && typeof Object.keys(raw_apply_entry)[0] === "string"),
+			assertTrue(typeof raw_apply_entry === "object" && raw_apply_entry != null &&
+				Object.keys(raw_apply_entry).length === 1 && typeof Object.keys(raw_apply_entry)[0] === "string",
 			"Apply Query not Correct Shape", InsightError);
 			const applyEntry = raw_apply_entry as Record<string, unknown>;
 			const applykey = Object.keys(applyEntry)[0];
@@ -309,17 +302,18 @@ export class QueryDataset extends Dataset {
 		assertTrue(Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
 			"OPTIONS.COLUMNS should be an array of strings", InsightError);
 		if (optionsObj.ORDER !== undefined) {
-			// assertTrue(Array.isArray(optionsObj.ORDER) && optionsObj.ORDER.every(o=>typeof o === "string"),
-			// "OPTIONS.ORDER should be an array of strings", InsightError);
 			if(typeof optionsObj.ORDER === "object") {
-				assertTrue(optionsObj.ORDER != null &&
-					Object.keys(optionsObj.ORDER).length === 2 &&
+				assertTrue(optionsObj.ORDER != null && Object.keys(optionsObj.ORDER).length === 2 &&
 					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "dir") &&
-					(["UP", "DOWN"].includes((optionsObj.ORDER as any).dir)) &&
-					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "keys") &&
-					Array.isArray((optionsObj.ORDER as any).keys) &&
-					((optionsObj.ORDER as any).keys as unknown[]).every((k) => typeof k === "string"),
+					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "keys"),
 				"ORDER is not in the right shape", InsightError);
+				const orderShaped = optionsObj.ORDER as {dir: unknown, keys: unknown};
+				assertTrue(typeof orderShaped.dir === "string" && ["UP", "DOWN"].includes(orderShaped.dir),
+					"ORDER.dir is not the right shape", InsightError);
+				assertTrue(Array.isArray(orderShaped.keys) &&
+					orderShaped.keys.length > 0 &&
+					orderShaped.keys.every((k) => typeof k === "string"),
+				"ORDER.keys is not the right shape", InsightError);
 			} else if(typeof optionsObj.ORDER === "string") {
 				const splitOrderField = optionsObj.ORDER.split("_");
 				assertTrue(splitOrderField.length === 2 &&

@@ -23,8 +23,7 @@ describe("InsightFacade_NewSuite", function () {
 	before(async function () {
 		// This block runs once and loads the datasets.
 		sections = await getContentFromArchives("pair.zip");
-		// TODO add rooms to dataset
-		// rooms = await getContentFromArchives("rooms.zip");
+		// rooms = await getContentFromArchives("campus.zip");
 
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
