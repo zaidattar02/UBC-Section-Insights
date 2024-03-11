@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import {CourseSection} from "../model/CourseSection";
+import {CourseSection, createCourseSection} from "../model/CourseSection";
 import {Dataset, IDatasetEntry} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
@@ -62,7 +62,7 @@ export abstract class DatasetProcessor {
 					sectionData.year = 1900;
 				}
 				try {
-					const section = new CourseSection(
+					const section = createCourseSection(
 						sectionData.id,
 						sectionData.Course,
 						sectionData.Title,

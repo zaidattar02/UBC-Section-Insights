@@ -41,7 +41,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction(WHERE, this.kind, this.id);
-		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties));
+		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties as DatasetEntry));
 		this.query_entries = out;
 	}
 
@@ -179,6 +179,11 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 		});
 	}
 
+	/**
+	 * @param COLUMNS COLUMNS Query Object
+	 * @param ORDER ORDERING Query Object
+	 * @requires this.query_entries[0].dataProperties to be of type Required<DatasetEntry>
+	 */
 	private optionsHandleOrdering( COLUMNS: string[], ORDER: unknown ) {
 		if(typeof ORDER === "string") {
 			assertTrue((ORDER.match(/_/) || []).length === 1, "Invalid Key in ORDER", InsightError);
@@ -225,7 +230,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 
 	private stringOrderingFunctionGenerator(orderField: keyof DatasetEntry) {
 		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number =>
-			a.dataProperties[orderField] > b.dataProperties[orderField] ? 1 : -1;
+			(a.dataProperties as DatasetEntry)[orderField] > (b.dataProperties as DatasetEntry)[orderField] ? 1 : -1;
 	}
 
 	private objectOrderingFunctionGenerator(
@@ -235,10 +240,12 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number => {
 			for (const orderkey of orderSchema) {
 				if(orderkey.type === "data_prop"){
-					if (a.dataProperties[orderkey.key] < b.dataProperties[orderkey.key]) {
+					if ((a.dataProperties as DatasetEntry)[orderkey.key] <
+						(b.dataProperties as DatasetEntry)[orderkey.key]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.dataProperties[orderkey.key] > b.dataProperties[orderkey.key]) {
+					if ((a.dataProperties as DatasetEntry)[orderkey.key] >
+						(b.dataProperties as DatasetEntry)[orderkey.key]) {
 						return 1 * orderingMultiplier;
 					}
 				} else if(orderkey.type === "derived_prop") {

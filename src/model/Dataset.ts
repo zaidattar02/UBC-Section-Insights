@@ -1,6 +1,6 @@
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 import {assertTrue} from "../service/Assertions";
-import {CourseSection} from "./CourseSection";
+import {CourseSection, createCourseSection} from "./CourseSection";
 import {Room} from "./Room";
 
 interface CourseSectionDataSet {
@@ -15,8 +15,9 @@ interface RoomDataSet {
 	entries: Room[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IDatasetEntry {}
+export interface IDatasetEntry {
+	[key: string]: string | number;
+}
 
 export class Dataset<T extends IDatasetEntry> {
 	protected id: string;
@@ -45,7 +46,7 @@ export class Dataset<T extends IDatasetEntry> {
 		} else if (validatedObject.kind === InsightDatasetKind.Sections) {
 			const dataset = new Dataset<CourseSection>(validatedObject.id, validatedObject.kind);
 			validatedObject.entries.forEach((sectionObj: any) => {
-				const section = new CourseSection(
+				const section = createCourseSection(
 					sectionObj.uuid,
 					sectionObj.id,
 					sectionObj.title,
