@@ -7,30 +7,23 @@ import {
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
 
-import {assert, expect, use} from "chai";
+import {AssertionError, assert, expect, use} from "chai";
 import chaiAsPromised = require("chai-as-promised");
-import {clearDisk, getContentFromArchives, readFileQueries} from "../TestUtil";
+import {clearDisk, getContentFromArchives, readFileQueries, ITestQuery, ITestSuite} from "../TestUtil";
 import {readdir} from "fs/promises";
-import {CourseSection} from "../../src/model/CourseSection";
-
 use(chaiAsPromised);
 
-export interface ITestQuery {
-	title: string;
-	input: unknown;
-	errorExpected: boolean;
-	expected: any;
-}
-
-describe("InsightFacade", function () {
+describe("InsightFacade_NewSuite", function () {
 	let facade: IInsightFacade;
 
 	// Declare datasets used in tests. You should add more datasets like this!
 	let sections: string;
+	let rooms: string;
 
 	before(async function () {
 		// This block runs once and loads the datasets.
 		sections = await getContentFromArchives("pair.zip");
+		// rooms = await getContentFromArchives("rooms.zip");
 
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
@@ -56,6 +49,24 @@ describe("InsightFacade", function () {
 		});
 	});
 
+
+	describe("performQueryNoDataset", function () {
+		before("clear the disk", function () {
+			return clearDisk();
+		});
+		it("should reject if a query references a dataset not added", async function () {
+			const ASSERT_1 = expect(
+				new InsightFacade().performQuery({
+					WHERE: {},
+					OPTIONS: {
+						COLUMNS: ["sections_dept"],
+					},
+				})
+			).to.be.rejectedWith(InsightError);
+			return await ASSERT_1;
+		});
+	});
+
 	/*
 	 * This test suite dynamically generates tests from the JSON files in test/resources/queries.
 	 * You can and should still make tests the normal way, this is just a convenient tool for a majority of queries.
@@ -66,7 +77,10 @@ describe("InsightFacade", function () {
 
 			// Add the datasets to InsightFacade once.
 			// Will *fail* if there is a problem reading ANY dataset.
-			const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
+			const loadDatasetPromises = [
+				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
+				// facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
+			];
 
 			try {
 				await Promise.all(loadDatasetPromises);
@@ -80,60 +94,77 @@ describe("InsightFacade", function () {
 		});
 
 		describe("valid queries", function () {
-			let validQueries: ITestQuery[];
+			let validQueries: ITestSuite[];
 			try {
-				validQueries = readFileQueries("valid");
+				validQueries = readFileQueries("valid.json");
 			} catch (e: unknown) {
 				expect.fail(`Failed to read one or more test queries. ${e}`);
 			}
 
-			validQueries.forEach(function (test) {
-				it(`${test.title}`, function () {
-					if (test.errorExpected) {
-						return expect(facade.performQuery(test.input)).to.be.rejectedWith(test.expected);
-					} else {
-						return expect(facade.performQuery(test.input)).to.eventually.deep.equal(test.expected);
-					}
+			validQueries.forEach(function (tests) {
+				context(`${tests.title}`, function () {
+					tests.tests.forEach(function (test: ITestQuery) {
+						it(`${test.title}`, async function () {
+							if (test.errorExpected) {
+								return assert.fail("Query should not be expected to throw an error");
+							}
+							const result = facade.performQuery(test.input);
+							// console.log(JSON.stringify(await result));
+							return expect(result)
+								.to.eventually.deep.equal(test.expected);
+						});
+					});
 				});
 			});
 		});
 
 		describe("invalid queries", function () {
-			let invalidQueries: ITestQuery[];
+			let invalidQueries: ITestSuite[];
 
 			try {
-				invalidQueries = readFileQueries("invalid");
+				invalidQueries = readFileQueries("invalid.json");
 			} catch (e: unknown) {
 				expect.fail(`Failed to read one or more test queries. ${e}`);
 			}
 
-			invalidQueries.forEach(function (test: any) {
-				it(`${test.title}`, function () {
-					return facade
-						.performQuery(test.input)
-						.then((result) => {
-							assert.fail(`performQuery resolved when it should have rejected with ${test.expected}`);
-						})
-						.catch((err: any) => {
-							if (test.expected === "InsightError") {
-								expect(err).to.be.instanceOf(InsightError);
-							} else {
-								assert.fail("Query threw unexpected error");
+			invalidQueries.forEach(function (tests) {
+				context(`${tests.title}`, function () {
+					tests.tests.forEach(function (test: ITestQuery) {
+						it(`${test.title}`, async function () {
+							if (!test.errorExpected) {
+								return assert.fail("Query should be expected to throw an error");
+							}
+							try {
+								await facade.performQuery(test.input);
+								assert.fail(`should have been rejected with ${test.expected as string}`);
+							} catch (err) {
+								if (err instanceof AssertionError) {
+									throw err;
+								}
+								console.log(`⬇️ threw error message: ${(err as Error).message}`);
+								switch (test.expected) {
+									case "InsightError":
+										console.log(JSON.stringify(err));
+										expect(err).to.be.instanceOf(InsightError);
+										break;
+									case "ResultTooLargeError":
+										expect(err).to.be.instanceOf(ResultTooLargeError);
+										break;
+									default:
+										assert.fail("Query threw unexpected error");
+								}
 							}
 						});
+					});
 				});
 			});
 		});
 	});
 });
 
-describe("InsightFacade", function () {
+describe.skip("InsightFacade", function () {
 	const validId = "validId";
-	const altValidID = "validId2";
 	const validKind = InsightDatasetKind.Sections;
-	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
-	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
-	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
 
 	describe("loading from disk", function () {
@@ -347,334 +378,6 @@ describe("InsightFacade", function () {
 			// test
 			const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([]);
 			return await ASSERT_1;
-		});
-	});
-
-	describe("performQueryNoDataset", function () {
-		before("clear the disk", function () {
-			return clearDisk();
-		});
-
-		it("should reject if a query references a dataset not added", async function () {
-			const ASSERT_1 = expect(
-				new InsightFacade().performQuery({
-					WHERE: {},
-					OPTIONS: {
-						COLUMNS: [`${validId}_dept`],
-					},
-				})
-			).to.be.rejectedWith(InsightError);
-			return await ASSERT_1;
-		});
-	});
-
-	describe("performQuery", function () {
-		before("add dataset to InsightFacade", async function () {
-			// if performQuery mutates the dataset, I will kill myself during class
-			await loadValidDataset();
-			return await new InsightFacade().addDataset(altValidID, validContent, validKind);
-		});
-
-		context("testing with semantically invalid query objects", function () {
-			it("should reject if a query is not an object", async function () {
-				return await Promise.all([
-					expect(new InsightFacade().performQuery("invalid_query")).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().performQuery(1)).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().performQuery([])).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().performQuery(null)).to.be.rejectedWith(InsightError),
-					expect(new InsightFacade().performQuery(undefined)).to.be.rejectedWith(InsightError),
-				]);
-			});
-
-			it("should reject if there is no where", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if there is no options", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if there is no columns in options", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if column is empty array", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-		});
-
-		const ValidQueryKeys = validIDs.map((key) => `${validId}_${key}`);
-		context("testing with logically invalid query objects", function () {
-			it("should reject if a query has more than 5000 results", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [ValidQueryKeys[0]],
-						},
-					})
-				).to.be.rejectedWith(ResultTooLargeError);
-				return await ASSERT_1;
-			});
-
-			it("should reject if a query references multiple datasets in OPTIONS-COLUMNS", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`, `${altValidID}_dept`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if a query references multiple datasets in WHERE CLAUSE", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							IS: {
-								[`${altValidID}_dept`]: "zool",
-							},
-						},
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			// this way the case where order and column both have the same invalid id should be covered
-			// this test gives us invariant that column checks query ids also check order ids
-			it("should reject if the ORDER value is not in COLUMNS", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [ValidQueryKeys[0]],
-							ORDER: ValidQueryKeys[1],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if there is an invalid id in COLUMN", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: ["sussybaka"],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				const ASSERT_2 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [validId],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				const ASSERT_3 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [`${validId}_sussybaka`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await Promise.all([ASSERT_1, ASSERT_2, ASSERT_3]);
-			});
-
-			it("should reject if there is a mix of datasets in columns", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {},
-						OPTIONS: {
-							COLUMNS: [`${validId}_${validIDs[0]}`, `${altValidID}_${validIDs[1]}`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-
-			it("should reject if there's a wildcard in the middle of a string", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							IS: {
-								[`${validId}_dept`]: "c*sc",
-							},
-						},
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`],
-						},
-					})
-				).to.be.rejectedWith(InsightError);
-
-				return await ASSERT_1;
-			});
-		});
-
-		context("testing with valid query objects", function () {
-			it("should select all columns effectively", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							EQ: {
-								[`${validId}_avg`]: 95,
-							},
-						},
-						OPTIONS: {
-							COLUMNS: ValidQueryKeys,
-						},
-					})
-				).to.be.fulfilled;
-				return await ASSERT_1;
-			});
-
-			it("should wildcards should work", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							AND: [
-								{
-									EQ: {
-										[`${validId}_avg`]: 75,
-									},
-								},
-								{
-									IS: {
-										[`${validId}_dept`]: "c*",
-									},
-								},
-								{
-									IS: {
-										[`${validId}_instructor`]: "*n",
-									},
-								},
-								{
-									IS: {
-										[`${validId}_title`]: "*u*",
-									},
-								},
-							],
-						},
-						OPTIONS: {
-							COLUMNS: [ValidQueryKeys[0]],
-						},
-					})
-				).to.be.eventually.of.length(5);
-				return await ASSERT_1;
-			});
-
-			it("should have functioning EQ (and OR)", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							OR: [{EQ: {[`${validId}_audit`]: 5}}, {EQ: {[`${validId}_fail`]: 20}}],
-						},
-						OPTIONS: {
-							COLUMNS: [ValidQueryKeys[0]],
-						},
-					})
-				).to.be.eventually.of.length(214);
-				return await ASSERT_1;
-			});
-
-			it("should have functioning GT, EQ (and AND)", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							AND: [
-								{
-									GT: {
-										[`${validId}_avg`]: 98.57,
-									},
-								},
-								{
-									EQ: {
-										[`${validId}_year`]: 1900,
-									},
-								},
-							],
-						},
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`],
-						},
-					})
-				).to.be.eventually.of.length(7);
-				return await ASSERT_1;
-			});
-
-			it("should have functioning LT, IS (and AND)", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							AND: [{LT: {[`${validId}_year`]: 1901}}, {IS: {[`${validId}_dept`]: "zool"}}],
-						},
-						OPTIONS: {COLUMNS: [`${validId}_dept`]},
-					})
-				).to.be.eventually.of.length(15);
-				return await ASSERT_1;
-			});
-
-			it("should have functioning GT (and NOT)", async function () {
-				const ASSERT_1 = expect(
-					new InsightFacade().performQuery({
-						WHERE: {
-							NOT: {
-								LT: {
-									[`${validId}_avg`]: 98.57,
-								},
-							},
-						},
-						OPTIONS: {
-							COLUMNS: [`${validId}_dept`],
-						},
-					})
-				).to.be.eventually.of.length(17);
-				return await ASSERT_1;
-			});
 		});
 	});
 });

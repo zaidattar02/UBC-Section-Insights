@@ -1,0 +1,1925 @@
+[
+    {
+        "title": "Given Tests",
+        "tests": [
+            {
+                "title": "SELECT dept, id, avg WHERE avg == 95 || avg > 90 && dept == 'adhe' ORDER BY avg",
+                "input": {
+                    "WHERE": {
+                        "OR": [
+                            {
+                                "AND": [
+                                    {
+                                        "GT": {
+                                            "sections_avg": 90
+                                        }
+                                    },
+                                    {
+                                        "IS": {
+                                            "sections_dept": "adhe"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "EQ": {
+                                    "sections_avg": 95
+                                }
+                            }
+                        ]
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_id",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP",
+                            "keys": [
+                                "sections_avg"
+                            ]
+                        }
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "329",
+                        "sections_avg": 90.02
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "412",
+                        "sections_avg": 90.16
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 90.17
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "412",
+                        "sections_avg": 90.18
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 90.5
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 90.72
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "329",
+                        "sections_avg": 90.82
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 90.85
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 91.29
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 91.33
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 91.33
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "330",
+                        "sections_avg": 91.48
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "329",
+                        "sections_avg": 92.54
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "329",
+                        "sections_avg": 93.33
+                    },
+                    {
+                        "sections_dept": "sowk",
+                        "sections_id": "570",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "rhsc",
+                        "sections_id": "501",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "psyc",
+                        "sections_id": "501",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "psyc",
+                        "sections_id": "501",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "obst",
+                        "sections_id": "549",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_id": "424",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_id": "424",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "musc",
+                        "sections_id": "553",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "mtrl",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "mtrl",
+                        "sections_id": "564",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "mtrl",
+                        "sections_id": "564",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_id": "532",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_id": "532",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "kin",
+                        "sections_id": "500",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "kin",
+                        "sections_id": "500",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "kin",
+                        "sections_id": "499",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_id": "682",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_id": "682",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_id": "606",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "edcp",
+                        "sections_id": "473",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "edcp",
+                        "sections_id": "473",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "econ",
+                        "sections_id": "516",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "econ",
+                        "sections_id": "516",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_id": "599",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "cpsc",
+                        "sections_id": "589",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "cpsc",
+                        "sections_id": "589",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "cnps",
+                        "sections_id": "535",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "cnps",
+                        "sections_id": "535",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "bmeg",
+                        "sections_id": "597",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "bmeg",
+                        "sections_id": "597",
+                        "sections_avg": 95
+                    },
+                    {
+                        "sections_dept": "adhe",
+                        "sections_id": "329",
+                        "sections_avg": 96.11
+                    }
+                ]
+            },
+            {
+                "title": "SELECT dept, avg WHERE avg > 97",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "sections_avg": 97
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept",
+                            "sections_avg"
+                        ],
+                        "ORDER": {
+                            "dir": "UP",
+                            "keys": [
+                                "sections_avg"
+                            ]
+                        }
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.09
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.09
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.09
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.09
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.25
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.25
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.29
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.29
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 97.33
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 97.33
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.41
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.41
+                    },
+                    {
+                        "sections_dept": "cnps",
+                        "sections_avg": 97.47
+                    },
+                    {
+                        "sections_dept": "cnps",
+                        "sections_avg": 97.47
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.48
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 97.48
+                    },
+                    {
+                        "sections_dept": "educ",
+                        "sections_avg": 97.5
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 97.53
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 97.53
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.67
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.69
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 97.78
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_avg": 98
+                    },
+                    {
+                        "sections_dept": "crwr",
+                        "sections_avg": 98
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.08
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.21
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.21
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.36
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.45
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.45
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.5
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.5
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.58
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.58
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.58
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.58
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.7
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.71
+                    },
+                    {
+                        "sections_dept": "nurs",
+                        "sections_avg": 98.71
+                    },
+                    {
+                        "sections_dept": "eece",
+                        "sections_avg": 98.75
+                    },
+                    {
+                        "sections_dept": "eece",
+                        "sections_avg": 98.75
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.76
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.76
+                    },
+                    {
+                        "sections_dept": "epse",
+                        "sections_avg": 98.8
+                    },
+                    {
+                        "sections_dept": "spph",
+                        "sections_avg": 98.98
+                    },
+                    {
+                        "sections_dept": "spph",
+                        "sections_avg": 98.98
+                    },
+                    {
+                        "sections_dept": "cnps",
+                        "sections_avg": 99.19
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 99.78
+                    },
+                    {
+                        "sections_dept": "math",
+                        "sections_avg": 99.78
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "Basic Functionality",
+        "tests": [
+            {
+                "title": "Should select all columns effectively",
+                "input": {
+                    "WHERE": {
+                        "EQ": {
+                            "sections_avg": 95
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_uuid",
+                            "sections_id",
+                            "sections_title",
+                            "sections_instructor",
+                            "sections_dept",
+                            "sections_year",
+                            "sections_avg",
+                            "sections_pass",
+                            "sections_fail",
+                            "sections_audit"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_uuid": "43501",
+                        "sections_id": "597",
+                        "sections_title": "master eng proj",
+                        "sections_instructor": "dumont, guy a",
+                        "sections_dept": "bmeg",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 2,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "43502",
+                        "sections_id": "597",
+                        "sections_title": "master eng proj",
+                        "sections_instructor": "",
+                        "sections_dept": "bmeg",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 2,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "28349",
+                        "sections_id": "535",
+                        "sections_title": "adlt psychpathlg",
+                        "sections_instructor": "schultz, izabela",
+                        "sections_dept": "cnps",
+                        "sections_year": 2016,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 1
+                    },
+                    {
+                        "sections_uuid": "28350",
+                        "sections_id": "535",
+                        "sections_title": "adlt psychpathlg",
+                        "sections_instructor": "",
+                        "sections_dept": "cnps",
+                        "sections_year": 2016,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 1
+                    },
+                    {
+                        "sections_uuid": "1385",
+                        "sections_id": "589",
+                        "sections_title": "m.sc major essay",
+                        "sections_instructor": "",
+                        "sections_dept": "cpsc",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "1386",
+                        "sections_id": "589",
+                        "sections_title": "m.sc major essay",
+                        "sections_instructor": "",
+                        "sections_dept": "cpsc",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "26257",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "graefe, sara",
+                        "sections_dept": "crwr",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 2,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "46406",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "svendsen, linda jane",
+                        "sections_dept": "crwr",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "46407",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "medved, maureen",
+                        "sections_dept": "crwr",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "71171",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "",
+                        "sections_dept": "crwr",
+                        "sections_year": 2012,
+                        "sections_avg": 95,
+                        "sections_pass": 3,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "75158",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "acheson, alison",
+                        "sections_dept": "crwr",
+                        "sections_year": 2015,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "81354",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "",
+                        "sections_dept": "crwr",
+                        "sections_year": 2012,
+                        "sections_avg": 95,
+                        "sections_pass": 3,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "92881",
+                        "sections_id": "599",
+                        "sections_title": "thesis",
+                        "sections_instructor": "galloway, steve",
+                        "sections_dept": "crwr",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 2,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "10016",
+                        "sections_id": "516",
+                        "sections_title": "spc tpcs macroec",
+                        "sections_instructor": "gallipoli, giovanni",
+                        "sections_dept": "econ",
+                        "sections_year": 2016,
+                        "sections_avg": 95,
+                        "sections_pass": 3,
+                        "sections_fail": 0,
+                        "sections_audit": 2
+                    },
+                    {
+                        "sections_uuid": "10017",
+                        "sections_id": "516",
+                        "sections_title": "spc tpcs macroec",
+                        "sections_instructor": "",
+                        "sections_dept": "econ",
+                        "sections_year": 2016,
+                        "sections_avg": 95,
+                        "sections_pass": 3,
+                        "sections_fail": 0,
+                        "sections_audit": 2
+                    },
+                    {
+                        "sections_uuid": "16690",
+                        "sections_id": "473",
+                        "sections_title": "ict educ ethics",
+                        "sections_instructor": "petrina, stephen",
+                        "sections_dept": "edcp",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 19,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "16691",
+                        "sections_id": "473",
+                        "sections_title": "ict educ ethics",
+                        "sections_instructor": "",
+                        "sections_dept": "edcp",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 19,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "76362",
+                        "sections_id": "606",
+                        "sections_title": "coll&uni teachng",
+                        "sections_instructor": "vadeboncoeur, jennifer",
+                        "sections_dept": "epse",
+                        "sections_year": 2009,
+                        "sections_avg": 95,
+                        "sections_pass": 7,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "86974",
+                        "sections_id": "682",
+                        "sections_title": "mult des anal rs",
+                        "sections_instructor": "zumbo, bruno",
+                        "sections_dept": "epse",
+                        "sections_year": 2007,
+                        "sections_avg": 95,
+                        "sections_pass": 9,
+                        "sections_fail": 0,
+                        "sections_audit": 9
+                    },
+                    {
+                        "sections_uuid": "86975",
+                        "sections_id": "682",
+                        "sections_title": "mult des anal rs",
+                        "sections_instructor": "",
+                        "sections_dept": "epse",
+                        "sections_year": 2007,
+                        "sections_avg": 95,
+                        "sections_pass": 9,
+                        "sections_fail": 0,
+                        "sections_audit": 9
+                    },
+                    {
+                        "sections_uuid": "72706",
+                        "sections_id": "499",
+                        "sections_title": "kin project",
+                        "sections_instructor": "",
+                        "sections_dept": "kin",
+                        "sections_year": 2015,
+                        "sections_avg": 95,
+                        "sections_pass": 5,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "59530",
+                        "sections_id": "500",
+                        "sections_title": "spec tpcs kin",
+                        "sections_instructor": "",
+                        "sections_dept": "kin",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 7,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "86831",
+                        "sections_id": "500",
+                        "sections_title": "spec tpcs kin",
+                        "sections_instructor": "",
+                        "sections_dept": "kin",
+                        "sections_year": 2014,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "29971",
+                        "sections_id": "532",
+                        "sections_title": "algb geometry i",
+                        "sections_instructor": "",
+                        "sections_dept": "math",
+                        "sections_year": 2008,
+                        "sections_avg": 95,
+                        "sections_pass": 6,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "29972",
+                        "sections_id": "532",
+                        "sections_title": "algb geometry i",
+                        "sections_instructor": "",
+                        "sections_dept": "math",
+                        "sections_year": 2008,
+                        "sections_avg": 95,
+                        "sections_pass": 6,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "49773",
+                        "sections_id": "564",
+                        "sections_title": "hydrmtllgcl rctr",
+                        "sections_instructor": "dixon, david",
+                        "sections_dept": "mtrl",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 6,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "49774",
+                        "sections_id": "564",
+                        "sections_title": "hydrmtllgcl rctr",
+                        "sections_instructor": "",
+                        "sections_dept": "mtrl",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 6,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "2676",
+                        "sections_id": "599",
+                        "sections_title": "masters thesis",
+                        "sections_instructor": "",
+                        "sections_dept": "mtrl",
+                        "sections_year": 2011,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "19490",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "langager, graeme",
+                        "sections_dept": "musc",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "19491",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "",
+                        "sections_dept": "musc",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "28877",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "langager, graeme",
+                        "sections_dept": "musc",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 7,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "28878",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "",
+                        "sections_dept": "musc",
+                        "sections_year": 2013,
+                        "sections_avg": 95,
+                        "sections_pass": 7,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "93963",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "langager, graeme",
+                        "sections_dept": "musc",
+                        "sections_year": 2011,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "93964",
+                        "sections_id": "553",
+                        "sections_title": "ubc singers",
+                        "sections_instructor": "",
+                        "sections_dept": "musc",
+                        "sections_year": 2011,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "96195",
+                        "sections_id": "424",
+                        "sections_title": "mntl hlth concrn",
+                        "sections_instructor": "phillips, craig",
+                        "sections_dept": "nurs",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 9,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "96196",
+                        "sections_id": "424",
+                        "sections_title": "mntl hlth concrn",
+                        "sections_instructor": "",
+                        "sections_dept": "nurs",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 9,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "98843",
+                        "sections_id": "549",
+                        "sections_title": "msc thesis",
+                        "sections_instructor": "",
+                        "sections_dept": "obst",
+                        "sections_year": 2009,
+                        "sections_avg": 95,
+                        "sections_pass": 1,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "94900",
+                        "sections_id": "501",
+                        "sections_title": "health psych",
+                        "sections_instructor": "de longis, anita",
+                        "sections_dept": "psyc",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 8,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "94901",
+                        "sections_id": "501",
+                        "sections_title": "health psych",
+                        "sections_instructor": "",
+                        "sections_dept": "psyc",
+                        "sections_year": 2010,
+                        "sections_avg": 95,
+                        "sections_pass": 8,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    },
+                    {
+                        "sections_uuid": "10582",
+                        "sections_id": "501",
+                        "sections_title": "eval src evidenc",
+                        "sections_instructor": "",
+                        "sections_dept": "rhsc",
+                        "sections_year": 2009,
+                        "sections_avg": 95,
+                        "sections_pass": 6,
+                        "sections_fail": 0,
+                        "sections_audit": 4
+                    },
+                    {
+                        "sections_uuid": "88881",
+                        "sections_id": "570",
+                        "sections_title": "directed study",
+                        "sections_instructor": "clark, natalie",
+                        "sections_dept": "sowk",
+                        "sections_year": 2015,
+                        "sections_avg": 95,
+                        "sections_pass": 4,
+                        "sections_fail": 0,
+                        "sections_audit": 0
+                    }
+                ]
+            },
+            {
+                "title": "Wildcards Test",
+                "input": {
+                    "WHERE": {
+                        "AND": [
+                            {
+                                "EQ": {
+                                    "sections_avg": 75
+                                }
+                            },
+                            {
+                                "IS": {
+                                    "sections_dept": "c*"
+                                }
+                            },
+                            {
+                                "IS": {
+                                    "sections_instructor": "*n"
+                                }
+                            },
+                            {
+                                "IS": {
+                                    "sections_title": "*u*"
+                                }
+                            }
+                        ]
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_id"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_id": "291"
+                    },
+                    {
+                        "sections_id": "390"
+                    },
+                    {
+                        "sections_id": "390"
+                    },
+                    {
+                        "sections_id": "390"
+                    },
+                    {
+                        "sections_id": "395"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "Filtering Tests",
+        "tests": [
+            {
+                "title": "Functioning EQ and OR",
+                "input": {
+                    "WHERE": {
+                        "OR": [
+                            {
+                                "EQ": {
+                                    "sections_audit": 5
+                                }
+                            },
+                            {
+                                "EQ": {
+                                    "sections_fail": 20
+                                }
+                            }
+                        ]
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_id"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_id": "160"
+                    },
+                    {
+                        "sections_id": "160"
+                    },
+                    {
+                        "sections_id": "160"
+                    },
+                    {
+                        "sections_id": "201"
+                    },
+                    {
+                        "sections_id": "278"
+                    },
+                    {
+                        "sections_id": "226"
+                    },
+                    {
+                        "sections_id": "226"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "530"
+                    },
+                    {
+                        "sections_id": "530"
+                    },
+                    {
+                        "sections_id": "111"
+                    },
+                    {
+                        "sections_id": "112"
+                    },
+                    {
+                        "sections_id": "112"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "140"
+                    },
+                    {
+                        "sections_id": "153"
+                    },
+                    {
+                        "sections_id": "153"
+                    },
+                    {
+                        "sections_id": "201"
+                    },
+                    {
+                        "sections_id": "230"
+                    },
+                    {
+                        "sections_id": "260"
+                    },
+                    {
+                        "sections_id": "335"
+                    },
+                    {
+                        "sections_id": "352"
+                    },
+                    {
+                        "sections_id": "352"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "293"
+                    },
+                    {
+                        "sections_id": "300"
+                    },
+                    {
+                        "sections_id": "300"
+                    },
+                    {
+                        "sections_id": "300"
+                    },
+                    {
+                        "sections_id": "300"
+                    },
+                    {
+                        "sections_id": "331"
+                    },
+                    {
+                        "sections_id": "331"
+                    },
+                    {
+                        "sections_id": "331"
+                    },
+                    {
+                        "sections_id": "344"
+                    },
+                    {
+                        "sections_id": "355"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "443"
+                    },
+                    {
+                        "sections_id": "443"
+                    },
+                    {
+                        "sections_id": "499"
+                    },
+                    {
+                        "sections_id": "457"
+                    },
+                    {
+                        "sections_id": "121"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "123"
+                    },
+                    {
+                        "sections_id": "203"
+                    },
+                    {
+                        "sections_id": "203"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "108"
+                    },
+                    {
+                        "sections_id": "108"
+                    },
+                    {
+                        "sections_id": "215"
+                    },
+                    {
+                        "sections_id": "509"
+                    },
+                    {
+                        "sections_id": "509"
+                    },
+                    {
+                        "sections_id": "290"
+                    },
+                    {
+                        "sections_id": "291"
+                    },
+                    {
+                        "sections_id": "293"
+                    },
+                    {
+                        "sections_id": "294"
+                    },
+                    {
+                        "sections_id": "295"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "213"
+                    },
+                    {
+                        "sections_id": "317"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "221"
+                    },
+                    {
+                        "sections_id": "221"
+                    },
+                    {
+                        "sections_id": "221"
+                    },
+                    {
+                        "sections_id": "325"
+                    },
+                    {
+                        "sections_id": "355"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "370"
+                    },
+                    {
+                        "sections_id": "568"
+                    },
+                    {
+                        "sections_id": "568"
+                    },
+                    {
+                        "sections_id": "504"
+                    },
+                    {
+                        "sections_id": "504"
+                    },
+                    {
+                        "sections_id": "565"
+                    },
+                    {
+                        "sections_id": "565"
+                    },
+                    {
+                        "sections_id": "342"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "112"
+                    },
+                    {
+                        "sections_id": "112"
+                    },
+                    {
+                        "sections_id": "114"
+                    },
+                    {
+                        "sections_id": "118"
+                    },
+                    {
+                        "sections_id": "310"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "231"
+                    },
+                    {
+                        "sections_id": "430"
+                    },
+                    {
+                        "sections_id": "430"
+                    },
+                    {
+                        "sections_id": "545"
+                    },
+                    {
+                        "sections_id": "545"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "122"
+                    },
+                    {
+                        "sections_id": "122"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "210"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "191"
+                    },
+                    {
+                        "sections_id": "529"
+                    },
+                    {
+                        "sections_id": "529"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "103"
+                    },
+                    {
+                        "sections_id": "104"
+                    },
+                    {
+                        "sections_id": "105"
+                    },
+                    {
+                        "sections_id": "105"
+                    },
+                    {
+                        "sections_id": "105"
+                    },
+                    {
+                        "sections_id": "110"
+                    },
+                    {
+                        "sections_id": "152"
+                    },
+                    {
+                        "sections_id": "180"
+                    },
+                    {
+                        "sections_id": "184"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "221"
+                    },
+                    {
+                        "sections_id": "255"
+                    },
+                    {
+                        "sections_id": "256"
+                    },
+                    {
+                        "sections_id": "257"
+                    },
+                    {
+                        "sections_id": "302"
+                    },
+                    {
+                        "sections_id": "224"
+                    },
+                    {
+                        "sections_id": "224"
+                    },
+                    {
+                        "sections_id": "224"
+                    },
+                    {
+                        "sections_id": "224"
+                    },
+                    {
+                        "sections_id": "360"
+                    },
+                    {
+                        "sections_id": "360"
+                    },
+                    {
+                        "sections_id": "473"
+                    },
+                    {
+                        "sections_id": "201"
+                    },
+                    {
+                        "sections_id": "202"
+                    },
+                    {
+                        "sections_id": "302"
+                    },
+                    {
+                        "sections_id": "302"
+                    },
+                    {
+                        "sections_id": "402"
+                    },
+                    {
+                        "sections_id": "402"
+                    },
+                    {
+                        "sections_id": "403"
+                    },
+                    {
+                        "sections_id": "403"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "120"
+                    },
+                    {
+                        "sections_id": "120"
+                    },
+                    {
+                        "sections_id": "120"
+                    },
+                    {
+                        "sections_id": "100"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "170"
+                    },
+                    {
+                        "sections_id": "170"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "101"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "302"
+                    },
+                    {
+                        "sections_id": "304"
+                    },
+                    {
+                        "sections_id": "304"
+                    },
+                    {
+                        "sections_id": "307"
+                    },
+                    {
+                        "sections_id": "501"
+                    },
+                    {
+                        "sections_id": "503"
+                    },
+                    {
+                        "sections_id": "505"
+                    },
+                    {
+                        "sections_id": "505"
+                    },
+                    {
+                        "sections_id": "507"
+                    },
+                    {
+                        "sections_id": "507"
+                    },
+                    {
+                        "sections_id": "507"
+                    },
+                    {
+                        "sections_id": "507"
+                    },
+                    {
+                        "sections_id": "507"
+                    },
+                    {
+                        "sections_id": "509"
+                    },
+                    {
+                        "sections_id": "509"
+                    },
+                    {
+                        "sections_id": "509"
+                    },
+                    {
+                        "sections_id": "200"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "102"
+                    },
+                    {
+                        "sections_id": "500"
+                    },
+                    {
+                        "sections_id": "443"
+                    },
+                    {
+                        "sections_id": "110"
+                    }
+                ]
+            },
+            {
+                "title": "Functioning GT, EQ, (and AND)",
+                "input": {
+                    "WHERE": {
+                        "AND": [
+                            {
+                                "GT": {
+                                    "sections_avg": 98.57
+                                }
+                            },
+                            {
+                                "EQ": {
+                                    "sections_year": 1900
+                                }
+                            }
+                        ]
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": []
+            },
+            {
+                "title": "should have functioning LT, IS (and AND)",
+                "input": {
+                    "WHERE": {
+                        "AND": [
+                            {
+                                "LT": {
+                                    "sections_year": 1901
+                                }
+                            },
+                            {
+                                "IS": {
+                                    "sections_dept": "zool"
+                                }
+                            }
+                        ]
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": []
+            },
+            {
+                "title": "functioning GT (and NOT)",
+                "input": {
+                    "WHERE": {
+                        "NOT": {
+                            "LT": {
+                                "sections_avg": 98.57
+                            }
+                        }
+                    },
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "sections_dept"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "expected": [
+                    {
+                        "sections_dept": "cnps"
+                    },
+                    {
+                        "sections_dept": "eece"
+                    },
+                    {
+                        "sections_dept": "eece"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "math"
+                    },
+                    {
+                        "sections_dept": "math"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "spph"
+                    },
+                    {
+                        "sections_dept": "spph"
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -162,12 +162,16 @@ export default class InsightFacade implements IInsightFacade {
 
 		// load data from disk (hopefully it has already been parsed by addDataset)
 		// this is very cringe but required because of bad design (EBNF)
-		const dataset = new QueryDataset(this.datasets.get(InsightFacade.inferDataSetName(validQuery.OPTIONS)));
-		dataset.queryWhere(validQuery.WHERE);
-		if(validQuery.TRANSFORMATIONS !== undefined) {
-			dataset.queryTransformations(validQuery.TRANSFORMATIONS);
+		const dataset =  this.datasets.get(InsightFacade.inferDataSetName(validQuery.OPTIONS));
+		if(dataset === undefined) {
+			throw new InsightError("Dataset not found");
 		}
-		return dataset.exportWithOptions(validQuery.OPTIONS);
+		const queryDataset = new QueryDataset(dataset);
+		queryDataset.queryWhere(validQuery.WHERE);
+		if(validQuery.TRANSFORMATIONS !== undefined) {
+			queryDataset.queryTransformations(validQuery.TRANSFORMATIONS);
+		}
+		return queryDataset.exportWithOptions(validQuery.OPTIONS);
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {

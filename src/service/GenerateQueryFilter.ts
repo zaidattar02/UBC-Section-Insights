@@ -111,12 +111,12 @@ function handle_comparison(
 }
 
 export function generateQueryFilterFunction(
-	filter: unknown,
+	WHERE: unknown,
 	datasetType: InsightDatasetKind,
 	unifiedDatasetName: string
 ): (section: IDatasetEntry) => boolean {
-	assertTrue(typeof filter === "object", "Filter object should be an object", InsightError);
-	const filterobj: object = filter as object;
+	assertTrue(typeof WHERE === "object", "Filter object should be an object", InsightError);
+	const filterobj: object = WHERE as object;
 
 	if (Object.keys(filterobj).length === 0) {
 		return () => true;

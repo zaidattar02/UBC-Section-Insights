@@ -22,10 +22,7 @@ export class QueryDataset extends Dataset {
 	private query_entries: QueryEntry[];
 	private derived_properties_names: string[] = [];
 
-	constructor(d?: Dataset) {
-		if (d === undefined) {
-			throw new Error("Dataset is undefined");
-		}
+	constructor(d: Dataset) {
 		super(d.getID(), d.getKind());
 		this.query_entries = d.getEntries().map((e) => ({
 			entry_properties: e,
@@ -131,16 +128,21 @@ export class QueryDataset extends Dataset {
 		return groups;
 	}
 
-	// private exportData: InsightResult[] = [];
-
 	public exportWithOptions(raw_options: unknown): InsightResult[] {
 		const options = this.validateOptions(raw_options);
 		this.options_filterColumns(options.COLUMNS);
+
 		if (options.ORDER !== undefined) {
 			this.options_handleOrdering(options as {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};});
 		}
-		// TODO flatten this.query_entries for final result
-		return [];
+		return this.query_entries.map((qe) => {
+			let out: InsightResult = {};
+			Object.entries(qe.entry_properties)
+				.forEach(([k, v]) => out[`${this.id}_${k}`] = v as string | number);
+			Object.entries(qe.derived_properties)
+				.forEach(([k, v]) => out[k] = v);
+			return out;
+		});
 	}
 
 	private options_filterColumns(COLUMNS: string[]): void {
@@ -168,7 +170,7 @@ export class QueryDataset extends Dataset {
 
 		this.query_entries = this.query_entries.map((s) => {
 			const ep: Partial<IDatasetEntry> = {};
-			columnKeys.forEach((c) => ep[c] = s[c]);
+			columnKeys.forEach((c) => ep[c] = s.entry_properties[c]);
 			const dp: Record<string, number> = {};
 			applyKeys.forEach((ak) => dp[ak] = s.derived_properties[ak]);
 			return {entry_properties: ep, derived_properties: dp};
@@ -180,13 +182,17 @@ export class QueryDataset extends Dataset {
 		const orderingMultiplier = options.ORDER.dir === "UP" ? 1 : -1;
 		this.query_entries = this.query_entries.sort((a, b) => {
 			for (const orderkey of options.ORDER.keys) {
-				const underscoreCount = (orderkey.match(/_/g) || []).length;
+				const underscoreCount = (orderkey.match(/_/) || []).length;
 				if (underscoreCount === 0) {
 					assertTrue(this.derived_properties_names.includes(orderkey),
 						`Invalid Key "${orderkey}" in ORDER`, InsightError);
-					assertTrue(options.COLUMNS.includes(orderkey), "ORDER key must be in COLUMNS", InsightError); // additional invariant from EBNF
+					assertTrue(options.COLUMNS.includes(orderkey),
+						`ORDER key "${orderkey}" must be in COLUMNS`, InsightError); // additional invariant from EBNF
 					const orderField = orderkey;
-
+					assertTrue(a.derived_properties[orderField] !== undefined &&
+						b.derived_properties[orderField] !== undefined,
+					`ORDER key "${orderkey}" must be in
+					${JSON.stringify(a.derived_properties)}, ${JSON.stringify(b.entry_properties)}`, InsightError);
 					if (a.derived_properties[orderField] < b.derived_properties[orderField]) {
 						return -1 * orderingMultiplier;
 					}
@@ -195,15 +201,19 @@ export class QueryDataset extends Dataset {
 					}
 				} else if (underscoreCount === 1) {
 					const splitOrderField = orderkey.split("_");
-					assertTrue(splitOrderField[0] === this.id &&
-						(this.id === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
-							.includes(splitOrderField[1]),
+					assertTrue(splitOrderField[0] === this.id, "Order is referencing the wrong dataset", InsightError);
+					assertTrue((this.id === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
+						.includes(splitOrderField[1]),
 					`Invalid Key "${orderkey}" in ORDER`, InsightError
 					);
-					assertTrue(options.COLUMNS.includes(splitOrderField[1]),
-						"ORDER key must be in COLUMNS", InsightError); // additional invariant from EBNF
+					assertTrue(options.COLUMNS.includes(orderkey),
+						`ORDER key "${orderkey}" must be in COLUMNS (${options.COLUMNS})`, InsightError); // additional invariant from EBNF
 					const orderField = splitOrderField[1] as keyof IDatasetEntry;
 
+					assertTrue(a.entry_properties[orderField] !== undefined &&
+						b.entry_properties[orderField] !== undefined,
+					`ORDER key "${orderkey}" must be in
+					${JSON.stringify(a.entry_properties)}, ${JSON.stringify(b.entry_properties)}`, InsightError);
 					if (a.entry_properties[orderField] < b.entry_properties[orderField]) {
 						return -1 * orderingMultiplier;
 					}
@@ -214,7 +224,7 @@ export class QueryDataset extends Dataset {
 					throw new InsightError(`Invalid Key "${orderkey}" in ORDER`);
 				}
 			}
-			return 0;
+			return -1;
 		});
 	}
 
