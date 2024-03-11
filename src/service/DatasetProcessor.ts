@@ -74,7 +74,7 @@ export abstract class DatasetProcessor {
 						sectionData.Audit,
 						sectionData.Year
 					);
-					dataset.addEntries(section);
+					dataset.addEntry(section);
 				} catch (e) {
 					console.error(`Invalid section data in file: ${e}`);
 				}

@@ -12,8 +12,8 @@ const utilIsNumber = (v: any) => typeof v === "number";
 const utilConvertToDecimal = (v: any) => new Decimal(v);
 
 interface QueryEntry<DatasetEntry> {
-	data_properties: Partial<DatasetEntry>;
-	derived_properties: Record<string, number>;
+	dataProperties: Partial<DatasetEntry>;
+	derivedProperties: Record<string, number>;
 }
 
 type OrderSchema<T> = Array<{type: "data_prop", key: keyof T} | {type: "derived_prop", key: string}>;
@@ -29,25 +29,25 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 	constructor(d: Dataset<DatasetEntry>) {
 		super(d.getID(), d.getKind());
 		this.query_entries = d.getEntries().map((e) => ({
-			data_properties: e,
-			derived_properties: {}
+			dataProperties: e,
+			derivedProperties: {}
 		}));
 	}
 
 	/**
 	 * @param WHERE Filter Query Object
-	 * @requires this.query_entries.data_properties to be of type Required<IDatasetEntry>
+	 * @requires this.query_entries.dataProperties to be of type Required<IDatasetEntry>
 	 */
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction(WHERE, this.kind, this.id);
-		const out = this.query_entries.filter((e) => filterFunction(e.data_properties));
+		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties));
 		this.query_entries = out;
 	}
 
 	/**
 	 * @param raw_transformation Transformation Query Object
-	 * @requires this.query_entries.data_properties to be of type Required<IDatasetEntry>
+	 * @requires this.query_entries.dataProperties to be of type Required<IDatasetEntry>
 	 * @requires raw_transformations not to be undefined
 	 */
 	public queryTransformations(raw_transformation: unknown): void {
@@ -58,36 +58,36 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 
 		const groups = this.makeGroups(groupKeys);
 		this.query_entries = Array.from(groups.entries()).map(([_hash, group]) => {
-			let o: QueryEntry<DatasetEntry> = {data_properties: group.shared_properties, derived_properties: {}};
+			let o: QueryEntry<DatasetEntry> = {dataProperties: group.shared_properties, derivedProperties: {}};
 			for (const {applykey, applytoken, datasetKey} of applyProps) {
 				const values = group.instances.map((i) => i[datasetKey]);
 				switch (applytoken) {
 					case "MAX":
 						assertTrue(values.every(utilIsNumber),
 							"MAX must be applied to a key with a numerical value", InsightError);
-						o.derived_properties[applykey] = Decimal.max(...values.map(utilConvertToDecimal)).toNumber();
+						o.derivedProperties[applykey] = Decimal.max(...values.map(utilConvertToDecimal)).toNumber();
 						break;
 					case "MIN":
 						assertTrue(values.every(utilIsNumber),
 							"MIN must be applied to a key with a numerical value", InsightError);
-						o.derived_properties[applykey] = Decimal.min(...values.map(utilConvertToDecimal)).toNumber();
+						o.derivedProperties[applykey] = Decimal.min(...values.map(utilConvertToDecimal)).toNumber();
 						break;
 					case "AVG":
 						assertTrue(values.every(utilIsNumber),
 							"AVG must be applied to a key with a numerical value", InsightError);
-						o.derived_properties[applykey] = Number((Number(values.map(utilConvertToDecimal)
+						o.derivedProperties[applykey] = Number((Number(values.map(utilConvertToDecimal)
 							.reduce((a, b) => a.add(b), new Decimal(0))) / values.length).toFixed(2));
 						break;
 					case "SUM":
 						assertTrue(values.every(utilIsNumber),
 							"SUM must be applied to a key with a numerical value", InsightError);
-						o.derived_properties[applykey] = Number(values.map(utilConvertToDecimal)
+						o.derivedProperties[applykey] = Number(values.map(utilConvertToDecimal)
 							.reduce((a, b) => a.add(b), new Decimal(0))
 							.toFixed(2)
 						);
 						break;
 					case "COUNT":
-						o.derived_properties[applykey] = values.length;
+						o.derivedProperties[applykey] = values.length;
 						break;
 				}
 				this.derived_properties_names.push(applykey);
@@ -97,7 +97,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 	}
 
 	/**
-	 * @requires this.query_entries[0].data_properties to be of type Required<DatasetEntry>
+	 * @requires this.query_entries[0].dataProperties to be of type Required<DatasetEntry>
 	 * @param GROUP List of keys to group by
 	 * @returns A map of groups, with the key being the hash of the group and the value being the group
 	 */
@@ -107,7 +107,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 		this.query_entries.forEach((query_entry) => {
 			let gp: Partial<DatasetEntry> = {};
 			GROUP.forEach((g) => {
-				gp[g] = query_entry.data_properties[g];
+				gp[g] = query_entry.dataProperties[g];
 			});
 			const groupHash = createHash("md5")
 				.update(JSON.stringify(Object.values(gp)))
@@ -115,12 +115,12 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 			if (!groups.has(groupHash)) {
 				groups.set(groupHash, {
 					shared_properties: gp,
-					instances: [query_entry.data_properties as DatasetEntry]
+					instances: [query_entry.dataProperties as DatasetEntry]
 				});
 			} else {
 				const cringe = groups.get(groupHash);
 				if (cringe !== undefined) {
-					cringe.instances.push(query_entry.data_properties as DatasetEntry);
+					cringe.instances.push(query_entry.dataProperties as DatasetEntry);
 				}
 			}
 		});
@@ -141,10 +141,10 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 		}
 		return this.query_entries.map((qe) => {
 			let out: InsightResult = {};
-			Object.entries(qe.data_properties)
+			Object.entries(qe.dataProperties)
 				// TODO fix not knowing what the value is.
 				.forEach(([k, v]) => out[`${this.id}_${k}`] = v as string | number);
-			Object.entries(qe.derived_properties)
+			Object.entries(qe.derivedProperties)
 				.forEach(([k, v]) => out[k] = v);
 			return out;
 		});
@@ -172,10 +172,10 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 
 		this.query_entries = this.query_entries.map((s) => {
 			const ep: Partial<DatasetEntry> = {};
-			columnKeys.forEach((c) => ep[c] = s.data_properties[c]);
+			columnKeys.forEach((c) => ep[c] = s.dataProperties[c]);
 			const dp: Record<string, number> = {};
-			applyKeys.forEach((ak) => dp[ak] = s.derived_properties[ak]);
-			return {data_properties: ep, derived_properties: dp};
+			applyKeys.forEach((ak) => dp[ak] = s.derivedProperties[ak]);
+			return {dataProperties: ep, derivedProperties: dp};
 		});
 	}
 
@@ -225,7 +225,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 
 	private stringOrderingFunctionGenerator(orderField: keyof DatasetEntry) {
 		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number =>
-			a.data_properties[orderField] > b.data_properties[orderField] ? 1 : -1;
+			a.dataProperties[orderField] > b.dataProperties[orderField] ? 1 : -1;
 	}
 
 	private objectOrderingFunctionGenerator(
@@ -235,17 +235,17 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number => {
 			for (const orderkey of orderSchema) {
 				if(orderkey.type === "data_prop"){
-					if (a.data_properties[orderkey.key] < b.data_properties[orderkey.key]) {
+					if (a.dataProperties[orderkey.key] < b.dataProperties[orderkey.key]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.data_properties[orderkey.key] > b.data_properties[orderkey.key]) {
+					if (a.dataProperties[orderkey.key] > b.dataProperties[orderkey.key]) {
 						return 1 * orderingMultiplier;
 					}
 				} else if(orderkey.type === "derived_prop") {
-					if (a.derived_properties[orderkey.key] < b.derived_properties[orderkey.key]) {
+					if (a.derivedProperties[orderkey.key] < b.derivedProperties[orderkey.key]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.derived_properties[orderkey.key] > b.derived_properties[orderkey.key]) {
+					if (a.derivedProperties[orderkey.key] > b.derivedProperties[orderkey.key]) {
 						return 1 * orderingMultiplier;
 					}
 				}

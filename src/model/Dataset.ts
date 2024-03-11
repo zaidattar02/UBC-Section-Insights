@@ -57,7 +57,7 @@ export class Dataset<T extends IDatasetEntry> {
 					sectionObj.audit,
 					sectionObj.year
 				);
-				dataset.addEntries(section);
+				dataset.addEntry(section);
 			});
 			return dataset;
 		} else {
@@ -81,7 +81,7 @@ export class Dataset<T extends IDatasetEntry> {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addEntries(section: T) {
+	public addEntry(section: T) {
 		this.entries.push(section);
 	}
 
