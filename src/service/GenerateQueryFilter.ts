@@ -1,6 +1,5 @@
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 import {CourseSectionNumericalKeyList, CourseSectionStringKeyList} from "../model/CourseSection";
-import {IDatasetEntry} from "../model/Dataset";
 import {RoomNumericalKeyList, RoomStringKeyList} from "../model/Room";
 import {assertTrue} from "./Assertions";
 
@@ -16,8 +15,9 @@ function isSComparison(key: string): key is "IS" {
 	return key === "IS";
 }
 
-function handle_m_comparison(dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, filterKey: string):
-	(section: IDatasetEntry) => boolean{
+function handle_m_comparison<IDatasetEntry>(
+	dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, filterKey: string
+): (section: IDatasetEntry) => boolean{
 	assertTrue(typeof dataVal === "number", "Key of inner object of Comparison should be a string", InsightError);
 	const dataValNum = dataVal as number;
 
@@ -42,8 +42,9 @@ function handle_m_comparison(dataKey: string, dataVal: unknown, datasetType: Ins
 	}
 }
 
-function handle_s_comparison(dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, _: string):
-	(section: IDatasetEntry) => boolean {
+function handle_s_comparison<IDatasetEntry>(
+	dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, _: string
+): (section: IDatasetEntry) => boolean {
 	assertTrue(typeof dataVal === "string", "Key of inner object of Comparison should be a string", InsightError);
 	const dataValStr = dataVal as string;
 
@@ -79,12 +80,12 @@ function handle_s_comparison(dataKey: string, dataVal: unknown, datasetType: Ins
 	}
 }
 
-function handle_comparison(
+function handle_comparison<T>(
 	innerVal: unknown,
 	unifiedDatasetName: string,
 	datasetType: InsightDatasetKind,
 	rootFilterObjKey: string
-): (section: IDatasetEntry) => boolean {
+): (section: T) => boolean {
 	assertTrue(typeof innerVal === "object", "Inner object of Comparison should be an object", InsightError);
 	const innerObj = innerVal as object;
 	const innerObjKVs: Array<[string, unknown]> = Object.entries(innerObj);
@@ -110,7 +111,7 @@ function handle_comparison(
 	throw new SyntaxError(`Code should be unreachable: Invalid Comparison Key, ${rootFilterObjKey}`);
 }
 
-export function generateQueryFilterFunction(
+export function generateQueryFilterFunction<IDatasetEntry>(
 	WHERE: unknown,
 	datasetType: InsightDatasetKind,
 	unifiedDatasetName: string

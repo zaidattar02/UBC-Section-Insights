@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import {CourseSection} from "../model/CourseSection";
-import {Dataset, IDatasetEntry} from "../model/Dataset";
+import {Dataset} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 import {Room} from "../model/Room";
@@ -49,7 +49,7 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<IDatasetEntry>): Promise<void> {
+	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);

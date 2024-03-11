@@ -1,4 +1,4 @@
-import {Dataset, IDatasetEntry} from "./Dataset";
+import {Dataset} from "./Dataset";
 import {generateQueryFilterFunction} from "../service/GenerateQueryFilter";
 import {InsightDatasetKind, InsightError, ResultTooLargeError, InsightResult} from "../controller/IInsightFacade";
 import {createHash} from "crypto";
@@ -21,7 +21,7 @@ type OrderSchema<T> = Array<{type: "data_prop", key: keyof T} | {type: "derived_
 /**
  * @param T The type of the dataset
  */
-export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<DatasetEntry> {
+export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEntry> {
 	// we make it partial in order to store shared_properties from grouping
 	private query_entries: Array<QueryEntry<DatasetEntry>>;
 	private derived_properties_names: string[] = [];
@@ -40,7 +40,7 @@ export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<Da
 	 */
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
-		const filterFunction = generateQueryFilterFunction(WHERE, this.kind, this.id);
+		const filterFunction = generateQueryFilterFunction<DatasetEntry>(WHERE, this.kind, this.id);
 		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties as DatasetEntry));
 		this.query_entries = out;
 	}

@@ -15,10 +15,7 @@ interface RoomDataSet {
 	entries: Room[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IDatasetEntry {}
-
-export class Dataset<T extends IDatasetEntry> {
+export class Dataset<T extends object> {
 	protected id: string;
 	protected kind: InsightDatasetKind;
 	private entries: T[];
