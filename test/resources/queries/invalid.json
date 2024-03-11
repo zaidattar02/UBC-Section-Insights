@@ -1,6 +1,6 @@
 [
     {
-        "title": "Datatype Problems",
+        "title": "Bad Query Datatype",
         "tests": [
             {
                 "title": "Empty Object Query",
@@ -35,8 +35,30 @@
         ]
     },
     {
-        "title": "Form Issues",
+        "title": "Bad Query Shape",
         "tests": [
+            {
+                "title": "Query missing WHERE",
+                "input": {
+                    "OPTIONS": {
+                        "COLUMNS": ["section_dept"]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Query missing OPTIONS",
+                "input": {
+                    "WHERE": {
+                        "GT": {
+                            "courses_avg": 97
+                        }
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
             {
                 "title": "Empty OPTIONS",
                 "input": {
@@ -65,25 +87,30 @@
                 "errorExpected": true,
                 "expected": "InsightError"
             },
+
+
+            
             {
-                "title": "Query missing WHERE",
-                "input": {
-                    "OPTIONS": {
-                        "COLUMNS": ["section_dept"]
-                    }
-                },
+                "title": "",
+                "input": {},
                 "errorExpected": true,
                 "expected": "InsightError"
             },
             {
-                "title": "Query missing OPTIONS",
-                "input": {
-                    "WHERE": {
-                        "GT": {
-                            "courses_avg": 97
-                        }
-                    }
-                },
+                "title": "",
+                "input": {},
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "",
+                "input": {},
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "",
+                "input": {},
                 "errorExpected": true,
                 "expected": "InsightError"
             }

@@ -4,7 +4,7 @@ import {InsightDatasetKind, InsightError, ResultTooLargeError, InsightResult} fr
 import {createHash} from "crypto";
 
 import {RoomKeyList} from "./Room";
-import {CourseSelectionKeyList} from "./CourseSection";
+import {CourseSelectionKey, CourseSelectionKeyList} from "./CourseSection";
 import {assertTrue} from "../service/Assertions";
 import Decimal from "decimal.js";
 
@@ -177,10 +177,34 @@ export class QueryDataset extends Dataset {
 		});
 	}
 
-	private options_handleOrdering(options: {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};}) {
+	private options_handleOrdering(
+		options: {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];} | string;}
+	) {
 		// Sort the results based on ORDER
-		const orderingMultiplier = options.ORDER.dir === "UP" ? 1 : -1;
-		this.query_entries = this.query_entries.sort((a, b) => {
+		this.query_entries = this.query_entries.sort(typeof options.ORDER === "string"
+			? this.stringOrderingFunctionGenerator(options.ORDER as string)
+			: this.objectOrderingFunctionGenerator(
+				options as {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};},
+				options.ORDER.dir === "UP" ? 1 : -1
+			));
+	}
+
+	private stringOrderingFunctionGenerator(orderField: string) {
+		const field = orderField.split("_")[1] as keyof IDatasetEntry;
+		return (a: QueryEntry,b: QueryEntry): number => {
+			if (a.entry_properties[field] > b.entry_properties[field]) {
+				return 1;
+			} else {
+				return -1;
+			}
+		};
+	}
+
+	private objectOrderingFunctionGenerator(
+		options: {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};},
+		orderingMultiplier: number
+	) {
+		return (a: QueryEntry,b: QueryEntry): number => {
 			for (const orderkey of options.ORDER.keys) {
 				const underscoreCount = (orderkey.match(/_/) || []).length;
 				if (underscoreCount === 0) {
@@ -225,7 +249,7 @@ export class QueryDataset extends Dataset {
 				}
 			}
 			return -1;
-		});
+		};
 	}
 
 	private validateTransformation(raw_transformation: unknown) {
@@ -267,38 +291,47 @@ export class QueryDataset extends Dataset {
 			assertTrue(id === this.id, "", InsightError);
 			assertTrue((this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList).includes(key)
 				, "", InsightError);
-
 			return {applykey, applytoken, datasetKey: key};
 		});
 	}
 
 	private validateOptions(raw_options: unknown) {
 		assertTrue(
-			typeof raw_options === "object" &&
-			raw_options != null &&
+			typeof raw_options === "object" && raw_options != null &&
 			((Object.keys(raw_options).length === 1 && Object.prototype.hasOwnProperty.call(raw_options, "COLUMNS")) ||
 				(Object.keys(raw_options).length === 2 &&
 					Object.prototype.hasOwnProperty.call(raw_options, "COLUMNS") &&
 					Object.prototype.hasOwnProperty.call(raw_options, "ORDER"))),
-			"OPTIONS should be an object with two keys, COLUMNS and ORDER",
-			InsightError
+			"OPTIONS should be an object with two keys, COLUMNS and ORDER", InsightError
 		);
 		const optionsObj = raw_options as {COLUMNS: unknown; ORDER?: unknown};
 
 		assertTrue(Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
-			"OPTIONS.COLUMNS should be an array of strings", InsightError
-		);
+			"OPTIONS.COLUMNS should be an array of strings", InsightError);
 		if (optionsObj.ORDER !== undefined) {
 			// assertTrue(Array.isArray(optionsObj.ORDER) && optionsObj.ORDER.every(o=>typeof o === "string"),
 			// "OPTIONS.ORDER should be an array of strings", InsightError);
-			assertTrue(typeof optionsObj.ORDER === "object" && optionsObj.ORDER != null &&
-				Object.keys(optionsObj.ORDER).length === 2 &&
-				Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "dir") &&
-				(["UP", "DOWN"].includes((optionsObj.ORDER as any).dir)) &&
-				Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "keys") &&
-				Array.isArray((optionsObj.ORDER as any).keys) &&
-				((optionsObj.ORDER as any).keys as unknown[]).every((k) => typeof k === "string"),
-			"ORDER is not in the right shape", InsightError);
+			if(typeof optionsObj.ORDER === "object") {
+				assertTrue(optionsObj.ORDER != null &&
+					Object.keys(optionsObj.ORDER).length === 2 &&
+					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "dir") &&
+					(["UP", "DOWN"].includes((optionsObj.ORDER as any).dir)) &&
+					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "keys") &&
+					Array.isArray((optionsObj.ORDER as any).keys) &&
+					((optionsObj.ORDER as any).keys as unknown[]).every((k) => typeof k === "string"),
+				"ORDER is not in the right shape", InsightError);
+			} else if(typeof optionsObj.ORDER === "string") {
+				const splitOrderField = optionsObj.ORDER.split("_");
+				assertTrue(splitOrderField.length === 2 &&
+						splitOrderField[0] === this.id &&
+						(this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
+							.includes(splitOrderField[1]),
+				"Invalid Key in ORDER", InsightError);
+				assertTrue((optionsObj.COLUMNS as string[]).includes(optionsObj.ORDER),
+					"ORDER key must be in COLUMNS", InsightError);
+			} else {
+				throw new InsightError("ORDER is not in the right shape");
+			}
 		}
 		return optionsObj as {COLUMNS: string[]; ORDER?: {dir: "UP" | "DOWN", keys: string[]}};
 	}

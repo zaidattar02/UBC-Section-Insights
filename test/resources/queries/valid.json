@@ -34,12 +34,7 @@
                             "sections_id",
                             "sections_avg"
                         ],
-                        "ORDER": {
-                            "dir": "UP",
-                            "keys": [
-                                "sections_avg"
-                            ]
-                        }
+                        "ORDER": "sections_avg"
                     }
                 },
                 "errorExpected": false,
@@ -1921,5 +1916,15 @@
                 ]
             }
         ]
+    },
+
+    {
+        "title": "Ordering Tests",
+        "tests": []
+    },
+
+    {
+        "title": "Aggregation Tests",
+        "tests": []
     }
 ]
