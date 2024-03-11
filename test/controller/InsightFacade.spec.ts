@@ -162,7 +162,7 @@ describe("InsightFacade_NewSuite", function () {
 	});
 });
 
-describe.skip("InsightFacade", function () {
+describe("InsightFacade", function () {
 	const validId = "validId";
 	const validKind = InsightDatasetKind.Sections;
 	let validContent: string;
