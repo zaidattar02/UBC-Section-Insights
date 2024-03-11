@@ -1,4 +1,6 @@
-export class Room{
+import {IDatasetEntry} from "./Dataset";
+
+export class Room implements IDatasetEntry{
 	private fullname: string;
 	private shortname: string;
 	private number: string;

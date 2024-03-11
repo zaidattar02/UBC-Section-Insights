@@ -4,25 +4,29 @@ import {InsightDatasetKind, InsightError, ResultTooLargeError, InsightResult} fr
 import {createHash} from "crypto";
 
 import {RoomKeyList} from "./Room";
-import {CourseSection, CourseSelectionKeyList} from "./CourseSection";
-import {assertTrue} from "../service/Assertions";
+import {CourseSelectionKeyList} from "./CourseSection";
+import {assertTrue, assertType} from "../service/Assertions";
 import Decimal from "decimal.js";
 
 const utilIsNumber = (v: any) => typeof v === "number";
 const utilConvertToDecimal = (v: any) => new Decimal(v);
 
-
-// we make it partial in order to store shared_properties from grouping
-interface QueryEntry {
-	data_properties: Partial<IDatasetEntry>;
+interface QueryEntry<DatasetEntry> {
+	data_properties: Partial<DatasetEntry>;
 	derived_properties: Record<string, number>;
 }
 
-export class QueryDataset extends Dataset {
-	private query_entries: QueryEntry[];
+type OrderSchema<T> = Array<{type: "data_prop", key: keyof T} | {type: "derived_prop", key: string}>;
+
+/**
+ * @param T The type of the dataset
+ */
+export class QueryDataset<DatasetEntry extends IDatasetEntry> extends Dataset<DatasetEntry> {
+	// we make it partial in order to store shared_properties from grouping
+	private query_entries: Array<QueryEntry<DatasetEntry>>;
 	private derived_properties_names: string[] = [];
 
-	constructor(d: Dataset) {
+	constructor(d: Dataset<DatasetEntry>) {
 		super(d.getID(), d.getKind());
 		this.query_entries = d.getEntries().map((e) => ({
 			data_properties: e,
@@ -37,22 +41,26 @@ export class QueryDataset extends Dataset {
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction(WHERE, this.kind, this.id);
-		const out = this.query_entries.filter((e) => filterFunction(e.data_properties as IDatasetEntry));
+		const out = this.query_entries.filter((e) => filterFunction(e.data_properties));
 		this.query_entries = out;
 	}
 
 	/**
 	 * @param raw_transformation Transformation Query Object
 	 * @requires this.query_entries.data_properties to be of type Required<IDatasetEntry>
+	 * @requires raw_transformations not to be undefined
 	 */
 	public queryTransformations(raw_transformation: unknown): void {
-		const transformation = this.validateTransformation(raw_transformation);
-		const groups = this.makeGroups(transformation.GROUP);
-		const applyQuery = this.validateApply(transformation.APPLY);
+		// validate queries
+		const transformation = this.validateTransformationShape(raw_transformation);
+		const groupKeys = this.validateGroup(transformation.GROUP);
+		const applyProps = this.validateApply(transformation.APPLY);
+
+		const groups = this.makeGroups(groupKeys);
 		this.query_entries = Array.from(groups.entries()).map(([_hash, group]) => {
-			let o: QueryEntry = {data_properties: group.shared_properties, derived_properties: {}};
-			for (const {applykey, applytoken, datasetKey} of applyQuery) {
-				const values = group.instances.map((i) => i[datasetKey as keyof IDatasetEntry]);
+			let o: QueryEntry<DatasetEntry> = {data_properties: group.shared_properties, derived_properties: {}};
+			for (const {applykey, applytoken, datasetKey} of applyProps) {
+				const values = group.instances.map((i) => i[datasetKey]);
 				switch (applytoken) {
 					case "MAX":
 						assertTrue(values.every(utilIsNumber),
@@ -88,30 +96,31 @@ export class QueryDataset extends Dataset {
 		});
 	}
 
-	private makeGroups(GROUP: string[]) {
+	/**
+	 * @requires this.query_entries[0].data_properties to be of type Required<DatasetEntry>
+	 * @param GROUP List of keys to group by
+	 * @returns A map of groups, with the key being the hash of the group and the value being the group
+	 */
+	private makeGroups(GROUP: Array<keyof DatasetEntry>) {
 		// populating groups
-		const groups = new Map<string, {shared_properties: Partial<IDatasetEntry>, instances: IDatasetEntry[]}>();
-		const UNSAFEtransformationGroupsKeyOnly = GROUP.map((g) => {
-			assertTrue((g.match(/_/g) || []).length === 1, "Group key must contain exactly 1 underscore", InsightError);
-			const split = g.split("_");
-			assertTrue(split[0] === this.id, "Group key must be from the same dataset", InsightError);
-			assertTrue(
-				(this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList).includes(split[1]),
-				"Group key must be a valid key", InsightError);
-			return split[1] as keyof IDatasetEntry;
-		});
-		this.query_entries.forEach((d) => {
-			let gp: Partial<IDatasetEntry> = {};
-			UNSAFEtransformationGroupsKeyOnly.forEach((g) => gp[g] = d.data_properties[g]);
+		const groups = new Map<string, {shared_properties: Partial<DatasetEntry>, instances: DatasetEntry[]}>();
+		this.query_entries.forEach((query_entry) => {
+			let gp: Partial<DatasetEntry> = {};
+			GROUP.forEach((g) => {
+				gp[g] = query_entry.data_properties[g];
+			});
 			const groupHash = createHash("md5")
 				.update(JSON.stringify(Object.values(gp)))
 				.digest("hex");
 			if (!groups.has(groupHash)) {
-				groups.set(groupHash, {shared_properties: gp, instances: [d.data_properties as IDatasetEntry]});
+				groups.set(groupHash, {
+					shared_properties: gp,
+					instances: [query_entry.data_properties as DatasetEntry]
+				});
 			} else {
 				const cringe = groups.get(groupHash);
 				if (cringe !== undefined) {
-					cringe.instances.push(d.data_properties as IDatasetEntry);
+					cringe.instances.push(query_entry.data_properties as DatasetEntry);
 				}
 			}
 		});
@@ -122,15 +131,18 @@ export class QueryDataset extends Dataset {
 		if (this.query_entries.length > 5000) {
 			throw new ResultTooLargeError("Query returned more than 5000 results");
 		}
-		const options = this.validateOptions(raw_options);
-		this.options_filterColumns(options.COLUMNS);
+		const {COLUMNS, ORDER} = this.validateOptionShape(raw_options);
 
-		if (options.ORDER !== undefined) {
-			this.options_handleOrdering(options as {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};});
+		assertType<string[]>(COLUMNS, Array.isArray(COLUMNS) && COLUMNS.every((c) => typeof c === "string"),
+			"OPTIONS.COLUMNS should be an array of strings", InsightError);
+		this.optionsFilterColumns(COLUMNS);
+		if (ORDER !== undefined) {
+			this.optionsHandleOrdering(COLUMNS, ORDER);
 		}
 		return this.query_entries.map((qe) => {
 			let out: InsightResult = {};
 			Object.entries(qe.data_properties)
+				// TODO fix not knowing what the value is.
 				.forEach(([k, v]) => out[`${this.id}_${k}`] = v as string | number);
 			Object.entries(qe.derived_properties)
 				.forEach(([k, v]) => out[k] = v);
@@ -138,9 +150,9 @@ export class QueryDataset extends Dataset {
 		});
 	}
 
-	private options_filterColumns(COLUMNS: string[]): void {
+	private optionsFilterColumns(COLUMNS: string[]): void {
 		// Select the columns
-		const columnKeys: Array<keyof IDatasetEntry> = [];
+		const columnKeys: Array<keyof DatasetEntry> = [];
 		const applyKeys: string[] = [];
 		COLUMNS.forEach((col) => {
 			const underscoreCount = (col.match(/_/g) || []).length;
@@ -149,20 +161,17 @@ export class QueryDataset extends Dataset {
 					`Invalid Key in COLUMNS, "${col}"`, InsightError);
 				applyKeys.push(col);
 			} else if (underscoreCount === 1) {
-				const colParts = col.split("_");
-				assertTrue(colParts[0] === this.id &&
-					(this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
-						.includes(colParts[1]),
-				`Invalid Key in COLUMNS, "${col}"`, InsightError
-				);
-				columnKeys.push(colParts[1] as keyof IDatasetEntry);
+				const [datasetId, key] = col.split("_");
+				assertTrue(datasetId === this.id, `Invalid Key in COLUMNS, "${col}"`, InsightError);
+				this.validateKey(key, `Invalid Key in COLUMNS, "${col}"`);
+				columnKeys.push(key);
 			} else {
 				throw new InsightError("Invalid Key in COLUMNS");
 			}
 		});
 
 		this.query_entries = this.query_entries.map((s) => {
-			const ep: Partial<IDatasetEntry> = {};
+			const ep: Partial<DatasetEntry> = {};
 			columnKeys.forEach((c) => ep[c] = s.data_properties[c]);
 			const dp: Record<string, number> = {};
 			applyKeys.forEach((ak) => dp[ak] = s.derived_properties[ak]);
@@ -170,96 +179,123 @@ export class QueryDataset extends Dataset {
 		});
 	}
 
-	private options_handleOrdering(
-		options: {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];} | string;}
-	) {
-		// Sort the results based on ORDER
-		this.query_entries = this.query_entries.sort(typeof options.ORDER === "string"
-			? this.stringOrderingFunctionGenerator(options.ORDER as string)
-			: this.objectOrderingFunctionGenerator(
-				options as {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};},
-				options.ORDER.dir === "UP" ? 1 : -1
-			));
+	private optionsHandleOrdering( COLUMNS: string[], ORDER: unknown ) {
+		if(typeof ORDER === "string") {
+			assertTrue((ORDER.match(/_/) || []).length === 1, "Invalid Key in ORDER", InsightError);
+			const [datasetID, key] = ORDER.split("_");
+			assertTrue(datasetID === this.id, "Invalid Key in ORDER", InsightError);
+			this.validateKey(key, "Invalid Key in ORDER");
+			assertTrue(COLUMNS.includes(ORDER), "ORDER key must be in COLUMNS", InsightError);
+			this.query_entries = this.query_entries.sort(this.stringOrderingFunctionGenerator(key));
+		} else if(typeof ORDER === "object") {
+			assertType<{dir: unknown, keys: unknown}>(ORDER, ORDER != null && Object.keys(ORDER).length === 2 &&
+				Object.prototype.hasOwnProperty.call(ORDER, "dir") &&
+				Object.prototype.hasOwnProperty.call(ORDER, "keys"),
+			"ORDER is not in the right shape", InsightError);
+			assertType<"UP" | "DOWN">(ORDER.dir, typeof ORDER.dir === "string" && ["UP", "DOWN"].includes(ORDER.dir),
+				"ORDER.dir is not the right shape", InsightError);
+			assertType<string[]>(ORDER.keys, Array.isArray(ORDER.keys) && ORDER.keys.length > 0 &&
+				ORDER.keys.every((k) => typeof k === "string"),
+			"ORDER.keys is not the right shape", InsightError);
+			this.query_entries = this.query_entries.sort(
+				this.objectOrderingFunctionGenerator(ORDER.keys.map((orderkey) => {
+					const underscoreCount = (orderkey.match(/_/) || []).length;
+					if (underscoreCount === 0) {
+						assertTrue(this.derived_properties_names.includes(orderkey),
+							`Invalid Key "${orderkey}" in ORDER`, InsightError);
+						assertTrue(COLUMNS.includes(orderkey),
+							`ORDER key "${orderkey}" must be in COLUMNS`, InsightError); // additional invariant from EBNF
+						return {type: "derived_prop", key: orderkey};
+					} else if (underscoreCount === 1) {
+						const [datasetID, key] = orderkey.split("_");
+						assertTrue(datasetID === this.id, "Order is referencing the wrong dataset", InsightError);
+						this.validateKey(key, `Invalid Key "${orderkey}" in ORDER`);
+						assertTrue(COLUMNS.includes(orderkey),
+							`ORDER key "${orderkey}" must be in COLUMNS (${COLUMNS})`, InsightError); // additional invariant from EBNF
+						return {type: "data_prop", key};
+					} else {
+						throw new InsightError(`Invalid Key "${orderkey}" in ORDER`);
+					}
+				}), ORDER.dir === "UP" ? 1 : -1)
+			);
+		} else {
+			throw new InsightError("ORDER is not in the right shape");
+		}
 	}
 
-	private stringOrderingFunctionGenerator(orderField: string) {
-		const field = orderField.split("_")[1] as keyof IDatasetEntry;
-		return (a: QueryEntry,b: QueryEntry): number => {
-			if (a.data_properties[field] > b.data_properties[field]) {
-				return 1;
-			} else {
-				return -1;
-			}
-		};
+	private stringOrderingFunctionGenerator(orderField: keyof DatasetEntry) {
+		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number =>
+			a.data_properties[orderField] > b.data_properties[orderField] ? 1 : -1;
 	}
 
 	private objectOrderingFunctionGenerator(
-		options: {COLUMNS: string[]; ORDER: {dir: "UP" | "DOWN"; keys: string[];};},
+		orderSchema: OrderSchema<DatasetEntry>,
 		orderingMultiplier: number
 	) {
-		return (a: QueryEntry,b: QueryEntry): number => {
-			for (const orderkey of options.ORDER.keys) {
-				const underscoreCount = (orderkey.match(/_/) || []).length;
-				if (underscoreCount === 0) {
-					assertTrue(this.derived_properties_names.includes(orderkey),
-						`Invalid Key "${orderkey}" in ORDER`, InsightError);
-					assertTrue(options.COLUMNS.includes(orderkey),
-						`ORDER key "${orderkey}" must be in COLUMNS`, InsightError); // additional invariant from EBNF
-					const orderField = orderkey;
-					assertTrue(a.derived_properties[orderField] !== undefined &&
-						b.derived_properties[orderField] !== undefined,
-					`ORDER key "${orderkey}" must be in
-					${JSON.stringify(a.derived_properties)}, ${JSON.stringify(b.data_properties)}`, InsightError);
-					if (a.derived_properties[orderField] < b.derived_properties[orderField]) {
+		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number => {
+			for (const orderkey of orderSchema) {
+				if(orderkey.type === "data_prop"){
+					if (a.data_properties[orderkey.key] < b.data_properties[orderkey.key]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.derived_properties[orderField] > b.derived_properties[orderField]) {
+					if (a.data_properties[orderkey.key] > b.data_properties[orderkey.key]) {
 						return 1 * orderingMultiplier;
 					}
-				} else if (underscoreCount === 1) {
-					const splitOrderField = orderkey.split("_");
-					assertTrue(splitOrderField[0] === this.id, "Order is referencing the wrong dataset", InsightError);
-					assertTrue((this.id === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
-						.includes(splitOrderField[1]),
-					`Invalid Key "${orderkey}" in ORDER`, InsightError
-					);
-					assertTrue(options.COLUMNS.includes(orderkey),
-						`ORDER key "${orderkey}" must be in COLUMNS (${options.COLUMNS})`, InsightError); // additional invariant from EBNF
-					const orderField = splitOrderField[1] as keyof IDatasetEntry;
-
-					assertTrue(a.data_properties[orderField] !== undefined &&
-						b.data_properties[orderField] !== undefined,
-					`ORDER key "${orderkey}" must be in
-					${JSON.stringify(a.data_properties)}, ${JSON.stringify(b.data_properties)}`, InsightError);
-					if (a.data_properties[orderField] < b.data_properties[orderField]) {
+				} else if(orderkey.type === "derived_prop") {
+					if (a.derived_properties[orderkey.key] < b.derived_properties[orderkey.key]) {
 						return -1 * orderingMultiplier;
 					}
-					if (a.data_properties[orderField] > b.data_properties[orderField]) {
+					if (a.derived_properties[orderkey.key] > b.derived_properties[orderkey.key]) {
 						return 1 * orderingMultiplier;
 					}
-				} else {
-					throw new InsightError(`Invalid Key "${orderkey}" in ORDER`);
 				}
 			}
 			return -1;
 		};
 	}
 
-	private validateTransformation(raw_transformation: unknown) {
-		assertTrue(typeof raw_transformation === "object" && raw_transformation !== null &&
+	// VALIDATIONS
+	private validateKey(k: unknown, msg: string): asserts k is keyof DatasetEntry {
+		if(typeof k !== "string") {
+			throw new InsightError("Key must be a string");
+		}
+		assertTrue((this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
+			.includes(k), msg, InsightError);
+	}
+
+	/**
+	 * @param raw_groups The raw unknown GROUP object
+	 * @returns the keys which are to be grouped
+	 */
+	private validateGroup(raw_groups: unknown): Array<keyof DatasetEntry> {
+		assertTrue(Array.isArray(raw_groups) && raw_groups.length > 0 && raw_groups.every((g) => typeof g === "string"),
+			"GROUP should be an array of valid strings, of length at least 1", InsightError);
+		const stringGroup = raw_groups as string[];
+		return stringGroup.map((g)=>{
+			assertTrue((g.match(/_/g) || []).length === 1, "Group key must contain exactly 1 underscore", InsightError);
+			const [datasetID, key] = g.split("_");
+			assertTrue(datasetID === this.id, `Group ${g} references variables from a different dataset`, InsightError);
+			this.validateKey(key, `Group ${g} references an invalid key for DatasetKind ${this.kind}`);
+			return key;
+		});
+	}
+
+	/**
+	 * @param raw_transformation The raw unknown transformation object
+	 * @returns A shaped transformation object, with GROUP valid
+	 */
+	private validateTransformationShape(raw_transformation: unknown) {
+		assertType<{GROUP: unknown, APPLY: unknown}>(raw_transformation,
+			typeof raw_transformation === "object" && raw_transformation !== null &&
 			Object.keys(raw_transformation).length === 2 &&
 			Object.prototype.hasOwnProperty.call(raw_transformation, "GROUP") &&
 			Object.prototype.hasOwnProperty.call(raw_transformation, "APPLY"),
-		"Transformation in not in the right shape", InsightError);
-		const shapedTransformation = raw_transformation as {GROUP: unknown, APPLY: unknown};
-		assertTrue(Array.isArray(shapedTransformation.GROUP) && shapedTransformation.GROUP.length > 0 &&
-			shapedTransformation.GROUP.every((c) => typeof c === "string"),
-		"GROUP should be an array of valid strings", InsightError);
-		assertTrue(Array.isArray(shapedTransformation.APPLY), "APPLY must be an array", InsightError);
-		return shapedTransformation as {GROUP: string[], APPLY: unknown[]};
+			"Transformation in not in the right shape", InsightError);
+		return raw_transformation;
 	}
 
-	private validateApply(raw_apply: unknown[]) {
+	private validateApply(raw_apply: unknown) {
+		assertType<unknown[]>(raw_apply, Array.isArray(raw_apply), "APPLY must be an array", InsightError);
 		return raw_apply.map((raw_apply_entry) => {
 			assertTrue(typeof raw_apply_entry === "object" && raw_apply_entry != null &&
 				Object.keys(raw_apply_entry).length === 1 && typeof Object.keys(raw_apply_entry)[0] === "string",
@@ -274,22 +310,22 @@ export class QueryDataset extends Dataset {
 			const innerobject = inner as Record<string, unknown>;
 
 			const applytoken = Object.keys(innerobject)[0];
-			assertTrue(/^(MAX|MIN|AVG|COUNT|SUM)$/.test(applytoken), "", InsightError);
+			assertType<"MAX" | "MIN" | "AVG" | "COUNT" | "SUM">(applytoken,
+				/^(MAX|MIN|AVG|COUNT|SUM)$/.test(applytoken), "", InsightError);
 			const innervalue = innerobject[applytoken] as unknown;
-			assertTrue(typeof innervalue === "string", "", InsightError);
+			assertType<string>(innervalue, typeof innervalue === "string", "", InsightError);
 
 			const innerValueString = innervalue as string;
 			assertTrue((innerValueString.match(/_/g) || []).length === 1, "", InsightError);
-			const [id, key] = innerValueString.split("_");
+			const [id, datasetKey] = innerValueString.split("_");
 			assertTrue(id === this.id, "", InsightError);
-			assertTrue((this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList).includes(key)
-				, "", InsightError);
-			return {applykey, applytoken, datasetKey: key};
+			this.validateKey(datasetKey, `Apply ${applykey} references an invalid key for DatasetKind ${this.kind}`);
+			return {applykey, applytoken, datasetKey};
 		});
 	}
 
-	private validateOptions(raw_options: unknown) {
-		assertTrue(
+	private validateOptionShape(raw_options: unknown) {
+		assertType<{COLUMNS: unknown; ORDER?: unknown}>(raw_options,
 			typeof raw_options === "object" && raw_options != null &&
 			((Object.keys(raw_options).length === 1 && Object.prototype.hasOwnProperty.call(raw_options, "COLUMNS")) ||
 				(Object.keys(raw_options).length === 2 &&
@@ -297,36 +333,6 @@ export class QueryDataset extends Dataset {
 					Object.prototype.hasOwnProperty.call(raw_options, "ORDER"))),
 			"OPTIONS should be an object with two keys, COLUMNS and ORDER", InsightError
 		);
-		const optionsObj = raw_options as {COLUMNS: unknown; ORDER?: unknown};
-
-		assertTrue(Array.isArray(optionsObj.COLUMNS) && optionsObj.COLUMNS.every((c) => typeof c === "string"),
-			"OPTIONS.COLUMNS should be an array of strings", InsightError);
-		if (optionsObj.ORDER !== undefined) {
-			if(typeof optionsObj.ORDER === "object") {
-				assertTrue(optionsObj.ORDER != null && Object.keys(optionsObj.ORDER).length === 2 &&
-					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "dir") &&
-					Object.prototype.hasOwnProperty.call(optionsObj.ORDER, "keys"),
-				"ORDER is not in the right shape", InsightError);
-				const orderShaped = optionsObj.ORDER as {dir: unknown, keys: unknown};
-				assertTrue(typeof orderShaped.dir === "string" && ["UP", "DOWN"].includes(orderShaped.dir),
-					"ORDER.dir is not the right shape", InsightError);
-				assertTrue(Array.isArray(orderShaped.keys) &&
-					orderShaped.keys.length > 0 &&
-					orderShaped.keys.every((k) => typeof k === "string"),
-				"ORDER.keys is not the right shape", InsightError);
-			} else if(typeof optionsObj.ORDER === "string") {
-				const splitOrderField = optionsObj.ORDER.split("_");
-				assertTrue(splitOrderField.length === 2 &&
-						splitOrderField[0] === this.id &&
-						(this.kind === InsightDatasetKind.Sections ? CourseSelectionKeyList : RoomKeyList)
-							.includes(splitOrderField[1]),
-				"Invalid Key in ORDER", InsightError);
-				assertTrue((optionsObj.COLUMNS as string[]).includes(optionsObj.ORDER),
-					"ORDER key must be in COLUMNS", InsightError);
-			} else {
-				throw new InsightError("ORDER is not in the right shape");
-			}
-		}
-		return optionsObj as {COLUMNS: string[]; ORDER?: {dir: "UP" | "DOWN", keys: string[]}};
+		return raw_options;
 	}
 }

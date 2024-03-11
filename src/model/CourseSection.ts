@@ -1,4 +1,6 @@
-export class CourseSection {
+import {IDatasetEntry} from "./Dataset";
+
+export class CourseSection implements IDatasetEntry {
 	private uuid: string;
 	private id: string;
 	private title: string;

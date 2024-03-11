@@ -15,12 +15,13 @@ interface RoomDataSet {
 	entries: Room[];
 }
 
-export type IDatasetEntry = CourseSection | Room;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IDatasetEntry {}
 
-export class Dataset {
+export class Dataset<T extends IDatasetEntry> {
 	protected id: string;
 	protected kind: InsightDatasetKind;
-	private entries: IDatasetEntry[];
+	private entries: T[];
 
 	constructor(id: string, kind: InsightDatasetKind) {
 		this.id = id;
@@ -28,7 +29,7 @@ export class Dataset {
 		this.entries = [];
 	}
 
-	public static fromObject(raw_obj: unknown): Dataset {
+	public static fromObject(raw_obj: unknown): Dataset<CourseSection | Room> {
 		assertTrue(typeof raw_obj === "object" && raw_obj !== null, "Invalid object", InsightError);
 		const obj = raw_obj as any;
 		assertTrue(typeof obj.id === "string", "Invalid id", InsightError);
@@ -37,10 +38,12 @@ export class Dataset {
 		assertTrue(Array.isArray(obj.entries), "Invalid entries", InsightError);
 		const validatedObject = obj as {id: string, kind: InsightDatasetKind, entries: unknown[]};
 
-		const dataset = new Dataset(validatedObject.id, validatedObject.kind);
 		if (validatedObject.kind === InsightDatasetKind.Rooms) {
+			const dataset = new Dataset<Room>(validatedObject.id, validatedObject.kind);
 			throw new Error("Not implemented");
+			return dataset;
 		} else if (validatedObject.kind === InsightDatasetKind.Sections) {
+			const dataset = new Dataset<CourseSection>(validatedObject.id, validatedObject.kind);
 			validatedObject.entries.forEach((sectionObj: any) => {
 				const section = new CourseSection(
 					sectionObj.uuid,
@@ -56,10 +59,10 @@ export class Dataset {
 				);
 				dataset.addEntries(section);
 			});
+			return dataset;
 		} else {
 			throw new Error("Invalid kind");
 		}
-		return dataset;
 	}
 
 	public getKind() {
@@ -78,11 +81,11 @@ export class Dataset {
 		return this.kind === InsightDatasetKind.Sections;
 	}
 
-	public addEntries(section: IDatasetEntry) {
+	public addEntries(section: T) {
 		this.entries.push(section);
 	}
 
-	public getEntries(): IDatasetEntry[] {
+	public getEntries(): T[] {
 		return this.entries;
 	}
 }

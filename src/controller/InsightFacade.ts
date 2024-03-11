@@ -6,34 +6,23 @@ import {
 	InsightResult,
 	NotFoundError,
 } from "./IInsightFacade";
-import {Dataset, IDatasetEntry} from "../model/Dataset";
+import {Dataset} from "../model/Dataset";
 import {DatasetProcessor} from "../service/DatasetProcessor";
 import fs from "fs-extra";
-import {
-	CourseSection,
-	CourseSelectionKeyList,
-} from "../model/CourseSection";
 import {assertTrue} from "../service/Assertions";
-import {RoomKeyList} from "../model/Room";
-import {createHash} from "crypto";
 import {QueryDataset} from "../model/QueryDataset";
-
-
-interface TransformationDataset {
-	underlyingData: Array<Partial<IDatasetEntry>>;
-	appliedData?: Array<{[k: string]: string}>;
-}
+import {CourseSection} from "../model/CourseSection";
+import {Room} from "../model/Room";
 
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
- *
  */
 export default class InsightFacade implements IInsightFacade {
-	private datasets: Map<string, Dataset>;
+	private datasets: Map<string, Dataset<CourseSection | Room>>;
 	private datasetsLoaded: Promise<void>;
 	constructor() {
-		this.datasets = new Map<string, Dataset>();
+		this.datasets = new Map<string, Dataset<CourseSection | Room>>();
 		this.datasetsLoaded = new Promise((resolve, reject) => {
 			this.loadDatasetsFromDisk()
 				.then((res) => {
@@ -41,7 +30,7 @@ export default class InsightFacade implements IInsightFacade {
 				})
 				.catch((e) => {
 					console.error("Failed to load datasets from disk:", e);
-					this.datasets = new Map<string, Dataset>();
+					this.datasets = new Map<string, Dataset<CourseSection | Room>>();
 				})
 				.finally(resolve);
 		});
@@ -51,11 +40,11 @@ export default class InsightFacade implements IInsightFacade {
 		return this.datasetsLoaded;
 	}
 
-	private async loadDatasetsFromDisk(): Promise<Map<string, Dataset>> {
+	private async loadDatasetsFromDisk(): Promise<Map<string, Dataset<CourseSection | Room>>> {
 		await fs.ensureDir("./data");
 		const files = await fs.readdir("./data"); // Get a list of dataset files
 
-		const ds = new Map<string, Dataset>();
+		const ds = new Map<string, Dataset<CourseSection | Room>>();
 		const loadPromises = files.map(async (file) => {
 			try {
 				const filePath = `./data/${file}`;

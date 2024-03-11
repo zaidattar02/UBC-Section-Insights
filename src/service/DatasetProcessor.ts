@@ -1,8 +1,9 @@
 import JSZip from "jszip";
 import {CourseSection} from "../model/CourseSection";
-import {Dataset} from "../model/Dataset";
+import {Dataset, IDatasetEntry} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
+import {Room} from "../model/Room";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -14,7 +15,9 @@ import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 //	public static methods
 
 export abstract class DatasetProcessor {
-	public static async ProcessDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+	public static async ProcessDataset(
+		id: string, content: string, kind: InsightDatasetKind
+	): Promise<Dataset<CourseSection | Room>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -23,7 +26,7 @@ export abstract class DatasetProcessor {
 				throw new InsightError("Invalid Data");
 			}
 			// if
-			const dataset = new Dataset(id, kind);
+			const dataset = new Dataset<CourseSection | Room>(id, kind);
 			const filePromises: any[] = [];
 			coursesFolder.forEach((relativePath, file) => {
 				const filePromise = this.processFile(file, dataset);
@@ -46,7 +49,7 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<IDatasetEntry>): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
