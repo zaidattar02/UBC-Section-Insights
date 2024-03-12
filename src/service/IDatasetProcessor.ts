@@ -1,12 +1,7 @@
-import JSZip from "jszip";
 import {CourseSection} from "../model/CourseSection";
 import {Dataset} from "../model/Dataset";
-import fs from "fs-extra";
-import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
-import * as parse5 from "parse5";
-import {Building} from "../model/Building";
+import {InsightDatasetKind} from "../controller/IInsightFacade";
 import {Room} from "../model/Room";
-import{fetchData} from"./HttpService";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -18,5 +13,5 @@ import{fetchData} from"./HttpService";
 //	public static methods
 
 export interface IDatasetProcessor {
-	processDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset>;
+	processDataset(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset<CourseSection | Room>>;
 }
