@@ -65,15 +65,15 @@ export default class InsightFacade implements IInsightFacade {
 		if (!id || id.trim().length === 0 || id.includes("_")) {
 			throw new InsightError("Invalid ID");
 		}
-		if (kind !== InsightDatasetKind.Sections) {
-			return Promise.reject(new InsightError("Invalid Dataset Kind"));
+		if (kind !== InsightDatasetKind.Sections && kind !== InsightDatasetKind.Rooms) {
+			return Promise.reject(new InsightError(`Invalid Dataset Kind = ${kind}`));
 		}
 
 		if (this.datasets.has(id)) {
 			throw new InsightError("Dataset already exists");
 		}
 		try {
-			const dataset = await DatasetProcessor.ProcessDataset(id, content, kind);
+			const dataset = await DatasetProcessor.processDataset(id, content, kind);
 			this.datasets.set(id, dataset);
 
 			return Array.from(this.datasets.keys());

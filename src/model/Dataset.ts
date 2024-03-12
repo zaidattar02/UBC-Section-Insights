@@ -30,14 +30,31 @@ export class Dataset<T extends object> {
 		assertTrue(typeof raw_obj === "object" && raw_obj !== null, "Invalid object", InsightError);
 		const obj = raw_obj as any;
 		assertTrue(typeof obj.id === "string", "Invalid id", InsightError);
-		assertTrue(typeof obj.kind === "string" && Object.values(InsightDatasetKind).includes(obj.kind),
-			"Invalid kind", InsightError);
+		assertTrue(
+			typeof obj.kind === "string" && Object.values(InsightDatasetKind).includes(obj.kind),
+			"Invalid kind",InsightError);
+
 		assertTrue(Array.isArray(obj.entries), "Invalid entries", InsightError);
-		const validatedObject = obj as {id: string, kind: InsightDatasetKind, entries: unknown[]};
+		const validatedObject = obj as {id: string; kind: InsightDatasetKind; entries: unknown[]};
 
 		if (validatedObject.kind === InsightDatasetKind.Rooms) {
 			const dataset = new Dataset<Room>(validatedObject.id, validatedObject.kind);
-			throw new Error("Not implemented");
+			validatedObject.entries.forEach((entry: any) => {
+				const room = new Room(
+					entry.fullName,
+					entry.shortname,
+					entry.number,
+					entry.name,
+					entry.address,
+					entry.lat,
+					entry.lon,
+					entry.seats,
+					entry.type,
+					entry.furniture,
+					entry.href
+				);
+				dataset.addEntry(room);
+			});
 			return dataset;
 		} else if (validatedObject.kind === InsightDatasetKind.Sections) {
 			const dataset = new Dataset<CourseSection>(validatedObject.id, validatedObject.kind);
