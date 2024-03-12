@@ -153,10 +153,12 @@ describe("InsightFacade", function () {
 	const validId = "validId";
 	const altValidID = "validId2";
 	const validKind = InsightDatasetKind.Sections;
+	const roomKind = InsightDatasetKind.Rooms;
 	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
 	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
 	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
+	let roomContent: string;
 
 	describe("loading from disk", function () {
 		it("should load from disk after creating new instance", async function () {
@@ -170,6 +172,7 @@ describe("InsightFacade", function () {
 	});
 	before("read in content", async function () {
 		validContent = await getContentFromArchives("pair.zip");
+		roomContent = await getContentFromArchives("campus.zip");
 	});
 
 	const loadValidDataset = async () => {
@@ -186,6 +189,12 @@ describe("InsightFacade", function () {
 			expect(await new InsightFacade().addDataset(validId, validContent, validKind)).to.be.deep.equal([validId]);
 			const files = await readdir("./data");
 			return expect(files.length).to.be.greaterThan(0);
+		});
+
+		it("should not fail with valid values ROOMS", async function () {
+			expect(await new InsightFacade().addDataset(validId, roomContent, roomKind)).to.be.deep.equal([validId]);
+			// const files = await readdir("./data");
+			// return expect(files.length).to.be.greaterThan(0);
 		});
 
 		context("checking dataset ID (arg1)", function () {

@@ -86,6 +86,7 @@ export default class InsightFacade implements IInsightFacade {
 				dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
 			} else if (kind === InsightDatasetKind.Rooms) {
 				dataset = await DatasetProcessor.ProcessDatasetRoom(id, content, kind);
+				console.log("added room");
 			} else {
 				throw new InsightError("Invalid Dataset Kind");
 			}

@@ -2,7 +2,7 @@ export class Room{
 	private fullname: string;
 	private shortname: string;
 	private number: string;
-	private name: string;
+	private name: string; // shorname_number
 	private address: string;
 	private lat: number;
 	private lon: number;
@@ -64,4 +64,13 @@ export class Room{
 		}
 		return value;
 	}
+}
+
+export interface IndexData{
+	sname: string;
+	fname: string;
+	addy: string;
+	fileLink: string;
+	lat: number;
+	lon: number;
 }
