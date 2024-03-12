@@ -73,6 +73,6 @@ export const CourseSectionNumericalKeyList: string[] = ["avg", "pass", "fail", "
 export type CourseSectionStringKeys = "uuid" | "id" | "title" | "instructor" | "dept";
 export const CourseSectionStringKeyList: string[] = ["uuid", "id", "title", "instructor", "dept"];
 
-export type CourseSelectionKey = keyof CourseSection;
+export type CourseSelectionKey = CourseSectionNumericalKeys | CourseSectionStringKeys;
 export const CourseSelectionKeyList: string[] = [...CourseSectionNumericalKeyList, ...CourseSectionStringKeyList];
 

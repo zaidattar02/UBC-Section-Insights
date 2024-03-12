@@ -3,7 +3,7 @@ export class Building{
 	public title: string;
 	public address: string;
 	public link: string;
-	public numberOfRooms:number = 0;
+	public numberOfRooms: number = 0;
 
 	constructor(
 		code: string,

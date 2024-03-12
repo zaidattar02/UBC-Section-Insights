@@ -3,11 +3,8 @@ import {CourseSection} from "../model/CourseSection";
 import {Dataset} from "../model/Dataset";
 import fs from "fs-extra";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
-import * as parse5 from "parse5";
-import {Building} from "../model/Building";
 import {Room} from "../model/Room";
-import{fetchData} from"./HttpService";
-import { IDatasetProcessor } from "./IDatasetProcessor";
+import {IDatasetProcessor} from "./IDatasetProcessor";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -18,13 +15,12 @@ import { IDatasetProcessor } from "./IDatasetProcessor";
 //	export abstract class Dataprocessor
 //	public static methods
 
-export class SectionsDatasetProcessor implements IDatasetProcessor  {
-	
+export class SectionsDatasetProcessor implements IDatasetProcessor {
 	public async processDataset(
 		id: string,
 		content: string,
 		kind: InsightDatasetKind
-	): Promise<Dataset> {
+	): Promise<Dataset<CourseSection>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -33,14 +29,14 @@ export class SectionsDatasetProcessor implements IDatasetProcessor  {
 				throw new InsightError("Invalid Data");
 			}
 			// if
-			const dataset = new Dataset(id, kind);
+			const dataset = new Dataset<CourseSection>(id, kind);
 			const filePromises: any[] = [];
 			coursesFolder.forEach((relativePath, file) => {
 				const filePromise = this.processFile(file, dataset);
 				filePromises.push(filePromise);
 			});
 			await Promise.all(filePromises);
-			if (dataset.getSections().length === 0) {
+			if (dataset.getEntries().length === 0) {
 				throw new InsightError("No valid sections found in the dataset");
 			}
 			//	convert JS object into JSON object, and save that representation to disk
@@ -55,7 +51,8 @@ export class SectionsDatasetProcessor implements IDatasetProcessor  {
 			throw new InsightError(`Error loading dataset: ${error}`);
 		}
 	}
-	public async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+
+	public async processFile(file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
