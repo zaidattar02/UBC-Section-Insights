@@ -87,7 +87,7 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 						);
 						break;
 					case "COUNT":
-						o.derivedProperties[applykey] = values.length;
+						o.derivedProperties[applykey] = (new Set(values)).size;
 						break;
 				}
 				this.derived_properties_names.push(applykey);
