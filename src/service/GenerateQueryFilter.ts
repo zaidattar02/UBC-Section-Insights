@@ -1,7 +1,7 @@
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 import {CourseSectionNumericalKeyList, CourseSectionStringKeyList} from "../model/CourseSection";
 import {RoomNumericalKeyList, RoomStringKeyList} from "../model/Room";
-import {assertTrue} from "./Assertions";
+import {assertTrue, assertType} from "./Assertions";
 
 function isLogicalComparison(key: string): key is "AND" | "OR" {
 	return key === "AND" || key === "OR";
@@ -43,7 +43,7 @@ function handle_m_comparison<IDatasetEntry>(
 }
 
 function handle_s_comparison<IDatasetEntry>(
-	dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, _: string
+	dataKey: string, dataVal: unknown, datasetType: InsightDatasetKind, _: "IS"
 ): (section: IDatasetEntry) => boolean {
 	assertTrue(typeof dataVal === "string", "Key of inner object of Comparison should be a string", InsightError);
 	const dataValStr = dataVal as string;
@@ -84,11 +84,11 @@ function handle_comparison<T>(
 	innerVal: unknown,
 	unifiedDatasetName: string,
 	datasetType: InsightDatasetKind,
-	rootFilterObjKey: string
+	rootFilterObjKey: "GT" | "LT" | "EQ" | "IS"
 ): (section: T) => boolean {
-	assertTrue(typeof innerVal === "object", "Inner object of Comparison should be an object", InsightError);
-	const innerObj = innerVal as object;
-	const innerObjKVs: Array<[string, unknown]> = Object.entries(innerObj);
+	assertType<object>(innerVal, typeof innerVal === "object",
+		"Inner object of Comparison should be an object", InsightError);
+	const innerObjKVs: Array<[string, unknown]> = Object.entries(innerVal);
 	assertTrue(innerObjKVs.length === 1, "Inner object of Comparison should only have one key", InsightError);
 	const [dataKeyFull, dataVal] = innerObjKVs[0];
 
@@ -140,8 +140,7 @@ export function generateQueryFilterFunction<IDatasetEntry>(
 		);
 		const innerArray = innerVal as unknown[];
 		const innerArrayFuncs = innerArray.map((filterElement) =>
-			generateQueryFilterFunction(filterElement, datasetType, unifiedDatasetName)
-		);
+			generateQueryFilterFunction<IDatasetEntry>(filterElement, datasetType, unifiedDatasetName));
 		switch (rootFilterObjKey) {
 			case "AND":
 				return (section: IDatasetEntry) => innerArrayFuncs.every((f) => f(section));

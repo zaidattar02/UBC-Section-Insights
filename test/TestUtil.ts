@@ -36,6 +36,7 @@ export interface ITestQuery {
 	title: string;
 	input: unknown;
 	errorExpected: boolean;
+	assertOrder: boolean;
 	expected: unknown | string;
 }
 

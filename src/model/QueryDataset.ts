@@ -41,6 +41,8 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction<DatasetEntry>(WHERE, this.kind, this.id);
+		// console.log("TESTING: ",
+		// (this.query_entries.find((e) => (e.dataProperties as any)["uuid"] === "10236")!.dataProperties as any)["year"]);
 		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties as DatasetEntry));
 		this.query_entries = out;
 	}
@@ -202,27 +204,27 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 			assertType<string[]>(ORDER.keys, Array.isArray(ORDER.keys) && ORDER.keys.length > 0 &&
 				ORDER.keys.every((k) => typeof k === "string"),
 			"ORDER.keys is not the right shape", InsightError);
-			this.query_entries = this.query_entries.sort(
-				this.objectOrderingFunctionGenerator(ORDER.keys.map((orderkey) => {
-					const underscoreCount = (orderkey.match(/_/) || []).length;
-					if (underscoreCount === 0) {
-						assertTrue(this.derived_properties_names.includes(orderkey),
-							`Invalid Key "${orderkey}" in ORDER`, InsightError);
-						assertTrue(COLUMNS.includes(orderkey),
-							`ORDER key "${orderkey}" must be in COLUMNS`, InsightError); // additional invariant from EBNF
-						return {type: "derived_prop", key: orderkey};
-					} else if (underscoreCount === 1) {
-						const [datasetID, key] = orderkey.split("_");
-						assertTrue(datasetID === this.id, "Order is referencing the wrong dataset", InsightError);
-						this.validateKey(key, `Invalid Key "${orderkey}" in ORDER`);
-						assertTrue(COLUMNS.includes(orderkey),
-							`ORDER key "${orderkey}" must be in COLUMNS (${COLUMNS})`, InsightError); // additional invariant from EBNF
-						return {type: "data_prop", key};
-					} else {
-						throw new InsightError(`Invalid Key "${orderkey}" in ORDER`);
-					}
-				}), ORDER.dir === "UP" ? 1 : -1)
-			);
+			const orderSchema: OrderSchema<DatasetEntry> = ORDER.keys.map((orderkey) => {
+				const underscoreCount = (orderkey.match(/_/) || []).length;
+				if (underscoreCount === 0) {
+					assertTrue(this.derived_properties_names.includes(orderkey),
+						`Invalid Key "${orderkey}" in ORDER`, InsightError);
+					assertTrue(COLUMNS.includes(orderkey),
+						`ORDER key "${orderkey}" must be in COLUMNS`, InsightError); // additional invariant from EBNF
+					return {type: "derived_prop", key: orderkey};
+				} else if (underscoreCount === 1) {
+					const [datasetID, key] = orderkey.split("_");
+					assertTrue(datasetID === this.id, "Order is referencing the wrong dataset", InsightError);
+					this.validateKey(key, `Invalid Key "${orderkey}" in ORDER`);
+					assertTrue(COLUMNS.includes(orderkey),
+						`ORDER key "${orderkey}" must be in COLUMNS (${COLUMNS})`, InsightError); // additional invariant from EBNF
+					return {type: "data_prop", key};
+				} else {
+					throw new InsightError(`Invalid Key "${orderkey}" in ORDER`);
+				}
+			});
+			this.query_entries = this.query_entries.sort(this.objectOrderingFunctionGenerator(orderSchema,
+				ORDER.dir === "UP" ? 1 : -1));
 		} else {
 			throw new InsightError("ORDER is not in the right shape");
 		}
@@ -230,7 +232,11 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 
 	private stringOrderingFunctionGenerator(orderField: keyof DatasetEntry) {
 		return (a: QueryEntry<DatasetEntry>,b: QueryEntry<DatasetEntry>): number =>
-			(a.dataProperties as DatasetEntry)[orderField] > (b.dataProperties as DatasetEntry)[orderField] ? 1 : -1;
+			(a.dataProperties as DatasetEntry)[orderField] > (b.dataProperties as DatasetEntry)[orderField]
+				? 1 :
+				(a.dataProperties as DatasetEntry)[orderField] < (b.dataProperties as DatasetEntry)[orderField]
+					? -1
+					: 0;
 	}
 
 	private objectOrderingFunctionGenerator(
@@ -257,7 +263,7 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 					}
 				}
 			}
-			return -1;
+			return 0;
 		};
 	}
 

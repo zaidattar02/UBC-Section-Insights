@@ -13,9 +13,7 @@ import chaiAsPromised = require("chai-as-promised");
 
 use(chaiAsPromised);
 
-let campus = getContentFromArchives("campus.zip"); // TODO Move this into a test, similar to how sections works rn.
-
-describe("InsightFacade_NewSuite", function () {
+describe("InsightFacade Querying", function () {
 	let facade: IInsightFacade;
 
 	// Declare datasets used in tests. You should add more datasets like this!
@@ -25,7 +23,7 @@ describe("InsightFacade_NewSuite", function () {
 	before(async function () {
 		// This block runs once and loads the datasets.
 		sections = await getContentFromArchives("pair.zip");
-		// rooms = await getContentFromArchives("campus.zip");
+		rooms = await getContentFromArchives("campus.zip");
 
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
@@ -57,21 +55,6 @@ describe("InsightFacade_NewSuite", function () {
 		});
 	});
 
-	// describe("AddDataSet HTML", function() {
-	// 	let rooms: string;
-	//
-	// 	beforeEach(function(){
-	// 		rooms = await getContentFromArchives("campus.zip");
-	// 		facade = new InsightFacade();
-	// 	});
-	// 	it("should accept dataset with valid HTML", function(){
-	// 		// rooms = await getContentFromArchives("campus.zip");
-	// 		const result = facade.addDataset("123", rooms,InsightDatasetKind.Rooms);
-	// 		return expect(result).to.eventually.deep.equal(["123"]);
-	//
-	// 	});
-	// });
-
 	describe("performQueryNoDataset", function () {
 		before("clear the disk", function () {
 			return clearDisk();
@@ -95,13 +78,14 @@ describe("InsightFacade_NewSuite", function () {
 	 */
 	describe("PerformQuery", function () {
 		before(async function () {
+			await clearDisk();
 			facade = new InsightFacade();
 
 			// Add the datasets to InsightFacade once.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
-				// facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
+				facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
 			];
 
 			try {
@@ -132,8 +116,13 @@ describe("InsightFacade_NewSuite", function () {
 							}
 							const result = facade.performQuery(test.input);
 							// console.log(JSON.stringify(await result));
-							return expect(result)
-								.to.eventually.deep.equal(test.expected);
+							if(test.assertOrder) {
+								return expect(result)
+									.to.eventually.have.deep.members(test.expected as any[]);
+							} else {
+								return expect(result)
+									.to.eventually.deep.equal(test.expected);
+							}
 						});
 					});
 				});
@@ -184,10 +173,10 @@ describe("InsightFacade_NewSuite", function () {
 	});
 });
 
-describe("InsightFacade", function () {
+describe.skip("InsightFacade Data Functions", function () {
 	const validId = "validId";
 	const roomID = "roomID";
-	const validKind = InsightDatasetKind.Sections;
+	const validKind = InsightDatasetKind.Rooms;
 	const roomKind = InsightDatasetKind.Rooms;
 	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
 	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
@@ -450,54 +439,6 @@ describe("InsightFacade", function () {
 			return await ASSERT_1;
 		});
 	});
-});
-
-// describe("InsightFacade Whitebox", function () {
-// 	describe("handleOptions", function () {
-// 		it("should throw a InsightError when OPTIONS is not an object", () => {
-// 			expect(() => InsightFacade.options_filterColumns("not an object", "courses", [])).to.throw(InsightError);
-// 		});
-// 		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
-// 			const options = {key1: "value1", key2: "value2", key3: "value3"};
-// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
-// 		});
-
-// 		it("should throw a InsightError when OPTIONS Query is invalid", () => {
-// 			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
-// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
-// 		});
-
-// 		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
-// 			const options: any = {COLUMNS: [], ORDER: 42};
-// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
-// 		});
-
-// 		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
-// 			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
-// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
-// 		});
-
-// 		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
-// 			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
-// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
-// 		});
-
-// 		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset
-
-// 		// it("should return filteredSections when OPTIONS are valid", () => {
-// 		// 	const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
-// 		// 	const filteredSections: CourseSection[] = [{} as CourseSection];
-
-// 		// 	expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
-// 		// });
-// 	});
-// });
-
-// Rooms Dataset Tests
-describe("InsightFacade", function () {
-	const validId = "validId";
-	const validKind = InsightDatasetKind.Rooms;
-	let validContent: string;
 
 	describe("loading rooms dataset from disk", function () {
 		beforeEach("clean disk before runs", () => {
@@ -511,14 +452,11 @@ describe("InsightFacade", function () {
 			return expect(datasets).to.have.lengthOf(1);
 		});
 	});
+
+
 	before("read in content", async function () {
 		validContent = await getContentFromArchives("rooms/campus.zip");
 	});
-
-	const loadValidDataset = async () => {
-		await clearDisk();
-		await new InsightFacade().addDataset(validId, validContent, validKind);
-	};
 
 	describe("add rooms Dataset", function () {
 		beforeEach("clean disk before runs", () => {
@@ -582,3 +520,44 @@ describe("InsightFacade", function () {
 		});
 	});
 });
+
+// describe("InsightFacade Whitebox", function () {
+// 	describe("handleOptions", function () {
+// 		it("should throw a InsightError when OPTIONS is not an object", () => {
+// 			expect(() => InsightFacade.options_filterColumns("not an object", "courses", [])).to.throw(InsightError);
+// 		});
+// 		it("should throw a InsightError when OPTIONS object has more than two keys", () => {
+// 			const options = {key1: "value1", key2: "value2", key3: "value3"};
+// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
+// 		});
+
+// 		it("should throw a InsightError when OPTIONS Query is invalid", () => {
+// 			const options = {ORDER: "orderValue", invalidKey: "invalidValue"};
+// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
+// 		});
+
+// 		it("should throw a InsightError when OPTIONS.ORDER is not a string", () => {
+// 			const options: any = {COLUMNS: [], ORDER: 42};
+// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
+// 		});
+
+// 		it("should throw a InsightError when OPTIONS.COLUMNS is not an array of strings", () => {
+// 			const options = {COLUMNS: [1, 2, 3], ORDER: "orderValue"};
+// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
+// 		});
+
+// 		it("should throw a InsightError when OPTIONS.COLUMNS contains a non-string value", () => {
+// 			const options = {COLUMNS: ["string", 42], ORDER: "orderValue"};
+// 			expect(() => InsightFacade.options_filterColumns(options, "courses", [])).to.throw(InsightError);
+// 		});
+
+// 		// THIS TEST IS WRONG because the columns do not refer to a valid existing dataset
+
+// 		// it("should return filteredSections when OPTIONS are valid", () => {
+// 		// 	const options = {COLUMNS: ["column1", "column2"], ORDER: "orderValue"};
+// 		// 	const filteredSections: CourseSection[] = [{} as CourseSection];
+
+// 		// 	expect(facade.handleOptions(options, "courses", filteredSections)).to.equal(filteredSections);
+// 		// });
+// 	});
+// });

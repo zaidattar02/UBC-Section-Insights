@@ -61,9 +61,6 @@ export class SectionsDatasetProcessor implements IDatasetProcessor {
 				return; // Skip this file as it doesn't contain any valid section
 			}
 			jsonData.result.forEach((sectionData: any) => {
-				if (sectionData.section === "overall") {
-					sectionData.year = 1900;
-				}
 				try {
 					const section = new CourseSection(
 						sectionData.id,
@@ -75,7 +72,7 @@ export class SectionsDatasetProcessor implements IDatasetProcessor {
 						sectionData.Pass,
 						sectionData.Fail,
 						sectionData.Audit,
-						sectionData.Year
+						sectionData.Section === "overall" ? 1900 : sectionData.Year
 					);
 					dataset.addEntry(section);
 				} catch (e) {
