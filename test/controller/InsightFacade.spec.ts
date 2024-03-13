@@ -193,8 +193,8 @@ describe("InsightFacade", function () {
 
 		it("should not fail with valid values ROOMS", async function () {
 			expect(await new InsightFacade().addDataset(validId, roomContent, roomKind)).to.be.deep.equal([validId]);
-			// const files = await readdir("./data");
-			// return expect(files.length).to.be.greaterThan(0);
+			const files = await readdir("./data");
+			return expect(files.length).to.be.greaterThan(0);
 		});
 
 		context("checking dataset ID (arg1)", function () {

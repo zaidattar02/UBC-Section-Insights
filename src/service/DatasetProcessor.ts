@@ -9,7 +9,11 @@ import {Attribute} from "parse5/dist/common/token";
 import {parse, defaultTreeAdapter} from "parse5";
 import{Document, Element, ChildNode, ParentNode, TextNode} from "parse5/dist/tree-adapters/default";
 import doc = Mocha.reporters.doc;
-
+import {Room} from "../model/Room";
+import {
+	CLASS_ADD,
+	CLASS_CODE,
+	CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE} from "./const";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -21,23 +25,23 @@ import doc = Mocha.reporters.doc;
 //	public static methods
 
 interface BuildingInfo {
-	code: string| null;
-	full: string| null;
-	address: string| null;
-	filePath: string| null;
+	code: string;
+	full: string;
+	address: string;
+	filePath: string;
 	// TODO: add the lon and lan for geolocation
 	// long: number| null;
 	// lat: number| null;
 }
 
-const CLASS_FNAME = "views-field-title";
-const CLASS_CODE = "views-field-field-building-code";
-const CLASS_ROOM_NUMBER = "views-field-field-room-number";
-const CLASS_ADD = "views-field-field-building-address";
-const CLASS_ROOM_CAP = "views-field-field-room-capacity";
-const CLASS_ROOM_FURNITURE = "views-field-field-room-furniture";
-const CLASS_ROOM_TYPE = "views-field-field-room-type";
-
+// const CLASS_FNAME = "views-field-title";
+// const CLASS_CODE = "views-field-field-building-code";
+// const CLASS_ROOM_NUMBER = "views-field-field-room-number";
+// const CLASS_ADD = "views-field-field-building-address";
+// const CLASS_CAP = "views-field-field-room-capacity";
+// const CLASS_ROOM_FURNITURE = "views-field-field-room-furniture";
+// const CLASS_ROOM_TYPE = "views-field-field-room-type";
+// const CLASS_HREF = "views-field-nothing";
 export abstract class DatasetProcessor {
 	public static async ProcessDatasetSection(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 		try {
@@ -79,25 +83,165 @@ export abstract class DatasetProcessor {
 				throw new InsightError("Invalid Data: No index file");
 			}
 
-			// Ensure that index.htm is a valid HTML file
-			//	Use this array of promises to keep track of all the asyn ops and await for them
-			let buildiongInfo: BuildingInfo[] = [];
-			const dataset = new Dataset(id,kind);
-			const filePromises: any[] = [];
 			const indexContent = await indexFile.async("string");
+			let document: Document;
 			try {
-				const document = parse(indexContent as string);
-				const c = defaultTreeAdapter.getChildNodes(document);
-				this.handleIndexHtm(c,buildiongInfo);
+				document = parse(indexContent);
 			} catch (error) {
 				throw new InsightError("Invalid Data: index.htm is not valid HTML");
 			}
 
+			// Extract building information from index.htm
+			let buildingInfo: BuildingInfo[] = [];
+			this.handleIndexHtm(defaultTreeAdapter.getChildNodes(document), buildingInfo);
+			// console.log(buildingInfo);
+
+			// Create a new dataset instance
+			const dataset = new Dataset(id, kind);
+
+			// Process each building's rooms and add them to the dataset
+			const roomPromises = buildingInfo.map((building) => this.ProcessBuildingRooms(building, zip, dataset));
+			await Promise.all(roomPromises);
+			await fs.ensureDir("./data");
+			const datasetJsonStr = JSON.stringify(dataset, null, 4);
+			const datasetPath = `./data/${id}.json`;
+			await fs.writeFile(datasetPath, datasetJsonStr);
+
 			return dataset;
-			// TODO: Rest of implementation.
 		} catch (error) {
 			throw new InsightError(`Error loading dataset: ${error}`);
 		}
+	}
+
+
+	private static async ProcessBuildingRooms(building: BuildingInfo, zip: JSZip, dataset: Dataset): Promise<void> {
+		try {
+			let htmlContent = await zip.file(building.filePath)?.async("string");
+			let document: Document = parse(htmlContent as string);
+			// console.log("parsed the doc");
+			this.ParseRoom(building, defaultTreeAdapter.getChildNodes(document), dataset);
+		} catch(e) {
+			console.log(`Error: ${e}`);
+			return;
+		}
+	}
+
+	private static ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset): void {
+		if (children) {
+			for (let child of children) {
+				if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
+					const childNodes: ChildNode[] = defaultTreeAdapter.getChildNodes(child as ParentNode);
+					// console.log("entered table");
+
+					const roomNumber = this.getRoomTD(childNodes, CLASS_ROOM_NUMBER);
+					console.log(roomNumber);
+					const roomSeatsStr = this.getRoomTD(childNodes, CLASS_CAP);
+					// console.log(roomSeatsStr);
+					const roomSeats = roomSeatsStr ? parseInt(roomSeatsStr, 10) : 0;
+					// console.log(roomSeats);
+					const roomType = this.getRoomTD(childNodes, CLASS_ROOM_TYPE);
+					// console.log(roomType);
+					const roomFurniture = this.getRoomTD(childNodes, CLASS_ROOM_FURNITURE);
+					// console.log(roomFurniture);
+					const roomHref = this.getRoomTD(childNodes, CLASS_HREF);
+
+					const isRoomDataValid =
+						roomNumber !== null &&
+						roomSeatsStr !== null &&
+						roomType !== null &&
+						roomFurniture !== null &&
+						roomHref !== null;
+					// Only create and add the room if all data is valid
+					if (isRoomDataValid) {
+						// console.log("room is valid");
+						const room = new Room(
+							validRoomsData.full,
+							validRoomsData.code,
+							roomNumber,
+							`${validRoomsData.code}_${roomNumber}`,
+							validRoomsData.address,
+							0, // Placeholder for latitude, you will need to set this
+							0, // Placeholder for longitude, you will need to set this
+							roomSeats,
+							roomType,
+							roomFurniture,
+							roomHref,
+						);
+						dataset.addEntry(room);
+						console.log(room);
+					}
+				}
+				this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
+			}
+		}
+	}
+
+	// private static getRoomTD(childNodes: ChildNode[], classID: string): string | null {
+	// 	for (let child of childNodes) {
+	// 		if (child.nodeName === "td") {
+	// 			let attrs: Attribute[] = defaultTreeAdapter.getAttrList(child as Element);
+	// 			if (this.hasClassName(attrs, classID)) {
+	// 				return this.getDataFromCell(child as Element, classID);
+	// 			}
+	// 		}
+	// 	}
+	// 	return null;
+	// }
+
+	private static getRoomTD(childNodes: ChildNode[], classID: string): string | null {
+		for (let child of childNodes) {
+			if (child.nodeName === "td") {
+				let attrs: Attribute[] = defaultTreeAdapter.getAttrList(child as Element);
+				if (this.hasClassName(attrs, classID)) {
+					// getDataFromCell now returns an object with textContent and href
+					const cellData = this.getDataFromCell(child as Element, classID);
+					if (cellData) {
+						// If classID matches the one for href, return href, otherwise return textContent
+						return classID === CLASS_HREF ? cellData.href : cellData.textContent;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static getDataFromCell(tdElement: Element, classID: string):
+		{textContent: string, href: string} | null {
+
+		if (!defaultTreeAdapter.isElementNode(tdElement) ||
+			!this.hasClassName(defaultTreeAdapter.getAttrList(tdElement), classID)) {
+			return null;
+		}
+
+		// Use helper functions to simplify the main function body
+		const anchorElement = this.findAnchorElement(tdElement);
+		const href = this.extractHref(anchorElement);
+		const textContent = this.extractTextContent(tdElement, anchorElement);
+
+		return (textContent || href) ? {textContent, href} : null;
+	}
+
+	private static findAnchorElement(tdElement: Element): Element | undefined {
+		return defaultTreeAdapter.getChildNodes(tdElement)
+			.find((node) => defaultTreeAdapter.isElementNode(node) && node.tagName === "a") as Element | undefined;
+	}
+
+	private static extractHref(anchorElement: Element | undefined): string {
+		if (!anchorElement) {
+			return "";
+		}
+		const hrefAttr = defaultTreeAdapter.getAttrList(anchorElement)
+			.find((attr) => attr.name === "href");
+		return hrefAttr ? hrefAttr.value.trim() : "";
+	}
+
+	private static extractTextContent(tdElement: Element, anchorElement: Element | undefined): string {
+		// If we have an anchor element, get the text from it; otherwise, get the text from the td element
+		const sourceElement = anchorElement || tdElement;
+		return sourceElement.childNodes
+			.filter(defaultTreeAdapter.isTextNode)
+			.map((node) => defaultTreeAdapter.getTextNodeContent(node))
+			.join("").trim();
 	}
 
 	private static handleIndexHtm(children: ChildNode[], buildings: BuildingInfo[]){
@@ -107,7 +251,7 @@ export abstract class DatasetProcessor {
 					const buildingInf = this.getTableRow(defaultTreeAdapter.getChildNodes(child as ParentNode));
 					if(buildingInf){
 						buildings.push(buildingInf);
-						console.log(buildingInf);
+						// console.log(buildingInf);
 					}
 				}
 				// recursive call to check the rest of the tree by taking the current child as the parent
@@ -124,24 +268,34 @@ export abstract class DatasetProcessor {
 				let attrs: Attribute[] = defaultTreeAdapter.getAttrList(child as Element);
 
 				if (this.hasClassName(attrs, CLASS_FNAME)) {
-					building.full = this.getTableData(child as Element, CLASS_FNAME);
-					building.filePath = this.getTableData(child as Element, CLASS_FNAME)?.substring(2);
+					const titleData = this.getTableData(child as Element, CLASS_FNAME);
+					if (titleData) {
+						building.full = titleData.textContent;
+						building.filePath = titleData.filePath.substring(2);
+					}
 				} else if (this.hasClassName(attrs, CLASS_ADD)) {
-					building.address = this.getTableData(child as Element, CLASS_ADD);
+					const addressData = this.getTableData(child as Element, CLASS_ADD);
+					if (addressData) {
+						building.address = addressData.textContent;
+					}
 				} else if (this.hasClassName(attrs, CLASS_CODE)){
-					building.code = this.getTableData(child as Element,CLASS_CODE);
+					const codeData = this.getTableData(child as Element, CLASS_CODE);
+					if (codeData) {
+						building.code = codeData.textContent;
+					}
 				}
 			}
 		}
 
-		if (building.code && building.filePath && building.address && building.full) {
+		// Make sure all the necessary properties are defined
+		if (building.code && building.full && building.address && building.filePath) {
 			return building as BuildingInfo;
 		} else {
 			return null;
 		}
 	}
 
-	private static getTableData(tdElement: Element, classID: string): string | null {
+	private static getTableData(tdElement: Element, classID: string): {textContent: string, filePath: string} | null {
 		if (!defaultTreeAdapter.isElementNode(tdElement)) {
 			return null; // The node is not a <td> element
 		}
@@ -151,76 +305,42 @@ export abstract class DatasetProcessor {
 			return null; // The <td> does not have the class we are interested in
 		}
 
-		// We're looking for text content, return the text content directly
-		if (classID === "views-field-title") {
-			// Find the <a> element for text content, not just the href
+		// Initialize the object to hold our return values
+		let result = {
+			textContent: "",
+			filePath: ""
+		};
+
+		// If we're looking for a link, need to find an <a> element with the href attribute
+		if (classID === "views-field-title" || classID === CLASS_HREF) {
 			const anchorElement = defaultTreeAdapter.getChildNodes(tdElement).find(
 				(node) => defaultTreeAdapter.isElementNode(node) && node.tagName === "a"
 			) as Element | undefined;
 
 			if (anchorElement) {
-				// Get all the text nodes within the anchor element and concatenate their content
-				let textContent = "";
-				const textNodes = defaultTreeAdapter.getChildNodes(anchorElement).filter((node) =>
-					defaultTreeAdapter.isTextNode(node)
-				);
-
-				for (const textNode of textNodes) {
-					textContent += defaultTreeAdapter.getTextNodeContent(textNode as TextNode);
+				// Get the href attribute if it exists
+				const hrefAttr = defaultTreeAdapter.getAttrList(anchorElement).find((attr) => attr.name === "href");
+				if (hrefAttr) {
+					result.filePath = hrefAttr.value.trim();
 				}
-				return textContent.trim();
+
+				// Get the text content of the anchor element, which is the full name
+				result.textContent = anchorElement.childNodes
+					.filter(defaultTreeAdapter.isTextNode)
+					.map((node) => defaultTreeAdapter.getTextNodeContent(node))
+					.join("")
+					.trim();
 			}
-			return null; // If no anchor element is found, return null
 		} else {
-			// For non-title fields, return the text content of the <td>
-			let textContent = "";
-			let childNodes = defaultTreeAdapter.getChildNodes(tdElement);
-			for (let textNode of childNodes) {
-				if (defaultTreeAdapter.isTextNode(textNode)) {
-					textContent += defaultTreeAdapter.getTextNodeContent(textNode as TextNode);
-				}
-			}
-			return textContent.trim();
+			// For other cases, just return the text content
+			result.textContent = defaultTreeAdapter.getChildNodes(tdElement)
+				.filter(defaultTreeAdapter.isTextNode)
+				.map((node) => defaultTreeAdapter.getTextNodeContent(node))
+				.join("")
+				.trim();
 		}
-	}
 
-	// private static getTableData(tdElement: Element, classID: string): string | null {
-	// 	if (!defaultTreeAdapter.isElementNode(tdElement)) {
-	// 		return null; // The node is not a <td> element
-	// 	}
-	//
-	// 	let attrs: Attribute[] = defaultTreeAdapter.getAttrList(tdElement);
-	// 	if (!this.hasClassName(attrs, classID)) {
-	// 		return null; // The <td> does not have the class we are interested in
-	// 	}
-	//
-	// 	// If we're looking for a link, need to find an <a> element with the href attribute
-	// 	if (classID === "views-field-title") {
-	// 		const anchorElement = defaultTreeAdapter.getChildNodes(tdElement).find(
-	// 			(node) => defaultTreeAdapter.isElementNode(node) && node.tagName === "a"
-	// 		) as Element | undefined;
-	//
-	// 		if (anchorElement) {
-	// 			const hrefAttr = defaultTreeAdapter.getAttrList(anchorElement).find((attr) => attr.name === "href");
-	// 			return hrefAttr ? hrefAttr.value.trim() : null;
-	// 		}
-	// 	} else {
-	// 		// For other cases, just return the text content
-	// 		let textContent = "";
-	// 		let childNodes = defaultTreeAdapter.getChildNodes(tdElement);
-	// 		for (let textNode of childNodes) {
-	// 			if (defaultTreeAdapter.isTextNode(textNode)) {
-	// 				textContent += defaultTreeAdapter.getTextNodeContent(textNode as TextNode);
-	// 			}
-	// 		}
-	// 		return textContent.trim();
-	// 	}
-	//
-	// 	return null;
-	// }
-
-	private static findAttribute(attrs: Attribute[], name: string): Attribute | undefined {
-		return attrs.find((attr) => attr.name === name);
+		return result.textContent || result.filePath ? result : null;
 	}
 
 	private static hasClassName(attrs: Attribute[], className: string): boolean {

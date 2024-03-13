@@ -86,7 +86,6 @@ export default class InsightFacade implements IInsightFacade {
 				dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
 			} else if (kind === InsightDatasetKind.Rooms) {
 				dataset = await DatasetProcessor.ProcessDatasetRoom(id, content, kind);
-				console.log("added room");
 			} else {
 				throw new InsightError("Invalid Dataset Kind");
 			}
@@ -96,14 +95,6 @@ export default class InsightFacade implements IInsightFacade {
 		} catch (error) {
 			throw new InsightError(`Failed to add dataset: ${error}`);
 		}
-		// try {
-		// 	const dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
-		// 	this.datasets.set(id, dataset);
-		//
-		// 	return Array.from(this.datasets.keys());
-		// } catch (error) {
-		// 	throw new InsightError(`Failed to add dataset: ${error}`);
-		// }
 	}
 
 	public async removeDataset(id: string): Promise<string> {

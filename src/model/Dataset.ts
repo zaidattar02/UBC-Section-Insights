@@ -54,27 +54,6 @@ export class Dataset {
 		return dataset;
 	}
 
-
-	// public static fromObject(obj: any): Dataset {
-	// 	const dataset = new Dataset(obj.id, obj.kind);
-	// 	obj.entries.forEach((sectionObj: any) => {
-	// 		const section = new CourseSection(
-	// 			sectionObj.uuid,
-	// 			sectionObj.id,
-	// 			sectionObj.title,
-	// 			sectionObj.instructor,
-	// 			sectionObj.dept,
-	// 			sectionObj.avg,
-	// 			sectionObj.pass,
-	// 			sectionObj.fail,
-	// 			sectionObj.audit,
-	// 			sectionObj.year
-	// 		);
-	// 		dataset.addEntry(section);
-	// 	});
-	// 	return dataset;
-	// }
-
 	public getKind() {
 		return this.kind;
 	}
