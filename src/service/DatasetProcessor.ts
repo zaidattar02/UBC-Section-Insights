@@ -1,7 +1,6 @@
-import JSZip from "jszip";
-import {CourseSection} from "../model/CourseSection";
 import {Dataset} from "../model/Dataset";
-import fs from "fs-extra";
+import {SectionsDatasetProcessor} from "./SectionsDatasetProcessor";
+import {RoomsDatasetProcessor} from "./RoomsDatasetProcessor";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 // import {parse} from "parse5";
 // import * as tree from "parse5";
@@ -386,11 +385,5 @@ export abstract class DatasetProcessor {
 			console.error(`Error parsing file content to JSON: ${e}`);
 			return;
 		}
-	}
-
-	private static hasValidSection(sections: any[]): boolean {
-		const validKeys = ["id", "Course", "Title", "Professor", "Subject", "Avg", "Pass", "Fail", "Audit", "Year"];
-		// Check if at least one section has all valid keys
-		return sections.some((section) => validKeys.every((key) => Object.hasOwn(section, key)));
 	}
 }
