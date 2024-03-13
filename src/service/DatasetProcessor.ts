@@ -36,10 +36,7 @@ export abstract class DatasetProcessor {
 			}
 			const dataset = new Dataset<CourseSection | Room>(id, kind);
 			const filePromises: any[] = [];
-			coursesFolder.forEach((relativePath, file) => {
-				const filePromise = this.processFile(file, dataset);
-				filePromises.push(filePromise);
-			});
+			coursesFolder.forEach((_relativePath, file) => filePromises.push(this.ProcessSectionFile(file, dataset)));
 			await Promise.all(filePromises);
 			if (dataset.getEntries().length === 0) {
 				throw new InsightError("No valid sections found in the dataset");
@@ -326,7 +323,9 @@ export abstract class DatasetProcessor {
 		return attrs.some((attr) => attr.name === "class" && attr.value.includes(className));
 	}
 
-	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>): Promise<void> {
+	public static async ProcessSectionFile(
+		file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>
+	): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
@@ -335,9 +334,6 @@ export abstract class DatasetProcessor {
 				return; // Skip this file as it doesn't contain any valid section
 			}
 			jsonData.result.forEach((sectionData: any) => {
-				if (sectionData.section === "overall") {
-					sectionData.year = 1900;
-				}
 				try {
 					const section = new CourseSection(
 						sectionData.id,
@@ -349,7 +345,7 @@ export abstract class DatasetProcessor {
 						sectionData.Pass,
 						sectionData.Fail,
 						sectionData.Audit,
-						sectionData.Year
+						sectionData.Section === "overall" ? 1900 : sectionData.Year
 					);
 					dataset.addEntry(section);
 				} catch (e) {

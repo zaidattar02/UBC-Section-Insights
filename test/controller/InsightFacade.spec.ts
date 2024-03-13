@@ -55,21 +55,6 @@ describe("InsightFacade Querying", function () {
 		});
 	});
 
-	// describe("AddDataSet HTML", function() {
-	// 	let rooms: string;
-	//
-	// 	beforeEach(function(){
-	// 		rooms = await getContentFromArchives("campus.zip");
-	// 		facade = new InsightFacade();
-	// 	});
-	// 	it("should accept dataset with valid HTML", function(){
-	// 		// rooms = await getContentFromArchives("campus.zip");
-	// 		const result = facade.addDataset("123", rooms,InsightDatasetKind.Rooms);
-	// 		return expect(result).to.eventually.deep.equal(["123"]);
-	//
-	// 	});
-	// });
-
 	describe("performQueryNoDataset", function () {
 		before("clear the disk", function () {
 			return clearDisk();
@@ -93,13 +78,14 @@ describe("InsightFacade Querying", function () {
 	 */
 	describe("PerformQuery", function () {
 		before(async function () {
+			await clearDisk();
 			facade = new InsightFacade();
 
 			// Add the datasets to InsightFacade once.
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
-				// facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
+				facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms)
 			];
 
 			try {
