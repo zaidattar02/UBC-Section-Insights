@@ -12,14 +12,6 @@ import JSZip = require("jszip");
 import {CourseSection} from "../model/CourseSection";
 import * as fs from "fs-extra";
 
-//	TA feedback:
-//	Dataset has an array of CourseSections
-//	Also has a function addSection --> is this how I save the dataset locally? as in after parsing?
-//	After implementing this file, do I create an instance of this class in InsightFacade?
-//	Need to check for duplicate ids and kind
-//	Abstract class and make methods static in TS
-//	export abstract class Dataprocessor
-//	public static methods
 
 interface BuildingInfo {
 	code: string;
@@ -102,7 +94,6 @@ export abstract class DatasetProcessor {
 			const datasetJsonStr = JSON.stringify(dataset, null, 4);
 			const datasetPath = `./data/${id}.json`;
 			await fs.writeFile(datasetPath, datasetJsonStr);
-
 			return dataset;
 		} catch (error) {
 			throw new InsightError(`Error loading dataset: ${error}`);
@@ -116,10 +107,10 @@ export abstract class DatasetProcessor {
 		try {
 			let htmlContent = await zip.file(building.filePath)?.async("string");
 			let document: Document = parse(htmlContent as string);
-			// console.log("parsed the doc");
 			this.ParseRoom(building, defaultTreeAdapter.getChildNodes(document), dataset);
 		} catch(e) {
-			console.log(`Error: ${e}`);
+			//	This is where the error length is being caught
+			// console.log(`Error: ${e}`);
 			return;
 		}
 	}
@@ -129,26 +120,16 @@ export abstract class DatasetProcessor {
 			for (let child of children) {
 				if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
 					const childNodes: ChildNode[] = defaultTreeAdapter.getChildNodes(child as ParentNode);
-					// console.log("entered table");
 
 					const roomNumber = this.getRoomTD(childNodes, CLASS_ROOM_NUMBER);
-					// console.log(roomNumber);
 					const roomSeatsStr = this.getRoomTD(childNodes, CLASS_CAP);
-					// console.log(roomSeatsStr);
 					const roomSeats = roomSeatsStr ? parseInt(roomSeatsStr, 10) : 0;
-					// console.log(roomSeats);
 					const roomType = this.getRoomTD(childNodes, CLASS_ROOM_TYPE);
-					// console.log(roomType);
 					const roomFurniture = this.getRoomTD(childNodes, CLASS_ROOM_FURNITURE);
-					// console.log(roomFurniture);
 					const roomHref = this.getRoomTD(childNodes, CLASS_HREF);
-
 					const isRoomDataValid =
-						roomNumber !== null &&
-						roomSeatsStr !== null &&
-						roomType !== null &&
-						roomFurniture !== null &&
-						roomHref !== null;
+						roomNumber !== null && roomSeatsStr !== undefined && roomSeats !== null &&
+						roomType !== null && roomFurniture !== null && roomHref !== null;
 					// Only create and add the room if all data is valid
 					if (isRoomDataValid) {
 						// console.log("room is valid");
@@ -173,18 +154,6 @@ export abstract class DatasetProcessor {
 			}
 		}
 	}
-
-	// private static getRoomTD(childNodes: ChildNode[], classID: string): string | null {
-	// 	for (let child of childNodes) {
-	// 		if (child.nodeName === "td") {
-	// 			let attrs: Attribute[] = defaultTreeAdapter.getAttrList(child as Element);
-	// 			if (this.hasClassName(attrs, classID)) {
-	// 				return this.getDataFromCell(child as Element, classID);
-	// 			}
-	// 		}
-	// 	}
-	// 	return null;
-	// }
 
 	private static getRoomTD(childNodes: ChildNode[], classID: string): string | null {
 		for (let child of childNodes) {
@@ -216,7 +185,13 @@ export abstract class DatasetProcessor {
 		const href = this.extractHref(anchorElement);
 		const textContent = this.extractTextContent(tdElement, anchorElement);
 
-		return (textContent || href) ? {textContent, href} : null;
+		// If the classID is for href and href is found, return it. Otherwise, return textContent.
+		// This ensures that empty td elements return an empty string, not null.
+		if (classID === CLASS_HREF && href) {
+			return {textContent: "", href};
+		} else {
+			return {textContent, href: ""};
+		}
 	}
 
 	private static findAnchorElement(tdElement: Element): Element | undefined {
@@ -233,13 +208,19 @@ export abstract class DatasetProcessor {
 		return hrefAttr ? hrefAttr.value.trim() : "";
 	}
 
+
 	private static extractTextContent(tdElement: Element, anchorElement: Element | undefined): string {
 		// If we have an anchor element, get the text from it; otherwise, get the text from the td element
 		const sourceElement = anchorElement || tdElement;
-		return sourceElement.childNodes
-			.filter(defaultTreeAdapter.isTextNode)
-			.map((node) => defaultTreeAdapter.getTextNodeContent(node))
-			.join("").trim();
+		const childTextNodes = sourceElement.childNodes.filter(defaultTreeAdapter.isTextNode);
+
+		if (childTextNodes.length === 0) {
+			// Return an empty string if the td element is present but contains no text nodes
+			return "";
+		}
+
+		// Concatenate and trim the content of all text nodes
+		return childTextNodes.map((node) => defaultTreeAdapter.getTextNodeContent(node)).join("").trim();
 	}
 
 	private static handleIndexHtm(children: ChildNode[], buildings: BuildingInfo[]){

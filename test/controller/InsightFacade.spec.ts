@@ -196,6 +196,9 @@ describe("InsightFacade", function () {
 	let roomContent: string;
 
 	describe("loading from disk", function () {
+		beforeEach("clean disk before runs", () => {
+			return clearDisk();
+		});
 		it("should load from disk after creating new instance", async function () {
 			const facade = new InsightFacade();
 			await facade.addDataset(validId, validContent, validKind);
@@ -221,6 +224,11 @@ describe("InsightFacade", function () {
 	const loadValidDataset = async () => {
 		await clearDisk();
 		await new InsightFacade().addDataset(validId, validContent, validKind);
+	};
+
+	const loadValidDatasetRooms = async () => {
+		await clearDisk();
+		await new InsightFacade().addDataset(roomID, roomContent, roomKind);
 	};
 
 	describe("addDataset", function () {
@@ -403,6 +411,20 @@ describe("InsightFacade", function () {
 					id: validId,
 					kind: InsightDatasetKind.Sections,
 					numRows: 64612,
+				},
+			]);
+			return await ASSERT_1;
+		});
+
+		it("should list all datasets when there are datasets ROOMS", async function () {
+			// setup
+			await loadValidDatasetRooms();
+			// test
+			const ASSERT_1 = expect(new InsightFacade().listDatasets()).to.eventually.be.deep.equal([
+				{
+					id: roomID,
+					kind: InsightDatasetKind.Rooms,
+					numRows: 364,
 				},
 			]);
 			return await ASSERT_1;
