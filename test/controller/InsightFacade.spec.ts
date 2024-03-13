@@ -6,24 +6,12 @@ import {
 	ResultTooLargeError,
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
-
-import {assert, expect, use} from "chai";
-import {clearDisk, getContentFromArchives, readFileQueries} from "../TestUtil";
 import {readdir} from "fs/promises";
-import chaiAsPromised = require("chai-as-promised");
 import {AssertionError, assert, expect, use} from "chai";
-import chaiAsPromised = require("chai-as-promised");
 import {clearDisk, getContentFromArchives, readFileQueries, ITestQuery, ITestSuite} from "../TestUtil";
-import {readdir} from "fs/promises";
+import chaiAsPromised = require("chai-as-promised");
 
 use(chaiAsPromised);
-
-export interface ITestQuery {
-	title: string;
-	input: unknown;
-	errorExpected: boolean;
-	expected: any;
-}
 
 let campus = getContentFromArchives("campus.zip"); // TODO Move this into a test, similar to how sections works rn.
 
@@ -83,7 +71,7 @@ describe("InsightFacade_NewSuite", function () {
 	//
 	// 	});
 	// });
-  
+
 	describe("performQueryNoDataset", function () {
 		before("clear the disk", function () {
 			return clearDisk();
@@ -473,3 +461,93 @@ describe("InsightFacade", function () {
 // 		// });
 // 	});
 // });
+
+// Rooms Dataset Tests
+describe("InsightFacade", function () {
+	const validId = "validId";
+	const validKind = InsightDatasetKind.Rooms;
+	let validContent: string;
+
+	describe("loading rooms dataset from disk", function () {
+		beforeEach("clean disk before runs", () => {
+			return clearDisk();
+		});
+		it("should load from disk after creating new instance", async function () {
+			const facade = new InsightFacade();
+			await facade.addDataset(validId, validContent, validKind);
+			const newFacade = new InsightFacade();
+			const datasets = await newFacade.listDatasets();
+			return expect(datasets).to.have.lengthOf(1);
+		});
+	});
+	before("read in content", async function () {
+		validContent = await getContentFromArchives("rooms/campus.zip");
+	});
+
+	const loadValidDataset = async () => {
+		await clearDisk();
+		await new InsightFacade().addDataset(validId, validContent, validKind);
+	};
+
+	describe("add rooms Dataset", function () {
+		beforeEach("clean disk before runs", () => {
+			return clearDisk();
+		});
+
+		it("should not fail with valid values, writing dataset to disk post-insertion", async function () {
+			expect(await new InsightFacade().addDataset(validId, validContent, validKind)).to.be.deep.equal([validId]);
+			const files = await readdir("./data");
+			return expect(files.length).to.be.greaterThan(0);
+		});
+
+		context("checking content zip file - rooms", function () {
+			it("should reject if content is not a base64 string of a zip file", async function () {
+				return await Promise.all([
+					// invalid characters
+					expect(new InsightFacade().addDataset(validId, "-", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, ".", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, "#", validKind)).to.be.rejectedWith(InsightError),
+					expect(new InsightFacade().addDataset(validId, "$", validKind)).to.be.rejectedWith(InsightError),
+
+					// valid characters but doesn't make sense as a zip file
+					expect(new InsightFacade().addDataset(validId, "abcdef", validKind)).to.be.rejectedWith(
+						InsightError
+					),
+				]);
+			});
+
+			it("should reject if  has an empty campus folder", async function () {
+				const emptyCourseContent = await getContentFromArchives("rooms/empty_campus_folder.zip");
+				const ASSERT_1 = expect(
+					new InsightFacade().addDataset(validId, emptyCourseContent, validKind)
+				).to.be.rejectedWith(InsightError);
+
+				return await ASSERT_1;
+			});
+			it("should reject if  has an empty discover folder", async function () {
+				const emptyCourseContent = await getContentFromArchives("rooms/empty_discover_folder.zip");
+				const ASSERT_1 = expect(
+					new InsightFacade().addDataset(validId, emptyCourseContent, validKind)
+				).to.be.rejectedWith(InsightError);
+
+				return await ASSERT_1;
+			});
+			it("should reject if  has an empty buildings-and-rooms folder", async function () {
+				const emptyCourseContent = await getContentFromArchives("rooms/empty_buildings_and_room_folder.zip");
+				const ASSERT_1 = expect(
+					new InsightFacade().addDataset(validId, emptyCourseContent, validKind)
+				).to.be.rejectedWith(InsightError);
+
+				return await ASSERT_1;
+			});
+			it("should reject if folder structure is fine but there is no room", async function () {
+				const emptyCourseContent = await getContentFromArchives("rooms/empty_room.zip");
+				const ASSERT_1 = expect(
+					new InsightFacade().addDataset(validId, emptyCourseContent, validKind)
+				).to.be.rejectedWith(InsightError);
+
+				return await ASSERT_1;
+			});
+		});
+	});
+});

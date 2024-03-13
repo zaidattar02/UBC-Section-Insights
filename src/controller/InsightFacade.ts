@@ -73,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("Dataset already exists");
 		}
 		try {
-			let dataset: Dataset;
+			let dataset: Dataset<CourseSection | Room>;
 			if (kind === InsightDatasetKind.Sections) {
 				dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
 			} else if (kind === InsightDatasetKind.Rooms) {

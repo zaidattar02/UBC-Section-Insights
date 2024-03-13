@@ -13,6 +13,9 @@ import {
 	CLASS_ADD,
 	CLASS_CODE,
 	CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE} from "./const";
+import JSZip = require("jszip");
+import {CourseSection} from "../model/CourseSection";
+import * as fs from "fs-extra";
 
 //	TA feedback:
 //	Dataset has an array of CourseSections
@@ -42,7 +45,9 @@ interface BuildingInfo {
 // const CLASS_ROOM_TYPE = "views-field-field-room-type";
 // const CLASS_HREF = "views-field-nothing";
 export abstract class DatasetProcessor {
-	public static async ProcessDatasetSection(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+	public static async ProcessDatasetSection(
+		id: string, content: string, kind: InsightDatasetKind
+	): Promise<Dataset<CourseSection | Room>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -50,7 +55,7 @@ export abstract class DatasetProcessor {
 			if (!coursesFolder) {
 				throw new InsightError("Invalid Data");
 			}
-			const dataset = new Dataset(id, kind);
+			const dataset = new Dataset<CourseSection | Room>(id, kind);
 			const filePromises: any[] = [];
 			coursesFolder.forEach((relativePath, file) => {
 				const filePromise = this.processFile(file, dataset);
@@ -73,7 +78,9 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	public static async ProcessDatasetRoom(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
+	public static async ProcessDatasetRoom(
+		id: string, content: string, kind: InsightDatasetKind
+	): Promise<Dataset<Room>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -96,7 +103,7 @@ export abstract class DatasetProcessor {
 			// console.log(buildingInfo);
 
 			// Create a new dataset instance
-			const dataset = new Dataset(id, kind);
+			const dataset = new Dataset<Room>(id, kind);
 
 			// Process each building's rooms and add them to the dataset
 			const roomPromises = buildingInfo.map((building) => this.ProcessBuildingRooms(building, zip, dataset));
@@ -113,7 +120,9 @@ export abstract class DatasetProcessor {
 	}
 
 
-	private static async ProcessBuildingRooms(building: BuildingInfo, zip: JSZip, dataset: Dataset): Promise<void> {
+	private static async ProcessBuildingRooms(
+		building: BuildingInfo, zip: JSZip, dataset: Dataset<Room>
+	): Promise<void> {
 		try {
 			let htmlContent = await zip.file(building.filePath)?.async("string");
 			let document: Document = parse(htmlContent as string);
@@ -125,7 +134,7 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	private static ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset): void {
+	private static ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset<Room>): void {
 		if (children) {
 			for (let child of children) {
 				if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
@@ -343,15 +352,10 @@ export abstract class DatasetProcessor {
 	}
 
 	private static hasClassName(attrs: Attribute[], className: string): boolean {
-		for (let attr of attrs) {
-			if (attr.name === "class" && attr.value.includes(className)) {
-				return true;
-			}
-		}
-		return false;
+		return attrs.some((attr) => attr.name === "class" && attr.value.includes(className));
 	}
 
-	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset): Promise<void> {
+	public static async processFile(file: JSZip.JSZipObject, dataset: Dataset<CourseSection | Room>): Promise<void> {
 		const fileContent = await file.async("string");
 		try {
 			const jsonData = JSON.parse(fileContent);
@@ -385,5 +389,11 @@ export abstract class DatasetProcessor {
 			console.error(`Error parsing file content to JSON: ${e}`);
 			return;
 		}
+	}
+
+	private static hasValidSection(sections: any[]): boolean {
+		const validKeys = ["id", "Course", "Title", "Professor", "Subject", "Avg", "Pass", "Fail", "Audit", "Year"];
+		// Check if at least one section has all valid keys
+		return sections.some((section) => validKeys.every((key) => Object.hasOwn(section, key)));
 	}
 }
