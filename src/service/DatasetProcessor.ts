@@ -1,13 +1,8 @@
 import {Dataset} from "../model/Dataset";
-import {SectionsDatasetProcessor} from "./SectionsDatasetProcessor";
-import {RoomsDatasetProcessor} from "./RoomsDatasetProcessor";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
-// import {parse} from "parse5";
-// import * as tree from "parse5";
 import {Attribute} from "parse5/dist/common/token";
 import {parse, defaultTreeAdapter} from "parse5";
 import{Document, Element, ChildNode, ParentNode, TextNode} from "parse5/dist/tree-adapters/default";
-import doc = Mocha.reporters.doc;
 import {Room} from "../model/Room";
 import {
 	CLASS_ADD,
@@ -100,6 +95,9 @@ export abstract class DatasetProcessor {
 			// Process each building's rooms and add them to the dataset
 			const roomPromises = buildingInfo.map((building) => this.ProcessBuildingRooms(building, zip, dataset));
 			await Promise.all(roomPromises);
+			if (dataset.getEntries().length === 0) {
+				throw new InsightError("No valid rooms found in the dataset");
+			}
 			await fs.ensureDir("./data");
 			const datasetJsonStr = JSON.stringify(dataset, null, 4);
 			const datasetPath = `./data/${id}.json`;
@@ -168,7 +166,7 @@ export abstract class DatasetProcessor {
 							roomHref,
 						);
 						dataset.addEntry(room);
-						// console.log(room);
+						console.log(room);
 					}
 				}
 				this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
