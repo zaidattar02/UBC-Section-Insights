@@ -73,9 +73,21 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("Dataset already exists");
 		}
 		try {
-			const dataset = await DatasetProcessor.processDataset(id, content, kind);
-			this.datasets.set(id, dataset);
+			let dataset: Dataset<CourseSection | Room>;
+			if (kind === InsightDatasetKind.Sections) {
+				dataset = await DatasetProcessor.ProcessDatasetSection(id, content, kind);
+			} else if (kind === InsightDatasetKind.Rooms) {
+				dataset = await DatasetProcessor.ProcessDatasetRoom(id, content, kind);
+			} else {
+				throw new InsightError("Invalid Dataset Kind");
+			}
 
+      // DHRUV's IMPLEMENTATION
+			// const dataset = await DatasetProcessor.processDataset(id, content, kind);
+			// this.datasets.set(id, dataset);
+
+
+			this.datasets.set(id, dataset);
 			return Array.from(this.datasets.keys());
 		} catch (error) {
 			throw new InsightError(`Failed to add dataset: ${error}`);

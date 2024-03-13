@@ -6,12 +6,14 @@ import {
 	ResultTooLargeError,
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
-
-import {AssertionError, assert, expect, use} from "chai";
-import chaiAsPromised = require("chai-as-promised");
-import {clearDisk, getContentFromArchives, readFileQueries, ITestQuery, ITestSuite} from "../TestUtil";
 import {readdir} from "fs/promises";
+import {AssertionError, assert, expect, use} from "chai";
+import {clearDisk, getContentFromArchives, readFileQueries, ITestQuery, ITestSuite} from "../TestUtil";
+import chaiAsPromised = require("chai-as-promised");
+
 use(chaiAsPromised);
+
+let campus = getContentFromArchives("campus.zip"); // TODO Move this into a test, similar to how sections works rn.
 
 describe("InsightFacade_NewSuite", function () {
 	let facade: IInsightFacade;
@@ -47,7 +49,28 @@ describe("InsightFacade_NewSuite", function () {
 
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
+
+		it("should reject with  an empty dataset id", async function () {
+			const result = facade.addDataset("", sections, InsightDatasetKind.Sections);
+
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
 	});
+
+	// describe("AddDataSet HTML", function() {
+	// 	let rooms: string;
+	//
+	// 	beforeEach(function(){
+	// 		rooms = await getContentFromArchives("campus.zip");
+	// 		facade = new InsightFacade();
+	// 	});
+	// 	it("should accept dataset with valid HTML", function(){
+	// 		// rooms = await getContentFromArchives("campus.zip");
+	// 		const result = facade.addDataset("123", rooms,InsightDatasetKind.Rooms);
+	// 		return expect(result).to.eventually.deep.equal(["123"]);
+	//
+	// 	});
+	// });
 
 	describe("performQueryNoDataset", function () {
 		before("clear the disk", function () {
@@ -164,7 +187,12 @@ describe("InsightFacade_NewSuite", function () {
 describe("InsightFacade", function () {
 	const validId = "validId";
 	const validKind = InsightDatasetKind.Sections;
+	const roomKind = InsightDatasetKind.Rooms;
+	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
+	const validSKeys = ["uuid", "id", "title", "instructor", "dept"];
+	const validIDs = [...validMKeys, ...validSKeys];
 	let validContent: string;
+	let roomContent: string;
 
 	describe("loading from disk", function () {
 		it("should load from disk after creating new instance", async function () {
@@ -178,6 +206,7 @@ describe("InsightFacade", function () {
 	});
 	before("read in content", async function () {
 		validContent = await getContentFromArchives("pair.zip");
+		roomContent = await getContentFromArchives("campus.zip");
 	});
 
 	const loadValidDataset = async () => {
@@ -197,6 +226,12 @@ describe("InsightFacade", function () {
 		});
 		it("should not fail with valid values, writing dataset to disk post-insertion", async function () {
 			expect(await new InsightFacade().addDataset(validId, validContent, validKind)).to.be.deep.equal([validId]);
+			const files = await readdir("./data");
+			return expect(files.length).to.be.greaterThan(0);
+		});
+
+		it("should not fail with valid values ROOMS", async function () {
+			expect(await new InsightFacade().addDataset(validId, roomContent, roomKind)).to.be.deep.equal([validId]);
 			const files = await readdir("./data");
 			return expect(files.length).to.be.greaterThan(0);
 		});

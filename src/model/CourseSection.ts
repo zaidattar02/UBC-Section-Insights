@@ -9,11 +9,6 @@ export class CourseSection {
 	private fail: number;
 	private audit: number;
 	private year: number;
-
-	//  validate here
-	//	check specifications
-	//	cast year as a number
-	//	helper functions for consistent cases i.e always string, always number
 	constructor(
 		uuid: string,
 		id: string,
