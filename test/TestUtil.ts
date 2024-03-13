@@ -1,5 +1,4 @@
 import * as fs from "fs-extra";
-import {ITestQuery} from "./controller/InsightFacade.spec";
 
 /**
  * The directory where data is persisted.
@@ -27,22 +26,37 @@ async function clearDisk(): Promise<void> {
 	await fs.remove(persistDir);
 }
 
+
+export interface ITestSuite {
+	title: string;
+	tests: ITestQuery[];
+}
+
+export interface ITestQuery {
+	title: string;
+	input: unknown;
+	errorExpected: boolean;
+	expected: unknown | string;
+}
+
 /**
  * Searches for test query JSON files in the path.
  * @param path The path to the sample query JSON files.
  */
-function readFileQueries(path: string): ITestQuery[] {
+function readFileQueries(path: string): ITestSuite[] {
 	// Note: This method *must* be synchronous for Mocha
-	const fileNames = fs.readdirSync(`test/resources/queries/${path}`);
+	// const fileName = fs.readdirSync(`test/resources/queries/${path}`);
 
-	const allQueries: ITestQuery[] = [];
-	for (const fileName of fileNames) {
-		const fileQuery = fs.readJSONSync(`test/resources/queries/${path}/${fileName}`);
+	// const allQueries: ITestQuery[] = [];
+	// for (const fileName of fileNames) {
+	// 	const fileQuery = fs.readJSONSync(`test/resources/queries/${path}/${fileName}`);
 
-		allQueries.push(fileQuery);
-	}
+	// 	allQueries.push(fileQuery);
+	// }
 
-	return allQueries;
+	// return allQueries;
+
+	return fs.readJSONSync(`test/resources/queries/${path}`);
 }
 
 export {getContentFromArchives, clearDisk, readFileQueries};
