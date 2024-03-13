@@ -38,6 +38,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": true,
                 "expected": [
                     {
                         "sections_dept": "adhe",
@@ -343,6 +344,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": true,
                 "expected": [
                     {
                         "sections_dept": "epse",
@@ -571,6 +573,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": [
                     {
                         "sections_uuid": "43501",
@@ -1100,6 +1103,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": [
                     {
                         "sections_id": "291"
@@ -1147,6 +1151,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": [
                     {
                         "sections_id": "160"
@@ -1816,6 +1821,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": {
                     "result": [
                         {
@@ -1866,6 +1872,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": {
                     "result": [
                         {
@@ -1933,6 +1940,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": [
                     {
                         "sections_dept": "cnps"
@@ -2016,6 +2024,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": true,
                 "expected": [
                     {
                         "sections_dept": "crwr",
@@ -2087,6 +2096,7 @@
                     }
                 },
                 "errorExpected": false,
+                "assertOrder": false,
                 "expected": [
                     {
                         "sections_dept": "aanb",
