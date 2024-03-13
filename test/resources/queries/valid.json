@@ -1822,31 +1822,29 @@
                 },
                 "errorExpected": false,
                 "assertOrder": false,
-                "expected": {
-                    "result": [
-                        {
-                            "sections_dept": "eece"
-                        },
-                        {
-                            "sections_dept": "epse"
-                        },
-                        {
-                            "sections_dept": "epse"
-                        },
-                        {
-                            "sections_dept": "math"
-                        },
-                        {
-                            "sections_dept": "nurs"
-                        },
-                        {
-                            "sections_dept": "nurs"
-                        },
-                        {
-                            "sections_dept": "spph"
-                        }
-                    ]
-                }
+                "expected": [
+                    {
+                        "sections_dept": "eece"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "epse"
+                    },
+                    {
+                        "sections_dept": "math"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "nurs"
+                    },
+                    {
+                        "sections_dept": "spph"
+                    }
+                ]
             },
             {
                 "title": "should have functioning LT, IS (and AND)",
@@ -1873,55 +1871,53 @@
                 },
                 "errorExpected": false,
                 "assertOrder": false,
-                "expected": {
-                    "result": [
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        },
-                        {
-                            "sections_dept": "zool"
-                        }
-                    ]
-                }
+                "expected": [
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    },
+                    {
+                        "sections_dept": "zool"
+                    }
+                ]
             },
             {
                 "title": "functioning GT (and NOT)",
