@@ -186,6 +186,7 @@ describe("InsightFacade_NewSuite", function () {
 
 describe("InsightFacade", function () {
 	const validId = "validId";
+	const roomID = "roomID";
 	const validKind = InsightDatasetKind.Sections;
 	const roomKind = InsightDatasetKind.Rooms;
 	const validMKeys = ["year", "avg", "pass", "fail", "audit"];
@@ -202,6 +203,14 @@ describe("InsightFacade", function () {
 			const datasets = await newFacade.listDatasets();
 			return expect(datasets).to.have.lengthOf(1);
 			// return expect(await facade.removeDataset(validId));
+		});
+
+		it("should load from disk after creating new instance ROOMS", async function () {
+			const facade = new InsightFacade();
+			await facade.addDataset(roomID, roomContent, roomKind);
+			const newFacade = new InsightFacade();
+			const datasets = await newFacade.listDatasets();
+			return expect(datasets).to.have.lengthOf(1);
 		});
 	});
 	before("read in content", async function () {

@@ -41,7 +41,7 @@ export class Dataset<T extends object> {
 			const dataset = new Dataset<Room>(validatedObject.id, validatedObject.kind);
 			validatedObject.entries.forEach((entry: any) => {
 				const room = new Room(
-					entry.fullName,
+					entry.fullname,
 					entry.shortname,
 					entry.number,
 					entry.name,
