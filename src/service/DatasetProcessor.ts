@@ -166,7 +166,7 @@ export abstract class DatasetProcessor {
 							roomHref,
 						);
 						dataset.addEntry(room);
-						console.log(room);
+						// console.log(room);
 					}
 				}
 				this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
