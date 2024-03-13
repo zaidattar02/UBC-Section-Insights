@@ -34,14 +34,6 @@ interface BuildingInfo {
 	// lat: number| null;
 }
 
-// const CLASS_FNAME = "views-field-title";
-// const CLASS_CODE = "views-field-field-building-code";
-// const CLASS_ROOM_NUMBER = "views-field-field-room-number";
-// const CLASS_ADD = "views-field-field-building-address";
-// const CLASS_CAP = "views-field-field-room-capacity";
-// const CLASS_ROOM_FURNITURE = "views-field-field-room-furniture";
-// const CLASS_ROOM_TYPE = "views-field-field-room-type";
-// const CLASS_HREF = "views-field-nothing";
 export abstract class DatasetProcessor {
 	public static async ProcessDatasetSection(id: string, content: string, kind: InsightDatasetKind): Promise<Dataset> {
 		try {
@@ -134,7 +126,7 @@ export abstract class DatasetProcessor {
 					// console.log("entered table");
 
 					const roomNumber = this.getRoomTD(childNodes, CLASS_ROOM_NUMBER);
-					console.log(roomNumber);
+					// console.log(roomNumber);
 					const roomSeatsStr = this.getRoomTD(childNodes, CLASS_CAP);
 					// console.log(roomSeatsStr);
 					const roomSeats = roomSeatsStr ? parseInt(roomSeatsStr, 10) : 0;
@@ -160,15 +152,15 @@ export abstract class DatasetProcessor {
 							roomNumber,
 							`${validRoomsData.code}_${roomNumber}`,
 							validRoomsData.address,
-							0, // Placeholder for latitude, you will need to set this
-							0, // Placeholder for longitude, you will need to set this
+							0, // TODO: Placeholder for latitude, you will need to set this
+							0, // TODO: Placeholder for longitude, you will need to set this
 							roomSeats,
 							roomType,
 							roomFurniture,
 							roomHref,
 						);
 						dataset.addEntry(room);
-						console.log(room);
+						// console.log(room);
 					}
 				}
 				this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
