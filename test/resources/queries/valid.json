@@ -1816,7 +1816,8 @@
                     },
                     "OPTIONS": {
                         "COLUMNS": [
-                            "sections_dept"
+                            "sections_dept",
+                            "sections_uuid"
                         ]
                     }
                 },
@@ -1824,25 +1825,32 @@
                 "assertOrder": false,
                 "expected": [
                     {
-                        "sections_dept": "eece"
+                        "sections_dept": "eece",
+                        "sections_uuid": "10236"
                     },
                     {
-                        "sections_dept": "epse"
+                        "sections_dept": "epse",
+                        "sections_uuid": "29256"
                     },
                     {
-                        "sections_dept": "epse"
+                        "sections_dept": "epse",
+                        "sections_uuid": "44817"
                     },
                     {
-                        "sections_dept": "math"
+                        "sections_dept": "math",
+                        "sections_uuid": "5374"
                     },
                     {
-                        "sections_dept": "nurs"
+                        "sections_dept": "nurs",
+                        "sections_uuid": "15344"
                     },
                     {
-                        "sections_dept": "nurs"
+                        "sections_dept": "nurs",
+                        "sections_uuid": "96251"
                     },
                     {
-                        "sections_dept": "spph"
+                        "sections_dept": "spph",
+                        "sections_uuid": "65070"
                     }
                 ]
             },
