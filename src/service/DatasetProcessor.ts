@@ -7,12 +7,14 @@ import {Room} from "../model/Room";
 import {
 	CLASS_ADD,
 	CLASS_CODE,
-	CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE, GEOLOCATION_API_URL} from "./const";
+	CLASS_HREF, CLASS_FNAME, 
+	CLASS_CAP, 
+	CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE, GEOLOCATION_API_URL} from "./const";
 import JSZip = require("jszip");
 import {CourseSection} from "../model/CourseSection";
 import * as fs from "fs-extra";
-import { fetchData } from "./HttpService";
-import { assertTrue } from "./Assertions";
+import {fetchData} from "./HttpService";
+import {assertTrue} from "./Assertions";
 
 
 interface BuildingInfo {
@@ -131,7 +133,7 @@ export abstract class DatasetProcessor {
 						roomType !== null && roomFurniture !== null && roomHref !== null;
 					// Only create and add the room if all data is valid
 					if (isRoomDataValid) {
-						const geolocationResponse = await this.getGeoLocation(validRoomsData)
+						const geolocationResponse = await this.getGeoLocation(validRoomsData);
 
 						// console.log("room is valid");
 						const room = new Room(
@@ -155,7 +157,8 @@ export abstract class DatasetProcessor {
 			}
 		}
 	}
-	private static async getGeoLocation(buildingInfo:BuildingInfo):Promise<{lat: number; lon: number}>{
+
+	private static async getGeoLocation(buildingInfo: BuildingInfo): Promise<{lat: number; lon: number}>{
 		const encodedAddress = encodeURIComponent(buildingInfo.address);
 		const apiUrl = `${GEOLOCATION_API_URL}/${encodedAddress}`;
 		let responseJson: {lat: number; lon: number};
