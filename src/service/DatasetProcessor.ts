@@ -2,14 +2,10 @@ import {Dataset} from "../model/Dataset";
 import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 import {Attribute} from "parse5/dist/common/token";
 import {parse, defaultTreeAdapter} from "parse5";
-import{Document, Element, ChildNode, ParentNode, TextNode} from "parse5/dist/tree-adapters/default";
+import{Document, Element, ChildNode, ParentNode} from "parse5/dist/tree-adapters/default";
 import {Room} from "../model/Room";
-import {
-	CLASS_ADD,
-	CLASS_CODE,
-	CLASS_HREF, CLASS_FNAME, 
-	CLASS_CAP, 
-	CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE, GEOLOCATION_API_URL} from "./const";
+import {CLASS_ADD, CLASS_CODE, CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER,
+	CLASS_ROOM_TYPE, GEOLOCATION_API_URL} from "./const";
 import JSZip = require("jszip");
 import {CourseSection} from "../model/CourseSection";
 import * as fs from "fs-extra";
@@ -22,9 +18,8 @@ interface BuildingInfo {
 	full: string;
 	address: string;
 	filePath: string;
-	// TODO: add the lon and lan for geolocation
-	// long: number| null;
-	// lat: number| null;
+	long: number| null;
+	lat: number| null;
 }
 
 export abstract class DatasetProcessor {
@@ -58,9 +53,8 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	public static async ProcessDatasetRoom(
-		id: string, content: string, kind: InsightDatasetKind
-	): Promise<Dataset<Room>> {
+	public static async ProcessDatasetRoom(id: string, content: string, kind: InsightDatasetKind):
+	Promise<Dataset<Room>> {
 		try {
 			const zip = new JSZip();
 			const data = await zip.loadAsync(content, {base64: true});
@@ -76,15 +70,11 @@ export abstract class DatasetProcessor {
 			} catch (error) {
 				throw new InsightError("Invalid Data: index.htm is not valid HTML");
 			}
-
 			// Extract building information from index.htm
 			let buildingInfo: BuildingInfo[] = [];
 			this.handleIndexHtm(defaultTreeAdapter.getChildNodes(document), buildingInfo);
-			// console.log(buildingInfo);
-
 			// Create a new dataset instance
 			const dataset = new Dataset<Room>(id, kind);
-
 			// Process each building's rooms and add them to the dataset
 			const roomPromises = buildingInfo.map((building) => this.ProcessBuildingRooms(building, zip, dataset));
 			await Promise.all(roomPromises);
@@ -101,61 +91,58 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-
-	private static async ProcessBuildingRooms(
-		building: BuildingInfo, zip: JSZip, dataset: Dataset<Room>
-	): Promise<void> {
+	private static async ProcessBuildingRooms(building: BuildingInfo, zip: JSZip, dataset: Dataset<Room>):
+	Promise<void> {
 		try {
 			let htmlContent = await zip.file(building.filePath)?.async("string");
 			let document: Document = parse(htmlContent as string);
 			await this.ParseRoom(building, defaultTreeAdapter.getChildNodes(document), dataset);
-		} catch(e) {
-			//	This is where the error length is being caught
-			// console.log(`Error: ${e}`);
-			return;
+		} catch(e) { //	This is where the error length is being caught
+			return; // console.log(`Error: ${e}`);
 		}
 	}
 
 	private static async ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset<Room>) {
-		if (children) {
-			for (let child of children) {
-				if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
-					const childNodes: ChildNode[] = defaultTreeAdapter.getChildNodes(child as ParentNode);
-
-					const roomNumber = this.getRoomTD(childNodes, CLASS_ROOM_NUMBER);
-					const roomSeatsStr = this.getRoomTD(childNodes, CLASS_CAP);
-					const roomSeats = roomSeatsStr ? parseInt(roomSeatsStr, 10) : 0;
-					const roomType = this.getRoomTD(childNodes, CLASS_ROOM_TYPE);
-					const roomFurniture = this.getRoomTD(childNodes, CLASS_ROOM_FURNITURE);
-					const roomHref = this.getRoomTD(childNodes, CLASS_HREF);
-					const isRoomDataValid =
-						roomNumber !== null && roomSeatsStr !== undefined && roomSeats !== null &&
-						roomType !== null && roomFurniture !== null && roomHref !== null;
-					// Only create and add the room if all data is valid
-					if (isRoomDataValid) {
-						const geolocationResponse = await this.getGeoLocation(validRoomsData);
-
-						// console.log("room is valid");
-						const room = new Room(
-							validRoomsData.full,
-							validRoomsData.code,
-							roomNumber,
-							`${validRoomsData.code}_${roomNumber}`,
-							validRoomsData.address,
-							geolocationResponse.lat, // TODO: Placeholder for latitude, you will need to set this
-							geolocationResponse.lon, // TODO: Placeholder for longitude, you will need to set this
-							roomSeats,
-							roomType,
-							roomFurniture,
-							roomHref,
-						);
-						dataset.addEntry(room);
-						return room;
-					}
-				}
-				await this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
-			}
+		if (!children) {
+			return;
 		}
+		await Promise.all(children.map(async (child) => {
+			if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
+				const childNodes: ChildNode[] = defaultTreeAdapter.getChildNodes(child as ParentNode);
+
+				const roomNumber = this.getRoomTD(childNodes, CLASS_ROOM_NUMBER);
+				const roomSeatsStr = this.getRoomTD(childNodes, CLASS_CAP);
+				const roomSeats = roomSeatsStr ? parseInt(roomSeatsStr, 10) : 0;
+				const roomType = this.getRoomTD(childNodes, CLASS_ROOM_TYPE);
+				const roomFurniture = this.getRoomTD(childNodes, CLASS_ROOM_FURNITURE);
+				const roomHref = this.getRoomTD(childNodes, CLASS_HREF);
+				const isRoomDataValid =
+					roomNumber !== null && roomSeatsStr !== undefined && roomSeats !== null &&
+					roomType !== null && roomFurniture !== null && roomHref !== null;
+				// Only create and add the room if all data is valid
+				if (isRoomDataValid) {
+					const geolocationResponse = await this.getGeoLocation(validRoomsData);
+
+					// console.log("room is valid");
+					const room = new Room(
+						validRoomsData.full,
+						validRoomsData.code,
+						roomNumber,
+						`${validRoomsData.code}_${roomNumber}`,
+						validRoomsData.address,
+						geolocationResponse.lat,
+						geolocationResponse.lon,
+						roomSeats,
+						roomType,
+						roomFurniture,
+						roomHref,
+					);
+					dataset.addEntry(room);
+					return room;
+				}
+			}
+			await this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
+		}));
 	}
 
 	private static async getGeoLocation(buildingInfo: BuildingInfo): Promise<{lat: number; lon: number}>{
