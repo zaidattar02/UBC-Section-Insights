@@ -118,10 +118,11 @@ describe("InsightFacade Querying", function () {
 							// console.log(JSON.stringify(await result));
 							if(test.assertOrder) {
 								return expect(result)
-									.to.eventually.have.deep.members(test.expected as any[]);
-							} else {
-								return expect(result)
 									.to.eventually.deep.equal(test.expected);
+							} else {
+								console.log("skipping assert order");
+								return expect(result)
+									.to.eventually.have.deep.members(test.expected as any[]);
 							}
 						});
 					});
