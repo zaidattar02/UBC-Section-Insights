@@ -6154,6 +6154,460 @@
                         "cringe10": 0
                     }
                 ]
+            },
+            {
+                "title": "MAX/MIN Tests for ROOMS",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "rooms_fullname",
+                            "cringe1",
+                            "cringe2",
+                            "cringe3",
+                            "cringe6",
+                            "cringe7",
+                            "cringe8"
+                        ]
+                    },
+                    "TRANSFORMATIONS": {
+                        "GROUP": [
+                            "rooms_fullname"
+                        ],
+                        "APPLY": [
+                            {
+                                "cringe1": {
+                                    "MAX": "rooms_lat"
+                                }
+                            },
+                            {
+                                "cringe2": {
+                                    "MAX": "rooms_lon"
+                                }
+                            },
+                            {
+                                "cringe3": {
+                                    "MAX": "rooms_seats"
+                                }
+                            },
+                            {
+                                "cringe6": {
+                                    "MIN": "rooms_lat"
+                                }
+                            },
+                            {
+                                "cringe7": {
+                                    "MIN": "rooms_lon"
+                                }
+                            },
+                            {
+                                "cringe8": {
+                                    "MIN": "rooms_seats"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "assertOrder": false,
+                "expected": [
+                    {
+                        "rooms_fullname": "Allard Hall (LAW)",
+                        "cringe1": 49.2699,
+                        "cringe2": -123.25318,
+                        "cringe3": 94,
+                        "cringe6": 49.2699,
+                        "cringe7": -123.25318,
+                        "cringe8": 20
+                    },
+                    {
+                        "rooms_fullname": "Anthropology and Sociology",
+                        "cringe1": 49.26958,
+                        "cringe2": -123.25741,
+                        "cringe3": 90,
+                        "cringe6": 49.26958,
+                        "cringe7": -123.25741,
+                        "cringe8": 26
+                    },
+                    {
+                        "rooms_fullname": "Aquatic Ecosystems Research Laboratory",
+                        "cringe1": 49.26372,
+                        "cringe2": -123.25099,
+                        "cringe3": 144,
+                        "cringe6": 49.26372,
+                        "cringe7": -123.25099,
+                        "cringe8": 144
+                    },
+                    {
+                        "rooms_fullname": "Auditorium Annex",
+                        "cringe1": 49.2666,
+                        "cringe2": -123.25655,
+                        "cringe3": 21,
+                        "cringe6": 49.2666,
+                        "cringe7": -123.25655,
+                        "cringe8": 20
+                    },
+                    {
+                        "rooms_fullname": "Biological Sciences",
+                        "cringe1": 49.26479,
+                        "cringe2": -123.25249,
+                        "cringe3": 228,
+                        "cringe6": 49.26479,
+                        "cringe7": -123.25249,
+                        "cringe8": 16
+                    },
+                    {
+                        "rooms_fullname": "Brock Hall Annex",
+                        "cringe1": 49.26862,
+                        "cringe2": -123.25237,
+                        "cringe3": 70,
+                        "cringe6": 49.26862,
+                        "cringe7": -123.25237,
+                        "cringe8": 24
+                    },
+                    {
+                        "rooms_fullname": "Buchanan",
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 275,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 18
+                    },
+                    {
+                        "rooms_fullname": "Centre for Interactive  Research on Sustainability",
+                        "cringe1": 49.26207,
+                        "cringe2": -123.25314,
+                        "cringe3": 426,
+                        "cringe6": 49.26207,
+                        "cringe7": -123.25314,
+                        "cringe8": 426
+                    },
+                    {
+                        "rooms_fullname": "Chemical and Biological Engineering Building",
+                        "cringe1": 49.26228,
+                        "cringe2": -123.24718,
+                        "cringe3": 200,
+                        "cringe6": 49.26228,
+                        "cringe7": -123.24718,
+                        "cringe8": 60
+                    },
+                    {
+                        "rooms_fullname": "Chemistry",
+                        "cringe1": 49.2659,
+                        "cringe2": -123.25308,
+                        "cringe3": 265,
+                        "cringe6": 49.2659,
+                        "cringe7": -123.25308,
+                        "cringe8": 90
+                    },
+                    {
+                        "rooms_fullname": "Civil and Mechanical Engineering",
+                        "cringe1": 49.26273,
+                        "cringe2": -123.24894,
+                        "cringe3": 100,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.24894,
+                        "cringe8": 22
+                    },
+                    {
+                        "rooms_fullname": "Earth and Ocean Sciences - Main",
+                        "cringe1": 49.26228,
+                        "cringe2": -123.25198,
+                        "cringe3": 50,
+                        "cringe6": 49.26228,
+                        "cringe7": -123.25198,
+                        "cringe8": 50
+                    },
+                    {
+                        "rooms_fullname": "Earth Sciences Building",
+                        "cringe1": 49.26274,
+                        "cringe2": -123.25224,
+                        "cringe3": 350,
+                        "cringe6": 49.26274,
+                        "cringe7": -123.25224,
+                        "cringe8": 80
+                    },
+                    {
+                        "rooms_fullname": "Food, Nutrition and Health",
+                        "cringe1": 49.26414,
+                        "cringe2": -123.24959,
+                        "cringe3": 99,
+                        "cringe6": 49.26414,
+                        "cringe7": -123.24959,
+                        "cringe8": 12
+                    },
+                    {
+                        "rooms_fullname": "Forest Sciences Centre",
+                        "cringe1": 49.26044,
+                        "cringe2": -123.24886,
+                        "cringe3": 250,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.24886,
+                        "cringe8": 18
+                    },
+                    {
+                        "rooms_fullname": "Frank Forward",
+                        "cringe1": 49.26176,
+                        "cringe2": -123.25179,
+                        "cringe3": 63,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.25179,
+                        "cringe8": 35
+                    },
+                    {
+                        "rooms_fullname": "Frederic Lasserre",
+                        "cringe1": 49.26767,
+                        "cringe2": -123.25583,
+                        "cringe3": 94,
+                        "cringe6": 49.26767,
+                        "cringe7": -123.25583,
+                        "cringe8": 20
+                    },
+                    {
+                        "rooms_fullname": "Friedman Building",
+                        "cringe1": 49.26541,
+                        "cringe2": -123.24608,
+                        "cringe3": 160,
+                        "cringe6": 49.26541,
+                        "cringe7": -123.24608,
+                        "cringe8": 160
+                    },
+                    {
+                        "rooms_fullname": "Geography",
+                        "cringe1": 49.26605,
+                        "cringe2": -123.25623,
+                        "cringe3": 225,
+                        "cringe6": 49.26605,
+                        "cringe7": -123.25623,
+                        "cringe8": 21
+                    },
+                    {
+                        "rooms_fullname": "Hebb",
+                        "cringe1": 49.2661,
+                        "cringe2": -123.25165,
+                        "cringe3": 375,
+                        "cringe6": 49.2661,
+                        "cringe7": -123.25165,
+                        "cringe8": 54
+                    },
+                    {
+                        "rooms_fullname": "Hennings",
+                        "cringe1": 49.26627,
+                        "cringe2": -123.25374,
+                        "cringe3": 257,
+                        "cringe6": 49.26627,
+                        "cringe7": -123.25374,
+                        "cringe8": 30
+                    },
+                    {
+                        "rooms_fullname": "Henry Angus",
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 260,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 16
+                    },
+                    {
+                        "rooms_fullname": "Hugh Dempster Pavilion",
+                        "cringe1": 49.26125,
+                        "cringe2": -123.24807,
+                        "cringe3": 160,
+                        "cringe6": 49.26125,
+                        "cringe7": -123.24807,
+                        "cringe8": 40
+                    },
+                    {
+                        "rooms_fullname": "Iona Building",
+                        "cringe1": 49.27106,
+                        "cringe2": -123.25042,
+                        "cringe3": 100,
+                        "cringe6": 49.27106,
+                        "cringe7": -123.25042,
+                        "cringe8": 50
+                    },
+                    {
+                        "rooms_fullname": "Irving K Barber Learning Centre",
+                        "cringe1": 49.26766,
+                        "cringe2": -123.2521,
+                        "cringe3": 154,
+                        "cringe6": 49.26766,
+                        "cringe7": -123.2521,
+                        "cringe8": 8
+                    },
+                    {
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work",
+                        "cringe1": 49.2643,
+                        "cringe2": -123.25505,
+                        "cringe3": 68,
+                        "cringe6": 49.2643,
+                        "cringe7": -123.25505,
+                        "cringe8": 12
+                    },
+                    {
+                        "rooms_fullname": "Leonard S. Klinck (also known as CSCI)",
+                        "cringe1": 49.26545,
+                        "cringe2": -123.25533,
+                        "cringe3": 205,
+                        "cringe6": 49.26545,
+                        "cringe7": -123.25533,
+                        "cringe8": 42
+                    },
+                    {
+                        "rooms_fullname": "Life Sciences Centre",
+                        "cringe1": 49.26236,
+                        "cringe2": -123.24494,
+                        "cringe3": 350,
+                        "cringe6": 49.26236,
+                        "cringe7": -123.24494,
+                        "cringe8": 125
+                    },
+                    {
+                        "rooms_fullname": "MacLeod",
+                        "cringe1": 49.26176,
+                        "cringe2": -123.24935,
+                        "cringe3": 136,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.24935,
+                        "cringe8": 40
+                    },
+                    {
+                        "rooms_fullname": "MacMillan",
+                        "cringe1": 49.26114,
+                        "cringe2": -123.25027,
+                        "cringe3": 200,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25027,
+                        "cringe8": 6
+                    },
+                    {
+                        "rooms_fullname": "Mathematics",
+                        "cringe1": 49.266463,
+                        "cringe2": -123.255534,
+                        "cringe3": 224,
+                        "cringe6": 49.266463,
+                        "cringe7": -123.255534,
+                        "cringe8": 25
+                    },
+                    {
+                        "rooms_fullname": "Mathematics Annex",
+                        "cringe1": 49.266089,
+                        "cringe2": -123.254816,
+                        "cringe3": 106,
+                        "cringe6": 49.266089,
+                        "cringe7": -123.254816,
+                        "cringe8": 106
+                    },
+                    {
+                        "rooms_fullname": "Neville Scarfe",
+                        "cringe1": 49.26398,
+                        "cringe2": -123.2531,
+                        "cringe3": 280,
+                        "cringe6": 49.26398,
+                        "cringe7": -123.2531,
+                        "cringe8": 20
+                    },
+                    {
+                        "rooms_fullname": "Orchard Commons",
+                        "cringe1": 49.26048,
+                        "cringe2": -123.24944,
+                        "cringe3": 72,
+                        "cringe6": 49.26048,
+                        "cringe7": -123.24944,
+                        "cringe8": 16
+                    },
+                    {
+                        "rooms_fullname": "Pharmaceutical Sciences Building",
+                        "cringe1": 49.26229,
+                        "cringe2": -123.24342,
+                        "cringe3": 236,
+                        "cringe6": 49.26229,
+                        "cringe7": -123.24342,
+                        "cringe8": 7
+                    },
+                    {
+                        "rooms_fullname": "Ponderosa Commons: Oak House",
+                        "cringe1": 49.264,
+                        "cringe2": -123.2559,
+                        "cringe3": 40,
+                        "cringe6": 49.264,
+                        "cringe7": -123.2559,
+                        "cringe8": 24
+                    },
+                    {
+                        "rooms_fullname": "Robert F. Osborne Centre",
+                        "cringe1": 49.26047,
+                        "cringe2": -123.24467,
+                        "cringe3": 442,
+                        "cringe6": 49.26047,
+                        "cringe7": -123.24467,
+                        "cringe8": 39
+                    },
+                    {
+                        "rooms_fullname": "School of Population and Public Health",
+                        "cringe1": 49.2642,
+                        "cringe2": -123.24842,
+                        "cringe3": 66,
+                        "cringe6": 49.2642,
+                        "cringe7": -123.24842,
+                        "cringe8": 12
+                    },
+                    {
+                        "rooms_fullname": "Student Recreation Centre",
+                        "cringe1": 49.2683,
+                        "cringe2": -123.24894,
+                        "cringe3": 299,
+                        "cringe6": 49.2683,
+                        "cringe7": -123.24894,
+                        "cringe8": 299
+                    },
+                    {
+                        "rooms_fullname": "The Leon and Thea Koerner University Centre",
+                        "cringe1": 49.26867,
+                        "cringe2": -123.25692,
+                        "cringe3": 55,
+                        "cringe6": 49.26867,
+                        "cringe7": -123.25692,
+                        "cringe8": 30
+                    },
+                    {
+                        "rooms_fullname": "War Memorial Gymnasium",
+                        "cringe1": 49.2663,
+                        "cringe2": -123.2466,
+                        "cringe3": 40,
+                        "cringe6": 49.2663,
+                        "cringe7": -123.2466,
+                        "cringe8": 25
+                    },
+                    {
+                        "rooms_fullname": "Wesbrook",
+                        "cringe1": 49.26517,
+                        "cringe2": -123.24937,
+                        "cringe3": 325,
+                        "cringe6": 49.26517,
+                        "cringe7": -123.24937,
+                        "cringe8": 102
+                    },
+                    {
+                        "rooms_fullname": "West Mall Swing Space",
+                        "cringe1": 49.26293,
+                        "cringe2": -123.25431,
+                        "cringe3": 190,
+                        "cringe6": 49.26293,
+                        "cringe7": -123.25431,
+                        "cringe8": 27
+                    },
+                    {
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+                        "cringe1": 49.26478,
+                        "cringe2": -123.24673,
+                        "cringe3": 503,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.24673,
+                        "cringe8": 10
+                    }
+                ]
             }
         ]
     }
