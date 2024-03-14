@@ -543,6 +543,1478 @@
                         "sections_avg": 99.78
                     }
                 ]
+            },
+            {
+                "title": "Sanity Test for AddDataset",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "rooms_seats",
+                            "rooms_fullname"
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "assertOrder": false,
+                "expected": [
+                    {
+                        "rooms_seats": 94,
+                        "rooms_fullname": "Allard Hall (LAW)"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Allard Hall (LAW)"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Allard Hall (LAW)"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Allard Hall (LAW)"
+                    },
+                    {
+                        "rooms_seats": 44,
+                        "rooms_fullname": "Allard Hall (LAW)"
+                    },
+                    {
+                        "rooms_seats": 26,
+                        "rooms_fullname": "Anthropology and Sociology"
+                    },
+                    {
+                        "rooms_seats": 33,
+                        "rooms_fullname": "Anthropology and Sociology"
+                    },
+                    {
+                        "rooms_seats": 37,
+                        "rooms_fullname": "Anthropology and Sociology"
+                    },
+                    {
+                        "rooms_seats": 90,
+                        "rooms_fullname": "Anthropology and Sociology"
+                    },
+                    {
+                        "rooms_seats": 144,
+                        "rooms_fullname": "Aquatic Ecosystems Research Laboratory"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Auditorium Annex"
+                    },
+                    {
+                        "rooms_seats": 21,
+                        "rooms_fullname": "Auditorium Annex"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Biological Sciences"
+                    },
+                    {
+                        "rooms_seats": 228,
+                        "rooms_fullname": "Biological Sciences"
+                    },
+                    {
+                        "rooms_seats": 76,
+                        "rooms_fullname": "Biological Sciences"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Biological Sciences"
+                    },
+                    {
+                        "rooms_seats": 70,
+                        "rooms_fullname": "Brock Hall Annex"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Brock Hall Annex"
+                    },
+                    {
+                        "rooms_seats": 275,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 150,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 131,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 150,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 181,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 108,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 108,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 42,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 26,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 56,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 78,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 78,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 18,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 78,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 78,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 31,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Buchanan"
+                    },
+                    {
+                        "rooms_seats": 426,
+                        "rooms_fullname": "Centre for Interactive  Research on Sustainability"
+                    },
+                    {
+                        "rooms_seats": 200,
+                        "rooms_fullname": "Chemical and Biological Engineering Building"
+                    },
+                    {
+                        "rooms_seats": 94,
+                        "rooms_fullname": "Chemical and Biological Engineering Building"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Chemical and Biological Engineering Building"
+                    },
+                    {
+                        "rooms_seats": 265,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 240,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 90,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 90,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 114,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 114,
+                        "rooms_fullname": "Chemistry"
+                    },
+                    {
+                        "rooms_seats": 100,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 62,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 26,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 34,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 45,
+                        "rooms_fullname": "Civil and Mechanical Engineering"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Earth and Ocean Sciences - Main"
+                    },
+                    {
+                        "rooms_seats": 150,
+                        "rooms_fullname": "Earth Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 350,
+                        "rooms_fullname": "Earth Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 80,
+                        "rooms_fullname": "Earth Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 28,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 43,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 99,
+                        "rooms_fullname": "Food, Nutrition and Health"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 250,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 99,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 18,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 36,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Forest Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 63,
+                        "rooms_fullname": "Frank Forward"
+                    },
+                    {
+                        "rooms_seats": 44,
+                        "rooms_fullname": "Frank Forward"
+                    },
+                    {
+                        "rooms_seats": 35,
+                        "rooms_fullname": "Frank Forward"
+                    },
+                    {
+                        "rooms_seats": 80,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 94,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 51,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Frederic Lasserre"
+                    },
+                    {
+                        "rooms_seats": 160,
+                        "rooms_fullname": "Friedman Building"
+                    },
+                    {
+                        "rooms_seats": 225,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 100,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 42,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 39,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 21,
+                        "rooms_fullname": "Geography"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Hebb"
+                    },
+                    {
+                        "rooms_seats": 375,
+                        "rooms_fullname": "Hebb"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Hebb"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Hebb"
+                    },
+                    {
+                        "rooms_seats": 257,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 155,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 150,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 36,
+                        "rooms_fullname": "Hennings"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 260,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 41,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 41,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 70,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 68,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 80,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 35,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 37,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 41,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 68,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 68,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 70,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 58,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 44,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 44,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 53,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "Henry Angus"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Hugh Dempster Pavilion"
+                    },
+                    {
+                        "rooms_seats": 120,
+                        "rooms_fullname": "Hugh Dempster Pavilion"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Hugh Dempster Pavilion"
+                    },
+                    {
+                        "rooms_seats": 80,
+                        "rooms_fullname": "Hugh Dempster Pavilion"
+                    },
+                    {
+                        "rooms_seats": 160,
+                        "rooms_fullname": "Hugh Dempster Pavilion"
+                    },
+                    {
+                        "rooms_seats": 100,
+                        "rooms_fullname": "Iona Building"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Iona Building"
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 154,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 112,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 10,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Irving K Barber Learning Centre"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 68,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 29,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 29,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 31,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Jack Bell Building for the School of Social Work"
+                    },
+                    {
+                        "rooms_seats": 205,
+                        "rooms_fullname": "Leonard S. Klinck (also known as CSCI)"
+                    },
+                    {
+                        "rooms_seats": 183,
+                        "rooms_fullname": "Leonard S. Klinck (also known as CSCI)"
+                    },
+                    {
+                        "rooms_seats": 75,
+                        "rooms_fullname": "Leonard S. Klinck (also known as CSCI)"
+                    },
+                    {
+                        "rooms_seats": 42,
+                        "rooms_fullname": "Leonard S. Klinck (also known as CSCI)"
+                    },
+                    {
+                        "rooms_seats": 350,
+                        "rooms_fullname": "Life Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 350,
+                        "rooms_fullname": "Life Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 125,
+                        "rooms_fullname": "Life Sciences Centre"
+                    },
+                    {
+                        "rooms_seats": 123,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 136,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 84,
+                        "rooms_fullname": "MacLeod"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 74,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 200,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 6,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 6,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "rooms_fullname": "MacMillan"
+                    },
+                    {
+                        "rooms_seats": 224,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Mathematics"
+                    },
+                    {
+                        "rooms_seats": 106,
+                        "rooms_fullname": "Mathematics Annex"
+                    },
+                    {
+                        "rooms_seats": 280,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 38,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 34,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Neville Scarfe"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "Orchard Commons"
+                    },
+                    {
+                        "rooms_seats": 236,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 167,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 14,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "rooms_fullname": "Pharmaceutical Sciences Building"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "rooms_fullname": "Ponderosa Commons: Oak House"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "Robert F. Osborne Centre"
+                    },
+                    {
+                        "rooms_seats": 39,
+                        "rooms_fullname": "Robert F. Osborne Centre"
+                    },
+                    {
+                        "rooms_seats": 442,
+                        "rooms_fullname": "Robert F. Osborne Centre"
+                    },
+                    {
+                        "rooms_seats": 28,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 14,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 66,
+                        "rooms_fullname": "School of Population and Public Health"
+                    },
+                    {
+                        "rooms_seats": 299,
+                        "rooms_fullname": "Student Recreation Centre"
+                    },
+                    {
+                        "rooms_seats": 299,
+                        "rooms_fullname": "Student Recreation Centre"
+                    },
+                    {
+                        "rooms_seats": 299,
+                        "rooms_fullname": "Student Recreation Centre"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "The Leon and Thea Koerner University Centre"
+                    },
+                    {
+                        "rooms_seats": 55,
+                        "rooms_fullname": "The Leon and Thea Koerner University Centre"
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "rooms_fullname": "The Leon and Thea Koerner University Centre"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "The Leon and Thea Koerner University Centre"
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "rooms_fullname": "War Memorial Gymnasium"
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "rooms_fullname": "War Memorial Gymnasium"
+                    },
+                    {
+                        "rooms_seats": 325,
+                        "rooms_fullname": "Wesbrook"
+                    },
+                    {
+                        "rooms_seats": 102,
+                        "rooms_fullname": "Wesbrook"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 187,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 188,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 190,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 190,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "rooms_fullname": "West Mall Swing Space"
+                    },
+                    {
+                        "rooms_seats": 120,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 503,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 88,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 120,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 120,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 181,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 21,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 14,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 10,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 10,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 10,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "rooms_fullname": "Woodward (Instructional Resources Centre-IRC)"
+                    }
+                ]
             }
         ]
     },
@@ -3617,7 +5089,7 @@
                 ]
             },
             {
-                "title": "More MAX/MIN Tests",
+                "title": "MAX/MIN Tests for all Sections (Segment on sections_dept)",
                 "input": {
                     "WHERE": {},
                     "OPTIONS": {
@@ -6156,7 +7628,7 @@
                 ]
             },
             {
-                "title": "MAX/MIN Tests for ROOMS",
+                "title": "MAX/MIN Tests for ROOMS (Segment on room_fullname)",
                 "input": {
                     "WHERE": {},
                     "OPTIONS": {
@@ -6606,6 +8078,982 @@
                         "cringe6": 49.26478,
                         "cringe7": -123.24673,
                         "cringe8": 10
+                    }
+                ]
+            },
+            {
+                "title": "More MAX/MIN Tests for ROOMS (Segment on rooms_seats)",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "rooms_seats",
+                            "cringe1",
+                            "cringe2",
+                            "cringe3",
+                            "cringe6",
+                            "cringe7",
+                            "cringe8"
+                        ]
+                    },
+                    "TRANSFORMATIONS": {
+                        "GROUP": [
+                            "rooms_seats"
+                        ],
+                        "APPLY": [
+                            {
+                                "cringe1": {
+                                    "MAX": "rooms_lat"
+                                }
+                            },
+                            {
+                                "cringe2": {
+                                    "MAX": "rooms_lon"
+                                }
+                            },
+                            {
+                                "cringe3": {
+                                    "MAX": "rooms_seats"
+                                }
+                            },
+                            {
+                                "cringe6": {
+                                    "MIN": "rooms_lat"
+                                }
+                            },
+                            {
+                                "cringe7": {
+                                    "MIN": "rooms_lon"
+                                }
+                            },
+                            {
+                                "cringe8": {
+                                    "MIN": "rooms_seats"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "errorExpected": false,
+                "assertOrder": false,
+                "expected": [
+                    {
+                        "rooms_seats": 6,
+                        "cringe1": 49.26114,
+                        "cringe2": -123.25027,
+                        "cringe3": 6,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25027,
+                        "cringe8": 6
+                    },
+                    {
+                        "rooms_seats": 7,
+                        "cringe1": 49.26229,
+                        "cringe2": -123.24342,
+                        "cringe3": 7,
+                        "cringe6": 49.26229,
+                        "cringe7": -123.24342,
+                        "cringe8": 7
+                    },
+                    {
+                        "rooms_seats": 8,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.25027,
+                        "cringe3": 8,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.2521,
+                        "cringe8": 8
+                    },
+                    {
+                        "rooms_seats": 10,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.24673,
+                        "cringe3": 10,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.2521,
+                        "cringe8": 10
+                    },
+                    {
+                        "rooms_seats": 12,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.24673,
+                        "cringe3": 12,
+                        "cringe6": 49.26414,
+                        "cringe7": -123.25505,
+                        "cringe8": 12
+                    },
+                    {
+                        "rooms_seats": 14,
+                        "cringe1": 49.26478,
+                        "cringe2": -123.24342,
+                        "cringe3": 14,
+                        "cringe6": 49.26229,
+                        "cringe7": -123.24842,
+                        "cringe8": 14
+                    },
+                    {
+                        "rooms_seats": 16,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.24673,
+                        "cringe3": 16,
+                        "cringe6": 49.26048,
+                        "cringe7": -123.25505,
+                        "cringe8": 16
+                    },
+                    {
+                        "rooms_seats": 18,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.24886,
+                        "cringe3": 18,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.25468,
+                        "cringe8": 18
+                    },
+                    {
+                        "rooms_seats": 20,
+                        "cringe1": 49.2699,
+                        "cringe2": -123.24886,
+                        "cringe3": 20,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.25655,
+                        "cringe8": 20
+                    },
+                    {
+                        "rooms_seats": 21,
+                        "cringe1": 49.2666,
+                        "cringe2": -123.24673,
+                        "cringe3": 21,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.25655,
+                        "cringe8": 21
+                    },
+                    {
+                        "rooms_seats": 22,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.24894,
+                        "cringe3": 22,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.25468,
+                        "cringe8": 22
+                    },
+                    {
+                        "rooms_seats": 24,
+                        "cringe1": 49.26862,
+                        "cringe2": -123.24886,
+                        "cringe3": 24,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.2559,
+                        "cringe8": 24
+                    },
+                    {
+                        "rooms_seats": 25,
+                        "cringe1": 49.266463,
+                        "cringe2": -123.2466,
+                        "cringe3": 25,
+                        "cringe6": 49.26048,
+                        "cringe7": -123.255534,
+                        "cringe8": 25
+                    },
+                    {
+                        "rooms_seats": 26,
+                        "cringe1": 49.26958,
+                        "cringe2": -123.24894,
+                        "cringe3": 26,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.25741,
+                        "cringe8": 26
+                    },
+                    {
+                        "rooms_seats": 27,
+                        "cringe1": 49.26414,
+                        "cringe2": -123.24959,
+                        "cringe3": 27,
+                        "cringe6": 49.26293,
+                        "cringe7": -123.25431,
+                        "cringe8": 27
+                    },
+                    {
+                        "rooms_seats": 28,
+                        "cringe1": 49.2642,
+                        "cringe2": -123.24842,
+                        "cringe3": 28,
+                        "cringe6": 49.26414,
+                        "cringe7": -123.24959,
+                        "cringe8": 28
+                    },
+                    {
+                        "rooms_seats": 29,
+                        "cringe1": 49.2643,
+                        "cringe2": -123.25505,
+                        "cringe3": 29,
+                        "cringe6": 49.2643,
+                        "cringe7": -123.25505,
+                        "cringe8": 29
+                    },
+                    {
+                        "rooms_seats": 30,
+                        "cringe1": 49.26867,
+                        "cringe2": -123.24673,
+                        "cringe3": 30,
+                        "cringe6": 49.2642,
+                        "cringe7": -123.25692,
+                        "cringe8": 30
+                    },
+                    {
+                        "rooms_seats": 31,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 31,
+                        "cringe6": 49.2643,
+                        "cringe7": -123.25505,
+                        "cringe8": 31
+                    },
+                    {
+                        "rooms_seats": 32,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25027,
+                        "cringe3": 32,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25468,
+                        "cringe8": 32
+                    },
+                    {
+                        "rooms_seats": 33,
+                        "cringe1": 49.26958,
+                        "cringe2": -123.25741,
+                        "cringe3": 33,
+                        "cringe6": 49.26958,
+                        "cringe7": -123.25741,
+                        "cringe8": 33
+                    },
+                    {
+                        "rooms_seats": 34,
+                        "cringe1": 49.26398,
+                        "cringe2": -123.24894,
+                        "cringe3": 34,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.2531,
+                        "cringe8": 34
+                    },
+                    {
+                        "rooms_seats": 35,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25179,
+                        "cringe3": 35,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.25364,
+                        "cringe8": 35
+                    },
+                    {
+                        "rooms_seats": 36,
+                        "cringe1": 49.26627,
+                        "cringe2": -123.24886,
+                        "cringe3": 36,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.25374,
+                        "cringe8": 36
+                    },
+                    {
+                        "rooms_seats": 37,
+                        "cringe1": 49.26958,
+                        "cringe2": -123.25364,
+                        "cringe3": 37,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25741,
+                        "cringe8": 37
+                    },
+                    {
+                        "rooms_seats": 38,
+                        "cringe1": 49.26398,
+                        "cringe2": -123.2531,
+                        "cringe3": 38,
+                        "cringe6": 49.26398,
+                        "cringe7": -123.2531,
+                        "cringe8": 38
+                    },
+                    {
+                        "rooms_seats": 39,
+                        "cringe1": 49.26605,
+                        "cringe2": -123.24467,
+                        "cringe3": 39,
+                        "cringe6": 49.26047,
+                        "cringe7": -123.25623,
+                        "cringe8": 39
+                    },
+                    {
+                        "rooms_seats": 40,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.24467,
+                        "cringe3": 40,
+                        "cringe6": 49.26047,
+                        "cringe7": -123.2559,
+                        "cringe8": 40
+                    },
+                    {
+                        "rooms_seats": 41,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 41,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 41
+                    },
+                    {
+                        "rooms_seats": 42,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 42,
+                        "cringe6": 49.26545,
+                        "cringe7": -123.25623,
+                        "cringe8": 42
+                    },
+                    {
+                        "rooms_seats": 43,
+                        "cringe1": 49.26414,
+                        "cringe2": -123.24959,
+                        "cringe3": 43,
+                        "cringe6": 49.26414,
+                        "cringe7": -123.24959,
+                        "cringe8": 43
+                    },
+                    {
+                        "rooms_seats": 44,
+                        "cringe1": 49.2699,
+                        "cringe2": -123.25179,
+                        "cringe3": 44,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.25364,
+                        "cringe8": 44
+                    },
+                    {
+                        "rooms_seats": 45,
+                        "cringe1": 49.26273,
+                        "cringe2": -123.24894,
+                        "cringe3": 45,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.24894,
+                        "cringe8": 45
+                    },
+                    {
+                        "rooms_seats": 47,
+                        "cringe1": 49.26293,
+                        "cringe2": -123.25027,
+                        "cringe3": 47,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25431,
+                        "cringe8": 47
+                    },
+                    {
+                        "rooms_seats": 48,
+                        "cringe1": 49.26867,
+                        "cringe2": -123.24944,
+                        "cringe3": 48,
+                        "cringe6": 49.26048,
+                        "cringe7": -123.25692,
+                        "cringe8": 48
+                    },
+                    {
+                        "rooms_seats": 50,
+                        "cringe1": 49.27106,
+                        "cringe2": -123.25042,
+                        "cringe3": 50,
+                        "cringe6": 49.26228,
+                        "cringe7": -123.25468,
+                        "cringe8": 50
+                    },
+                    {
+                        "rooms_seats": 51,
+                        "cringe1": 49.26767,
+                        "cringe2": -123.25583,
+                        "cringe3": 51,
+                        "cringe6": 49.26767,
+                        "cringe7": -123.25583,
+                        "cringe8": 51
+                    },
+                    {
+                        "rooms_seats": 53,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 53,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 53
+                    },
+                    {
+                        "rooms_seats": 54,
+                        "cringe1": 49.2661,
+                        "cringe2": -123.24959,
+                        "cringe3": 54,
+                        "cringe6": 49.26414,
+                        "cringe7": -123.25364,
+                        "cringe8": 54
+                    },
+                    {
+                        "rooms_seats": 55,
+                        "cringe1": 49.26867,
+                        "cringe2": -123.25692,
+                        "cringe3": 55,
+                        "cringe6": 49.26867,
+                        "cringe7": -123.25692,
+                        "cringe8": 55
+                    },
+                    {
+                        "rooms_seats": 56,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 56,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 56
+                    },
+                    {
+                        "rooms_seats": 58,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 58,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 58
+                    },
+                    {
+                        "rooms_seats": 60,
+                        "cringe1": 49.26767,
+                        "cringe2": -123.24718,
+                        "cringe3": 60,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.25623,
+                        "cringe8": 60
+                    },
+                    {
+                        "rooms_seats": 62,
+                        "cringe1": 49.26273,
+                        "cringe2": -123.24894,
+                        "cringe3": 62,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.24894,
+                        "cringe8": 62
+                    },
+                    {
+                        "rooms_seats": 63,
+                        "cringe1": 49.26176,
+                        "cringe2": -123.25179,
+                        "cringe3": 63,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.25179,
+                        "cringe8": 63
+                    },
+                    {
+                        "rooms_seats": 65,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.24886,
+                        "cringe3": 65,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.25468,
+                        "cringe8": 65
+                    },
+                    {
+                        "rooms_seats": 66,
+                        "cringe1": 49.2642,
+                        "cringe2": -123.24842,
+                        "cringe3": 66,
+                        "cringe6": 49.2642,
+                        "cringe7": -123.24842,
+                        "cringe8": 66
+                    },
+                    {
+                        "rooms_seats": 68,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 68,
+                        "cringe6": 49.2643,
+                        "cringe7": -123.25505,
+                        "cringe8": 68
+                    },
+                    {
+                        "rooms_seats": 70,
+                        "cringe1": 49.26862,
+                        "cringe2": -123.25237,
+                        "cringe3": 70,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 70
+                    },
+                    {
+                        "rooms_seats": 72,
+                        "cringe1": 49.26605,
+                        "cringe2": -123.24342,
+                        "cringe3": 72,
+                        "cringe6": 49.26048,
+                        "cringe7": -123.25623,
+                        "cringe8": 72
+                    },
+                    {
+                        "rooms_seats": 74,
+                        "cringe1": 49.26114,
+                        "cringe2": -123.25027,
+                        "cringe3": 74,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25027,
+                        "cringe8": 74
+                    },
+                    {
+                        "rooms_seats": 75,
+                        "cringe1": 49.26545,
+                        "cringe2": -123.25533,
+                        "cringe3": 75,
+                        "cringe6": 49.26545,
+                        "cringe7": -123.25533,
+                        "cringe8": 75
+                    },
+                    {
+                        "rooms_seats": 76,
+                        "cringe1": 49.26479,
+                        "cringe2": -123.25249,
+                        "cringe3": 76,
+                        "cringe6": 49.26479,
+                        "cringe7": -123.25249,
+                        "cringe8": 76
+                    },
+                    {
+                        "rooms_seats": 78,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 78,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 78
+                    },
+                    {
+                        "rooms_seats": 80,
+                        "cringe1": 49.26767,
+                        "cringe2": -123.24807,
+                        "cringe3": 80,
+                        "cringe6": 49.26125,
+                        "cringe7": -123.25583,
+                        "cringe8": 80
+                    },
+                    {
+                        "rooms_seats": 84,
+                        "cringe1": 49.26176,
+                        "cringe2": -123.24935,
+                        "cringe3": 84,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.24935,
+                        "cringe8": 84
+                    },
+                    {
+                        "rooms_seats": 88,
+                        "cringe1": 49.26478,
+                        "cringe2": -123.24673,
+                        "cringe3": 88,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.24673,
+                        "cringe8": 88
+                    },
+                    {
+                        "rooms_seats": 90,
+                        "cringe1": 49.26958,
+                        "cringe2": -123.25308,
+                        "cringe3": 90,
+                        "cringe6": 49.2659,
+                        "cringe7": -123.25741,
+                        "cringe8": 90
+                    },
+                    {
+                        "rooms_seats": 94,
+                        "cringe1": 49.2699,
+                        "cringe2": -123.24718,
+                        "cringe3": 94,
+                        "cringe6": 49.26228,
+                        "cringe7": -123.25583,
+                        "cringe8": 94
+                    },
+                    {
+                        "rooms_seats": 99,
+                        "cringe1": 49.26414,
+                        "cringe2": -123.24886,
+                        "cringe3": 99,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.24959,
+                        "cringe8": 99
+                    },
+                    {
+                        "rooms_seats": 100,
+                        "cringe1": 49.27106,
+                        "cringe2": -123.24894,
+                        "cringe3": 100,
+                        "cringe6": 49.26273,
+                        "cringe7": -123.25623,
+                        "cringe8": 100
+                    },
+                    {
+                        "rooms_seats": 102,
+                        "cringe1": 49.26517,
+                        "cringe2": -123.24937,
+                        "cringe3": 102,
+                        "cringe6": 49.26517,
+                        "cringe7": -123.24937,
+                        "cringe8": 102
+                    },
+                    {
+                        "rooms_seats": 106,
+                        "cringe1": 49.266089,
+                        "cringe2": -123.254816,
+                        "cringe3": 106,
+                        "cringe6": 49.266089,
+                        "cringe7": -123.254816,
+                        "cringe8": 106
+                    },
+                    {
+                        "rooms_seats": 108,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 108,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 108
+                    },
+                    {
+                        "rooms_seats": 112,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.2521,
+                        "cringe3": 112,
+                        "cringe6": 49.26766,
+                        "cringe7": -123.2521,
+                        "cringe8": 112
+                    },
+                    {
+                        "rooms_seats": 114,
+                        "cringe1": 49.2659,
+                        "cringe2": -123.25308,
+                        "cringe3": 114,
+                        "cringe6": 49.2659,
+                        "cringe7": -123.25308,
+                        "cringe8": 114
+                    },
+                    {
+                        "rooms_seats": 120,
+                        "cringe1": 49.26478,
+                        "cringe2": -123.24673,
+                        "cringe3": 120,
+                        "cringe6": 49.26125,
+                        "cringe7": -123.24807,
+                        "cringe8": 120
+                    },
+                    {
+                        "rooms_seats": 123,
+                        "cringe1": 49.26176,
+                        "cringe2": -123.24935,
+                        "cringe3": 123,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.24935,
+                        "cringe8": 123
+                    },
+                    {
+                        "rooms_seats": 125,
+                        "cringe1": 49.26236,
+                        "cringe2": -123.24494,
+                        "cringe3": 125,
+                        "cringe6": 49.26236,
+                        "cringe7": -123.24494,
+                        "cringe8": 125
+                    },
+                    {
+                        "rooms_seats": 131,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 131,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 131
+                    },
+                    {
+                        "rooms_seats": 136,
+                        "cringe1": 49.26176,
+                        "cringe2": -123.24935,
+                        "cringe3": 136,
+                        "cringe6": 49.26176,
+                        "cringe7": -123.24935,
+                        "cringe8": 136
+                    },
+                    {
+                        "rooms_seats": 144,
+                        "cringe1": 49.26372,
+                        "cringe2": -123.25099,
+                        "cringe3": 144,
+                        "cringe6": 49.26372,
+                        "cringe7": -123.25099,
+                        "cringe8": 144
+                    },
+                    {
+                        "rooms_seats": 150,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25224,
+                        "cringe3": 150,
+                        "cringe6": 49.26274,
+                        "cringe7": -123.25468,
+                        "cringe8": 150
+                    },
+                    {
+                        "rooms_seats": 154,
+                        "cringe1": 49.26766,
+                        "cringe2": -123.2521,
+                        "cringe3": 154,
+                        "cringe6": 49.26766,
+                        "cringe7": -123.2521,
+                        "cringe8": 154
+                    },
+                    {
+                        "rooms_seats": 155,
+                        "cringe1": 49.26627,
+                        "cringe2": -123.25374,
+                        "cringe3": 155,
+                        "cringe6": 49.26627,
+                        "cringe7": -123.25374,
+                        "cringe8": 155
+                    },
+                    {
+                        "rooms_seats": 160,
+                        "cringe1": 49.26541,
+                        "cringe2": -123.24608,
+                        "cringe3": 160,
+                        "cringe6": 49.26125,
+                        "cringe7": -123.24807,
+                        "cringe8": 160
+                    },
+                    {
+                        "rooms_seats": 167,
+                        "cringe1": 49.26229,
+                        "cringe2": -123.24342,
+                        "cringe3": 167,
+                        "cringe6": 49.26229,
+                        "cringe7": -123.24342,
+                        "cringe8": 167
+                    },
+                    {
+                        "rooms_seats": 181,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.24673,
+                        "cringe3": 181,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.25468,
+                        "cringe8": 181
+                    },
+                    {
+                        "rooms_seats": 183,
+                        "cringe1": 49.26545,
+                        "cringe2": -123.25533,
+                        "cringe3": 183,
+                        "cringe6": 49.26545,
+                        "cringe7": -123.25533,
+                        "cringe8": 183
+                    },
+                    {
+                        "rooms_seats": 187,
+                        "cringe1": 49.26293,
+                        "cringe2": -123.25431,
+                        "cringe3": 187,
+                        "cringe6": 49.26293,
+                        "cringe7": -123.25431,
+                        "cringe8": 187
+                    },
+                    {
+                        "rooms_seats": 188,
+                        "cringe1": 49.26293,
+                        "cringe2": -123.25431,
+                        "cringe3": 188,
+                        "cringe6": 49.26293,
+                        "cringe7": -123.25431,
+                        "cringe8": 188
+                    },
+                    {
+                        "rooms_seats": 190,
+                        "cringe1": 49.26293,
+                        "cringe2": -123.25431,
+                        "cringe3": 190,
+                        "cringe6": 49.26293,
+                        "cringe7": -123.25431,
+                        "cringe8": 190
+                    },
+                    {
+                        "rooms_seats": 200,
+                        "cringe1": 49.26228,
+                        "cringe2": -123.24718,
+                        "cringe3": 200,
+                        "cringe6": 49.26114,
+                        "cringe7": -123.25027,
+                        "cringe8": 200
+                    },
+                    {
+                        "rooms_seats": 205,
+                        "cringe1": 49.26545,
+                        "cringe2": -123.25533,
+                        "cringe3": 205,
+                        "cringe6": 49.26545,
+                        "cringe7": -123.25533,
+                        "cringe8": 205
+                    },
+                    {
+                        "rooms_seats": 224,
+                        "cringe1": 49.266463,
+                        "cringe2": -123.255534,
+                        "cringe3": 224,
+                        "cringe6": 49.266463,
+                        "cringe7": -123.255534,
+                        "cringe8": 224
+                    },
+                    {
+                        "rooms_seats": 225,
+                        "cringe1": 49.26605,
+                        "cringe2": -123.25623,
+                        "cringe3": 225,
+                        "cringe6": 49.26605,
+                        "cringe7": -123.25623,
+                        "cringe8": 225
+                    },
+                    {
+                        "rooms_seats": 228,
+                        "cringe1": 49.26479,
+                        "cringe2": -123.25249,
+                        "cringe3": 228,
+                        "cringe6": 49.26479,
+                        "cringe7": -123.25249,
+                        "cringe8": 228
+                    },
+                    {
+                        "rooms_seats": 236,
+                        "cringe1": 49.26229,
+                        "cringe2": -123.24342,
+                        "cringe3": 236,
+                        "cringe6": 49.26229,
+                        "cringe7": -123.24342,
+                        "cringe8": 236
+                    },
+                    {
+                        "rooms_seats": 240,
+                        "cringe1": 49.2659,
+                        "cringe2": -123.25308,
+                        "cringe3": 240,
+                        "cringe6": 49.2659,
+                        "cringe7": -123.25308,
+                        "cringe8": 240
+                    },
+                    {
+                        "rooms_seats": 250,
+                        "cringe1": 49.26044,
+                        "cringe2": -123.24886,
+                        "cringe3": 250,
+                        "cringe6": 49.26044,
+                        "cringe7": -123.24886,
+                        "cringe8": 250
+                    },
+                    {
+                        "rooms_seats": 257,
+                        "cringe1": 49.26627,
+                        "cringe2": -123.25374,
+                        "cringe3": 257,
+                        "cringe6": 49.26627,
+                        "cringe7": -123.25374,
+                        "cringe8": 257
+                    },
+                    {
+                        "rooms_seats": 260,
+                        "cringe1": 49.26486,
+                        "cringe2": -123.25364,
+                        "cringe3": 260,
+                        "cringe6": 49.26486,
+                        "cringe7": -123.25364,
+                        "cringe8": 260
+                    },
+                    {
+                        "rooms_seats": 265,
+                        "cringe1": 49.2659,
+                        "cringe2": -123.25308,
+                        "cringe3": 265,
+                        "cringe6": 49.2659,
+                        "cringe7": -123.25308,
+                        "cringe8": 265
+                    },
+                    {
+                        "rooms_seats": 275,
+                        "cringe1": 49.26826,
+                        "cringe2": -123.25468,
+                        "cringe3": 275,
+                        "cringe6": 49.26826,
+                        "cringe7": -123.25468,
+                        "cringe8": 275
+                    },
+                    {
+                        "rooms_seats": 280,
+                        "cringe1": 49.26398,
+                        "cringe2": -123.2531,
+                        "cringe3": 280,
+                        "cringe6": 49.26398,
+                        "cringe7": -123.2531,
+                        "cringe8": 280
+                    },
+                    {
+                        "rooms_seats": 299,
+                        "cringe1": 49.2683,
+                        "cringe2": -123.24894,
+                        "cringe3": 299,
+                        "cringe6": 49.2683,
+                        "cringe7": -123.24894,
+                        "cringe8": 299
+                    },
+                    {
+                        "rooms_seats": 325,
+                        "cringe1": 49.26517,
+                        "cringe2": -123.24937,
+                        "cringe3": 325,
+                        "cringe6": 49.26517,
+                        "cringe7": -123.24937,
+                        "cringe8": 325
+                    },
+                    {
+                        "rooms_seats": 350,
+                        "cringe1": 49.26274,
+                        "cringe2": -123.24494,
+                        "cringe3": 350,
+                        "cringe6": 49.26236,
+                        "cringe7": -123.25224,
+                        "cringe8": 350
+                    },
+                    {
+                        "rooms_seats": 375,
+                        "cringe1": 49.2661,
+                        "cringe2": -123.25165,
+                        "cringe3": 375,
+                        "cringe6": 49.2661,
+                        "cringe7": -123.25165,
+                        "cringe8": 375
+                    },
+                    {
+                        "rooms_seats": 426,
+                        "cringe1": 49.26207,
+                        "cringe2": -123.25314,
+                        "cringe3": 426,
+                        "cringe6": 49.26207,
+                        "cringe7": -123.25314,
+                        "cringe8": 426
+                    },
+                    {
+                        "rooms_seats": 442,
+                        "cringe1": 49.26047,
+                        "cringe2": -123.24467,
+                        "cringe3": 442,
+                        "cringe6": 49.26047,
+                        "cringe7": -123.24467,
+                        "cringe8": 442
+                    },
+                    {
+                        "rooms_seats": 503,
+                        "cringe1": 49.26478,
+                        "cringe2": -123.24673,
+                        "cringe3": 503,
+                        "cringe6": 49.26478,
+                        "cringe7": -123.24673,
+                        "cringe8": 503
                     }
                 ]
             }

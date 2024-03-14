@@ -389,7 +389,7 @@
         "title": "Aggregation Issues",
         "tests": [
             {
-                "title": "Request Aggregation for non-numerical value",
+                "title": "Request MAX for non-numerical value",
                 "input": {
                     "WHERE": {},
                     "OPTIONS": {
@@ -406,6 +406,58 @@
                                 "MAX": "sections_dept"
                             }
                         }]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Reject when MIN on non-numerical value",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "rooms_fullname",
+                            "cringe1"
+                        ]
+                    },
+                    "TRANSFORMATIONS": {
+                        "GROUP": [
+                            "rooms_fullname"
+                        ],
+                        "APPLY": [
+                            {
+                                "cringe1": {
+                                    "MIN": "rooms_address"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "errorExpected": true,
+                "expected": "InsightError"
+            },
+            {
+                "title": "Reject when MIN null value",
+                "input": {
+                    "WHERE": {},
+                    "OPTIONS": {
+                        "COLUMNS": [
+                            "rooms_fullname",
+                            "cringe1"
+                        ]
+                    },
+                    "TRANSFORMATIONS": {
+                        "GROUP": [
+                            "rooms_fullname"
+                        ],
+                        "APPLY": [
+                            {
+                                "cringe1": {
+                                    "MIN": ""
+                                }
+                            }
+                        ]
                     }
                 },
                 "errorExpected": true,

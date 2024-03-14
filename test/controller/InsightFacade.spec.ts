@@ -115,12 +115,10 @@ describe("InsightFacade Querying", function () {
 								return assert.fail("Query should not be expected to throw an error");
 							}
 							const result = facade.performQuery(test.input);
-							// console.log(JSON.stringify(await result));
 							if(test.assertOrder) {
 								return expect(result)
 									.to.eventually.deep.equal(test.expected);
 							} else {
-								console.log("skipping assert order");
 								return expect(result)
 									.to.eventually.have.deep.members(test.expected as any[]);
 							}
