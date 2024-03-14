@@ -7,10 +7,12 @@ import {Room} from "../model/Room";
 import {
 	CLASS_ADD,
 	CLASS_CODE,
-	CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE} from "./const";
+	CLASS_HREF, CLASS_FNAME, CLASS_CAP, CLASS_ROOM_FURNITURE, CLASS_ROOM_NUMBER, CLASS_ROOM_TYPE, GEOLOCATION_API_URL} from "./const";
 import JSZip = require("jszip");
 import {CourseSection} from "../model/CourseSection";
 import * as fs from "fs-extra";
+import { fetchData } from "./HttpService";
+import { assertTrue } from "./Assertions";
 
 
 interface BuildingInfo {
@@ -104,7 +106,7 @@ export abstract class DatasetProcessor {
 		try {
 			let htmlContent = await zip.file(building.filePath)?.async("string");
 			let document: Document = parse(htmlContent as string);
-			this.ParseRoom(building, defaultTreeAdapter.getChildNodes(document), dataset);
+			await this.ParseRoom(building, defaultTreeAdapter.getChildNodes(document), dataset);
 		} catch(e) {
 			//	This is where the error length is being caught
 			// console.log(`Error: ${e}`);
@@ -112,7 +114,7 @@ export abstract class DatasetProcessor {
 		}
 	}
 
-	private static ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset<Room>): void {
+	private static async ParseRoom(validRoomsData: BuildingInfo, children: ChildNode[], dataset: Dataset<Room>) {
 		if (children) {
 			for (let child of children) {
 				if (child.nodeName === "tr" && child.parentNode?.nodeName === "tbody") {
@@ -129,6 +131,8 @@ export abstract class DatasetProcessor {
 						roomType !== null && roomFurniture !== null && roomHref !== null;
 					// Only create and add the room if all data is valid
 					if (isRoomDataValid) {
+						const geolocationResponse = await this.getGeoLocation(validRoomsData)
+
 						// console.log("room is valid");
 						const room = new Room(
 							validRoomsData.full,
@@ -136,19 +140,39 @@ export abstract class DatasetProcessor {
 							roomNumber,
 							`${validRoomsData.code}_${roomNumber}`,
 							validRoomsData.address,
-							0, // TODO: Placeholder for latitude, you will need to set this
-							0, // TODO: Placeholder for longitude, you will need to set this
+							geolocationResponse.lat, // TODO: Placeholder for latitude, you will need to set this
+							geolocationResponse.lon, // TODO: Placeholder for longitude, you will need to set this
 							roomSeats,
 							roomType,
 							roomFurniture,
 							roomHref,
 						);
 						dataset.addEntry(room);
-						// console.log(room);
+						return room;
 					}
 				}
-				this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
+				await this.ParseRoom(validRoomsData, defaultTreeAdapter.getChildNodes(child as ParentNode), dataset);
 			}
+		}
+	}
+	private static async getGeoLocation(buildingInfo:BuildingInfo):Promise<{lat: number; lon: number}>{
+		const encodedAddress = encodeURIComponent(buildingInfo.address);
+		const apiUrl = `${GEOLOCATION_API_URL}/${encodedAddress}`;
+		let responseJson: {lat: number; lon: number};
+
+		try {
+			const response = await fetchData(apiUrl);
+			responseJson = JSON.parse(response);
+			assertTrue(
+				Object.prototype.hasOwnProperty.call(responseJson, "lat") &&
+					Object.prototype.hasOwnProperty.call(responseJson, "lon"),
+				"Invalid Room Details Found",
+				InsightError
+			);
+			return responseJson;
+		} catch (e) {
+			console.log(e);
+			throw new InsightError("Not Able to fetch Lat Long for the room");
 		}
 	}
 

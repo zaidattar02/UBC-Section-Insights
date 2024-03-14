@@ -6,3 +6,4 @@ export const CLASS_CAP = "views-field-field-room-capacity";
 export const CLASS_ROOM_FURNITURE = "views-field-field-room-furniture";
 export const CLASS_ROOM_TYPE = "views-field-field-room-type";
 export const CLASS_HREF = "views-field-nothing";
+export const GEOLOCATION_API_URL = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team134";
