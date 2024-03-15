@@ -99,6 +99,13 @@ describe("InsightFacade Querying", function () {
 			await clearDisk();
 		});
 
+		describe("why is this not showing", function () {
+			it("i'm so mad", function () {
+				expect([{id: 1, b:1}, {id: 1, b:1}, {id: 3}])
+					.to.have.deep.members([{id: 1, b: 1}, {id: 3}, {id: 1, b: 1}]);
+			});
+		});
+
 		describe("valid queries", function () {
 			let validQueries: ITestSuite[];
 			try {
@@ -115,7 +122,7 @@ describe("InsightFacade Querying", function () {
 								return assert.fail("Query should not be expected to throw an error");
 							}
 							const result = facade.performQuery(test.input);
-							if(test.assertOrder) {
+							if (test.assertOrder) {
 								return expect(result)
 									.to.eventually.deep.equal(test.expected);
 							} else {
@@ -154,7 +161,6 @@ describe("InsightFacade Querying", function () {
 								console.log(`⬇️ threw error message: ${(err as Error).message}`);
 								switch (test.expected) {
 									case "InsightError":
-										console.log(JSON.stringify(err));
 										expect(err).to.be.instanceOf(InsightError);
 										break;
 									case "ResultTooLargeError":
