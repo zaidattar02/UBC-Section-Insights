@@ -41,8 +41,6 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 	public queryWhere(WHERE: unknown): void {
 		// Handle WHERE Clause
 		const filterFunction = generateQueryFilterFunction<DatasetEntry>(WHERE, this.kind, this.id);
-		// console.log("TESTING: ",
-		// (this.query_entries.find((e) => (e.dataProperties as any)["uuid"] === "10236")!.dataProperties as any)["year"]);
 		const out = this.query_entries.filter((e) => filterFunction(e.dataProperties as DatasetEntry));
 		this.query_entries = out;
 	}
@@ -315,23 +313,21 @@ export class QueryDataset<DatasetEntry extends object> extends Dataset<DatasetEn
 			"Apply Query not Correct Shape", InsightError);
 			const applyEntry = raw_apply_entry as Record<string, unknown>;
 			const applykey = Object.keys(applyEntry)[0];
-			assertTrue(/^[^_]+$/.test(applykey), "", InsightError);
+			assertTrue(/^[^_]+$/.test(applykey), "Apply Key in Wrong Form", InsightError);
 
 			const inner = applyEntry[applykey];
 			assertTrue(typeof inner === "object" && inner != null && Object.keys(inner).length === 1 &&
-				typeof Object.keys(inner)[0] === "string", "", InsightError);
+				typeof Object.keys(inner)[0] === "string", "Aggregation Query Inner Value not Valid", InsightError);
 			const innerobject = inner as Record<string, unknown>;
 
 			const applytoken = Object.keys(innerobject)[0];
 			assertType<"MAX" | "MIN" | "AVG" | "COUNT" | "SUM">(applytoken,
-				/^(MAX|MIN|AVG|COUNT|SUM)$/.test(applytoken), "", InsightError);
-			const innervalue = innerobject[applytoken] as unknown;
-			assertType<string>(innervalue, typeof innervalue === "string", "", InsightError);
-
-			const innerValueString = innervalue as string;
-			assertTrue((innerValueString.match(/_/g) || []).length === 1, "", InsightError);
-			const [id, datasetKey] = innerValueString.split("_");
-			assertTrue(id === this.id, "", InsightError);
+				/^(MAX|MIN|AVG|COUNT|SUM)$/.test(applytoken), "Apply Token not valid", InsightError);
+			const ivDSKey = innerobject[applytoken] as unknown;
+			assertType<string>(ivDSKey, typeof ivDSKey === "string", "Dataset Key not a string", InsightError);
+			assertTrue((ivDSKey.match(/_/g) || []).length === 1, "Dataset Key Not Valid", InsightError);
+			const [id, datasetKey] = ivDSKey.split("_");
+			assertTrue(id === this.id, "Disagreement on Aggregation Dataset ID", InsightError);
 			this.validateKey(datasetKey, `Apply ${applykey} references an invalid key for DatasetKind ${this.kind}`);
 			return {applykey, applytoken, datasetKey};
 		});
