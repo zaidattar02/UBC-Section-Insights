@@ -442,6 +442,19 @@ describe("InsightFacade", function () {
 			expect(dataset.numRows).to.equal(64612);
 		});
 
+		it("should list all datasets when there are datasets ROOMS", async function () {
+			// setup
+			await loadValidDatasetRooms();
+
+			// test
+			const datasets = await new InsightFacade().listDatasets();
+			expect(datasets).to.have.lengthOf(1);
+			const dataset = datasets[0];
+			expect(dataset.id).to.equal(roomID);
+			expect(dataset.kind).to.equal(InsightDatasetKind.Rooms);
+			expect(dataset.numRows).to.equal(364);
+		});
+
 		it("should return an empty array when there are no datasets", async function () {
 			// setup
 			await clearDisk();
