@@ -40,6 +40,7 @@ export class InsightFacadeServer {
 			res.status(400).json({error: err.message});
 		}
 	}
+
 	public static async deleteDataset(req: Request, res: Response) {
 		try {
 			console.log(`InsightFacadeServer::deleteDataset(..) - params: ${JSON.stringify(req.params)}`);
@@ -60,6 +61,7 @@ export class InsightFacadeServer {
 			res.status(400).json({error: err.message});
 		}
 	}
+
 	public static async queryDataset(req: Request, res: Response) {
 		try {
 			console.log(`InsightFacadeServer::queryDataset(..) - params: ${JSON.stringify(req.body)}`);
@@ -77,6 +79,7 @@ export class InsightFacadeServer {
 			res.status(400).json({error: err.message});
 		}
 	}
+
 	public static async getDatasets(req: Request, res: Response) {
 		try {
 			console.log(`InsightFacadeServer::getDatasets(..) - params: ${JSON.stringify(req.params)}`);
@@ -93,7 +96,8 @@ export class InsightFacadeServer {
 			res.status(400).json({error: err.message});
 		}
 	}
-	static convertToKindEnum(str: string): InsightDatasetKind {
+
+	public static convertToKindEnum(str: string): InsightDatasetKind {
 		const kindValue = InsightDatasetKind[str as keyof typeof InsightDatasetKind];
 		if (!kindValue) {
 			throw new InsightError(`Invalid Dataset Kind = ${str}`);

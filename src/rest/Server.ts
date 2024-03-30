@@ -1,7 +1,7 @@
 import express, {Application, Request, Response} from "express";
 import * as http from "http";
 import cors from "cors";
-import { InsightFacadeServer } from "./InsightFacadeServer";
+import {InsightFacadeServer} from "./InsightFacadeServer";
 
 export default class Server {
 	private readonly port: number;
@@ -19,7 +19,7 @@ export default class Server {
 		// NOTE: you can serve static frontend files in from your express server
 		// by uncommenting the line below. This makes files in ./frontend/public
 		// accessible at http://localhost:<port>/
-		this.express.use(express.static("./frontend/public"))
+		this.express.use(express.static("./frontend/public"));
 	}
 
 	/**
