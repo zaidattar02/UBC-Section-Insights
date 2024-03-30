@@ -8,7 +8,6 @@ import {
 	NotFoundError,
 } from "../controller/IInsightFacade";
 import JSZip from "jszip";
-const fs = require("fs");
 const facade = new InsightFacade();
 
 export class InsightFacadeServer {
@@ -97,11 +96,32 @@ export class InsightFacadeServer {
 		}
 	}
 
-	public static convertToKindEnum(str: string): InsightDatasetKind {
-		const kindValue = InsightDatasetKind[str as keyof typeof InsightDatasetKind];
-		if (!kindValue) {
-			throw new InsightError(`Invalid Dataset Kind = ${str}`);
+	private static convertToKindEnum(str: string): InsightDatasetKind {
+		switch (str.toLocaleLowerCase()) {
+			case "rooms":
+				return InsightDatasetKind.Rooms;
+			case "sections":
+				return InsightDatasetKind.Sections;
+			default:
+				throw new InsightError(`Invalid Dataset Kind = ${str}`);
 		}
-		return kindValue;
+	}
+
+	public static echo(req: Request, res: Response) {
+		try {
+			console.log(`Server::echo(..) - params: ${JSON.stringify(req.params)}`);
+			const response = InsightFacadeServer.performEcho(req.params.msg);
+			res.status(200).json({result: response});
+		} catch (err) {
+			res.status(400).json({error: err});
+		}
+	}
+
+	private static performEcho(msg: string): string {
+		if (typeof msg !== "undefined" && msg !== null) {
+			return `${msg}...${msg}`;
+		} else {
+			return "Message not provided";
+		}
 	}
 }

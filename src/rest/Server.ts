@@ -83,8 +83,7 @@ export default class Server {
 	private registerRoutes() {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
 		// http://localhost:4321/echo/hello
-		this.express.get("/echo/:msg", Server.echo);
-
+		this.express.get("/echo/:msg", InsightFacadeServer.echo);
 		this.express.put("/dataset/:id/:kind", InsightFacadeServer.addDataset);
 		this.express.delete("/dataset/:id", InsightFacadeServer.deleteDataset);
 		this.express.post("/dataset/query", InsightFacadeServer.queryDataset);
@@ -92,24 +91,7 @@ export default class Server {
 
 	}
 
-	// The next two methods handle the echo service.
-	// These are almost certainly not the best place to put these, but are here for your reference.
-	// By updating the Server.echo function pointer above, these methods can be easily moved.
-	private static echo(req: Request, res: Response) {
-		try {
-			console.log(`Server::echo(..) - params: ${JSON.stringify(req.params)}`);
-			const response = Server.performEcho(req.params.msg);
-			res.status(200).json({result: response});
-		} catch (err) {
-			res.status(400).json({error: err});
-		}
-	}
-
-	private static performEcho(msg: string): string {
-		if (typeof msg !== "undefined" && msg !== null) {
-			return `${msg}...${msg}`;
-		} else {
-			return "Message not provided";
-		}
+	public get app(): Application{
+		return this.express;
 	}
 }
