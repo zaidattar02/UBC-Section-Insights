@@ -3,51 +3,168 @@ import InsightFacade from "../../src/controller/InsightFacade";
 
 import {expect} from "chai";
 import request, {Response} from "supertest";
+import {InsightDatasetKind} from "../../src/controller/IInsightFacade";
+import e, {Application} from "express";
+const fs = require("fs");
 
 describe("Facade D3", function () {
-
 	let facade: InsightFacade;
 	let server: Server;
+	let SERVER_URL: string;
 
-	before(function () {
+	before(async function () {
 		facade = new InsightFacade();
 		server = new Server(4321);
-		// TODO: start server here once and handle errors properly
 	});
 
 	after(function () {
 		// TODO: stop server here once!
 	});
 
-	beforeEach(function () {
-		// might want to add some process logging here to keep track of what is going on
-	});
+	// beforeEach(async function () {});
 
-	afterEach(function () {
-		// might want to add some process logging here to keep track of what is going on
-	});
+	// afterEach(async function () {});
 
-	// Sample on how to format PUT requests
-	/*
-	it("PUT test for courses dataset", function () {
+	it("200 - Add dataset test for rooms dataset", async function () {
 		try {
-			return request(SERVER_URL)
-				.put(ENDPOINT_URL)
-				.send(ZIP_FILE_DATA)
-				.set("Content-Type", "application/x-zip-compressed")
-				.then(function (res: Response) {
-					// some logging here please!
-					expect(res.status).to.be.equal(200);
-				})
-				.catch(function (err) {
-					// some logging here please!
-					expect.fail();
-				});
+			let response = await addDataset("test-add", InsightDatasetKind.Rooms);
+			const responseBody = JSON.parse(response.text);
+			console.log(responseBody);
+			expect(response.status).to.be.equal(200);
+			expect(responseBody.result.result.length).to.be.equal(1);
 		} catch (err) {
-			// and some more logging here!
+			console.error(err);
+			throw err;
+		}
+		await deleteDataset("test-add");
+	});
+	it("400 - Add duplicate dataset test for rooms dataset", async function () {
+		try {
+			let firstAddResponse = await addDataset("test-add", InsightDatasetKind.Rooms);
+			expect(firstAddResponse.status).to.be.equal(200);
+			let secondAddResponse = await addDataset("test-add", InsightDatasetKind.Rooms);
+			expect(secondAddResponse.status).to.be.equal(400);
+		} catch (err) {
+			console.error(err);
+			expect.fail();
+		}
+		await deleteDataset("test-add");
+	});
+
+	it("200 - Delete dataset test for rooms dataset", async function () {
+		try {
+			let addResponse = await addDataset("test", InsightDatasetKind.Rooms);
+			expect(addResponse.status).to.be.equal(200);
+
+			let deleteResponse = await deleteDataset("test");
+			expect(deleteResponse.status).to.be.equal(200);
+			const deleteResponseBody = JSON.parse(deleteResponse.text);
+			expect(deleteResponseBody.result.result).to.be.equal("test");
+		} catch (err) {
+			console.error(err);
+			expect.fail();
 		}
 	});
-	*/
+	it("404 - Delete invailid dataset dataset test for rooms dataset", async function () {
+		try {
+			let deleteResponse = await deleteDataset("test");
+			expect(deleteResponse.status).to.be.equal(404);
+		} catch (err) {
+			console.error(err);
+			expect.fail();
+		}
+	});
+	it("400 - Invalid Query dataset test for rooms dataset", async function () {
+		try {
+			let deleteResponse = await queryDataset({
+				WHERE: {},
+				OPTIONS: {
+					COLUMNS: [
+						"test_address"
+					]
+				}
+			});
+			expect(deleteResponse.status).to.be.equal(400);
+			const deleteResponseBody = JSON.parse(deleteResponse.text);
+		} catch (err) {
+			console.error(err);
+			expect.fail();
+		}
+	});
+	it("200 - Query dataset test for rooms dataset", async function () {
+		try {
+			let addResponse = await addDataset("test", InsightDatasetKind.Rooms);
+			expect(addResponse.status).to.be.equal(200);
 
-	// The other endpoints work similarly. You should be able to find all instructions at the supertest documentation
+			let response = await queryDataset({
+				WHERE: {},
+				OPTIONS: {
+					COLUMNS: [
+						"test_address"
+					]
+				}
+			});
+			expect(response.status).to.be.equal(200);
+			const responseBody = JSON.parse(response.text);
+			expect(responseBody.result.result.length > 0).to.be.true;
+		} catch (err) {
+			console.error(err);
+			expect.fail();
+		}
+	});
+	it("200 - Get All dataset test for rooms dataset", async function () {
+		try {
+			let response = await getDatasets();
+			expect(response.status).to.be.equal(200);
+			const responseBody = JSON.parse(response.text);
+			expect(responseBody.result.result.length > 0).to.be.true;
+		} catch (err) {
+			console.error(err);
+			expect.fail();
+		}
+	});
+
+	async function addDataset(id: string, kind: InsightDatasetKind) {
+		const buffer = await fs.readFileSync("test/resources/archives/campus.zip");
+		try {
+			let response = await request(server.app)
+				.put(`/dataset/${id}/${kind}`)
+				.send(buffer)
+				.set("Content-Type", "application/zip");
+			return response;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	}
+	async function queryDataset(query: object) {
+		try {
+			let response = await request(server.app)
+				.post("/dataset/query")
+				.send(query)
+				.set("Content-Type", "application/json");
+			return response;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	}
+	async function deleteDataset(id: string) {
+		try {
+			let response = await request(server.app).delete(`/dataset/${id}`).set("Content-Type", "application/json");
+			return response;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	}
+	async function getDatasets() {
+		try {
+			let response = await request(server.app).get("/datasets").set("Content-Type", "application/json");
+			return response;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	}
 });
