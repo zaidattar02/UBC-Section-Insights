@@ -29,7 +29,7 @@ export class InsightFacadeServer {
 				.addDataset(id, base64Data, kindValue)
 				.then((resp: string[]) => {
 					const response = {result: resp};
-					res.status(200).json({result: response});
+					res.status(200).json(response);
 				})
 				.catch((err: Error) => {
 					res.status(400).json({error: err.message});
@@ -48,7 +48,7 @@ export class InsightFacadeServer {
 				.removeDataset(id)
 				.then((resp: string) => {
 					const response = {result: resp};
-					res.status(200).json({result: response});
+					res.status(200).json(response);
 				})
 				.catch((err: Error) => {
 					if (err instanceof NotFoundError) {
@@ -69,7 +69,7 @@ export class InsightFacadeServer {
 				.performQuery(body)
 				.then((resp: InsightResult[]) => {
 					const response = {result: resp};
-					res.status(200).json({result: response});
+					res.status(200).json(response);
 				})
 				.catch((err: Error) => {
 					res.status(400).json({error: err.message});
@@ -86,7 +86,7 @@ export class InsightFacadeServer {
 				.listDatasets()
 				.then((resp: InsightDataset[]) => {
 					const response = {result: resp};
-					res.status(200).json({result: response});
+					res.status(200).json(response);
 				})
 				.catch((err: Error) => {
 					res.status(400).json({error: err.message});

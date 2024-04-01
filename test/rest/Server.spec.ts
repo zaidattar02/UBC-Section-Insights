@@ -17,8 +17,10 @@ describe("Facade D3", function () {
 		server = new Server(4321);
 	});
 
-	after(function () {
-		// TODO: stop server here once!
+	after(async function () {
+		await deleteDataset("test");
+		await deleteDataset("test-add");
+
 	});
 
 	// beforeEach(async function () {});
@@ -31,24 +33,20 @@ describe("Facade D3", function () {
 			const responseBody = JSON.parse(response.text);
 			console.log(responseBody);
 			expect(response.status).to.be.equal(200);
-			expect(responseBody.result.result.length).to.be.equal(1);
+			expect(responseBody.result.length).to.be.equal(1);
 		} catch (err) {
 			console.error(err);
 			throw err;
 		}
-		await deleteDataset("test-add");
 	});
 	it("400 - Add duplicate dataset test for rooms dataset", async function () {
 		try {
-			let firstAddResponse = await addDataset("test-add", InsightDatasetKind.Rooms);
-			expect(firstAddResponse.status).to.be.equal(200);
 			let secondAddResponse = await addDataset("test-add", InsightDatasetKind.Rooms);
 			expect(secondAddResponse.status).to.be.equal(400);
 		} catch (err) {
 			console.error(err);
 			expect.fail();
 		}
-		await deleteDataset("test-add");
 	});
 
 	it("200 - Delete dataset test for rooms dataset", async function () {
@@ -59,7 +57,7 @@ describe("Facade D3", function () {
 			let deleteResponse = await deleteDataset("test");
 			expect(deleteResponse.status).to.be.equal(200);
 			const deleteResponseBody = JSON.parse(deleteResponse.text);
-			expect(deleteResponseBody.result.result).to.be.equal("test");
+			expect(deleteResponseBody.result).to.be.equal("test");
 		} catch (err) {
 			console.error(err);
 			expect.fail();
@@ -106,7 +104,7 @@ describe("Facade D3", function () {
 			});
 			expect(response.status).to.be.equal(200);
 			const responseBody = JSON.parse(response.text);
-			expect(responseBody.result.result.length > 0).to.be.true;
+			expect(responseBody.result.length > 0).to.be.true;
 		} catch (err) {
 			console.error(err);
 			expect.fail();
@@ -117,7 +115,7 @@ describe("Facade D3", function () {
 			let response = await getDatasets();
 			expect(response.status).to.be.equal(200);
 			const responseBody = JSON.parse(response.text);
-			expect(responseBody.result.result.length > 0).to.be.true;
+			expect(responseBody.result.length > 0).to.be.true;
 		} catch (err) {
 			console.error(err);
 			expect.fail();
@@ -125,7 +123,7 @@ describe("Facade D3", function () {
 	});
 
 	async function addDataset(id: string, kind: InsightDatasetKind) {
-		const buffer = await fs.readFileSync("test/resources/archives/campus.zip");
+		const buffer = await fs.readFileSync("test/resources/archives/rooms/campus.zip");
 		try {
 			let response = await request(server.app)
 				.put(`/dataset/${id}/${kind}`)
@@ -151,7 +149,7 @@ describe("Facade D3", function () {
 	}
 	async function deleteDataset(id: string) {
 		try {
-			let response = await request(server.app).delete(`/dataset/${id}`).set("Content-Type", "application/json");
+			let response = await request(server.app).delete(`/dataset/${id}`);
 			return response;
 		} catch (err) {
 			console.error(err);
