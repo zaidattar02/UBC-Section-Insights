@@ -16,8 +16,7 @@ export class InsightFacadeServer {
 			console.log(`InsightFacadeServer::addDataset(..) - params: ${JSON.stringify(req.params)}`);
 			// Check if the request body contains raw data
 			if (!req.body || !Buffer.isBuffer(req.body)) {
-				res.status(400).json({error: "Request body must contain raw data buffer"});
-				return;
+				return res.status(400).json({error: "Request body must contain raw data buffer"});
 			}
 			const zipBuffer = req.body;
 			const zip = await JSZip.loadAsync(zipBuffer);
@@ -29,14 +28,14 @@ export class InsightFacadeServer {
 				.addDataset(id, base64Data, kindValue)
 				.then((resp: string[]) => {
 					const response = {result: resp};
-					res.status(200).json(response);
+					return res.status(200).json(response);
 				})
 				.catch((err: Error) => {
-					res.status(400).json({error: err.message});
+					return res.status(400).json({error: err.message});
 				});
 		} catch (err: any) {
 			console.error(err);
-			res.status(400).json({error: err.message});
+			return res.status(400).json({error: err.message});
 		}
 	}
 
@@ -48,16 +47,16 @@ export class InsightFacadeServer {
 				.removeDataset(id)
 				.then((resp: string) => {
 					const response = {result: resp};
-					res.status(200).json(response);
+					return res.status(200).json(response);
 				})
 				.catch((err: Error) => {
 					if (err instanceof NotFoundError) {
-						res.status(404).json({error: err.message});
+						return res.status(404).json({error: err.message});
 					}
-					res.status(400).json({error: err});
+					return res.status(400).json({error: err.message});
 				});
 		} catch (err: any) {
-			res.status(400).json({error: err.message});
+			return res.status(400).json({error: err.message});
 		}
 	}
 
@@ -69,13 +68,13 @@ export class InsightFacadeServer {
 				.performQuery(body)
 				.then((resp: InsightResult[]) => {
 					const response = {result: resp};
-					res.status(200).json(response);
+					return res.status(200).json(response);
 				})
 				.catch((err: Error) => {
-					res.status(400).json({error: err.message});
+					return res.status(400).json({error: err.message});
 				});
 		} catch (err: any) {
-			res.status(400).json({error: err.message});
+			return res.status(400).json({error: err.message});
 		}
 	}
 
@@ -86,13 +85,13 @@ export class InsightFacadeServer {
 				.listDatasets()
 				.then((resp: InsightDataset[]) => {
 					const response = {result: resp};
-					res.status(200).json(response);
+					return res.status(200).json(response);
 				})
 				.catch((err: Error) => {
-					res.status(400).json({error: err.message});
+					return res.status(400).json({error: err.message});
 				});
 		} catch (err: any) {
-			res.status(400).json({error: err.message});
+			return res.status(400).json({error: err.message});
 		}
 	}
 
