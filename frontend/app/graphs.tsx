@@ -65,10 +65,10 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
     useEffect(() => {
         if (!selectedDataset) return;
         
-        for (const {s, q} of [
-                {s: setQueryResult1, q: generateQuery1},
-                {s: setQueryResult2, q: generateQuery2},
-                {s: setQueryResult3, q: generateQuery3}
+        for (const {s, q, n} of [
+                {s: setQueryResult1, q: generateQuery1, n: 1},
+                {s: setQueryResult2, q: generateQuery2, n: 2},
+                {s: setQueryResult3, q: generateQuery3, n: 3}
             ]) {
             (async () => {
                 const res = await fetch(`${apiURL}/query`, {
@@ -77,9 +77,10 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     body: JSON.stringify(q(selectedDataset)),
                 })
                 if(!res.ok) {
-                    const data = (await res.text()).trim()
-                    toast.error(data, {
-                        description: `failed: \"${data}\"`
+                    const clone = res.clone()
+                    const data: {error: string} | string = await res.json().catch(async e => (await clone.text()).trim())
+                    toast.error(`Query ${n} Failed`, {
+                        description: `failed: \"${typeof data === "object" ? data.error : data}\"`
                     })
                     return
                 }
