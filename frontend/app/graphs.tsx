@@ -51,20 +51,22 @@ function generateQuery3(selectedDataset: DatasetInterface): object {
 	return {
 		WHERE: {},
 		OPTIONS: {
-			COLUMNS: [
-				`${idPrefix}_dept`,
-				"avgGrade"
-			],
+			COLUMNS: [`${idPrefix}_year`, "toalStudentFail"],
 			ORDER: {
 				dir: "DOWN",
-				keys: ["avgGrade"]
+				keys: ["toalStudentFail"],
 			},
-			// LIMIT: 5
 		},
 		TRANSFORMATIONS: {
-			GROUP: [`${idPrefix}_dept`],
-			APPLY: [{ avgGrade: { AVG: `${idPrefix}_avg` } }]
-		}
+			GROUP: [`${idPrefix}_year`],
+			APPLY: [
+				{
+					toalStudentFail: {
+						SUM: `${idPrefix}_fail`,
+					},
+				},
+			],
+		},
 	};
 }
 
@@ -134,6 +136,11 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
         }
     }, [selectedDataset, datasets])
 
+	const formattedData3 = queryResult1?.map(item => ({
+		name: item[Object.keys(item)[0]], // X-axis label
+		value: item[Object.keys(item)[1]]// Y-axis value
+	}));
+
 	const formattedData = queryResult1?.map(item => ({
 		name: item.x_dept, // X-axis label
 		value: item.avgGrade// Y-axis value
@@ -143,11 +150,6 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 	const formattedData2 = queryResult2?.map(item => ({
 		name: item.x_dept, // X-axis label for second graph
 		value: item.courseCount // Y-axis value for second graph
-	}));
-
-	const formattedData3 = queryResult3?.map(item => ({
-		name: item.sections_dept, // X-axis label for third graph
-		value: item.avgGrade // Y-axis value for third graph
 	}));
 
 
