@@ -35,9 +35,9 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     body: JSON.stringify(q(selectedDataset)),
                 })
                 if(!res.ok) {
-                    const data = (await res.text()).trim()
+                    const data: {error: string} | string = await res.json().catch(async e => (await res.text()).trim())
                     toast.error(`Query ${n} Failed`, {
-                        description: `failed: \"${data}\"`
+                        description: `failed: \"${typeof data === "object" ? data.error : data}\"`
                     })
                     return
                 }
