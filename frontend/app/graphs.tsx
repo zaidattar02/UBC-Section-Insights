@@ -6,23 +6,29 @@ import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
 import { toast } from "sonner";
 
-//Query To See Enrollment Trends after 2000 In Math
+//Query To See Total Students failed yearly
 function generateQuery1(selectedDataset: DatasetInterface): object {
 	const idPrefix = selectedDataset.id;
 
 	return {
 		WHERE: {},
 		OPTIONS: {
-			COLUMNS: [`${idPrefix}_dept`, "avgGrade"],
+			COLUMNS: [`${idPrefix}_year`, "toalStudentFail"],
 			ORDER: {
 				dir: "DOWN",
-				keys: ["avgGrade"]
-			}
+				keys: ["toalStudentFail"],
+			},
 		},
 		TRANSFORMATIONS: {
-			GROUP: [`${idPrefix}_dept`],
-			APPLY: [{ avgGrade: { AVG: `${idPrefix}_avg` } }]
-		}
+			GROUP: [`${idPrefix}_year`],
+			APPLY: [
+				{
+					toalStudentFail: {
+						SUM: `${idPrefix}_fail`,
+					},
+				},
+			],
+		},
 	};
 }
 function generateQuery2(selectedDataset: DatasetInterface): object {
@@ -135,8 +141,8 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
     }, [selectedDataset, datasets])
 
 	const formattedData = queryResult1?.map(item => ({
-		name: item.x_dept, // X-axis label
-		value: item.avgGrade// Y-axis value
+		name: item[Object.keys(item)[0]], // X-axis label
+		value: item[Object.keys(item)[1]]// Y-axis value
 	}));
 	console.log(formattedData);
 
@@ -163,7 +169,7 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 					<YAxis label={{value: 'Average Grade', angle: -90, position: 'insideLeft'}}/>
 					<Tooltip/>
 					<Legend verticalAlign="top" height={36}/>
-					<Bar dataKey="value" name="Avg Grade" fill="#8884d8"/>
+					<Bar dataKey="value" name="# Students Failed" fill="#8884d8"/>
 				</BarChart>
 				</div>
 			)}
