@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
+import { toast } from "sonner";
 
 function generateQuery1(selectedDataset: DatasetInterface): object {
     return {}
@@ -21,16 +22,28 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 
     useEffect(() => {
         if (!selectedDataset) return;
+        
         for (const {s, q} of [
                 {s: setQueryResult1, q: generateQuery1},
                 {s: setQueryResult2, q: generateQuery2},
                 {s: setQueryResult3, q: generateQuery3}
             ]) {
-            fetch(`${apiURL}/query`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", },
-                body: JSON.stringify(q(selectedDataset)),
-            }).then(res => res.json()).then(data => s(data.result))
+            (async () => {
+                const res = await fetch(`${apiURL}/query`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify(q(selectedDataset)),
+                })
+                if(!res.ok) {
+                    const data = res.text()
+                    toast.error(data, {
+                        description: `failed: \"${data}\"`
+                    })
+                    return
+                }
+                const data: {result: Array<any>} = await res.json()
+                s(data.result)
+            })();
         }
     }, [selectedDataset, datasets])
     
