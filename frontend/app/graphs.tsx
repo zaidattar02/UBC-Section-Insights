@@ -35,7 +35,8 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     body: JSON.stringify(q(selectedDataset)),
                 })
                 if(!res.ok) {
-                    const data: {error: string} | string = await res.json().catch(async e => (await res.text()).trim())
+                    const clone = res.clone()
+                    const data: {error: string} | string = await res.json().catch(async e => (await clone.text()).trim())
                     toast.error(`Query ${n} Failed`, {
                         description: `failed: \"${typeof data === "object" ? data.error : data}\"`
                     })
