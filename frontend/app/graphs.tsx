@@ -6,6 +6,7 @@ import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
 import { toast } from "sonner";
 
+//Query To See Enrollment Trends after 2000 In Math
 function generateQuery1(selectedDataset: DatasetInterface): object {
 	const idPrefix = selectedDataset.id;
 
