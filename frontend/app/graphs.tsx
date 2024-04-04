@@ -1,61 +1,100 @@
 "use client"
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, Label } from 'recharts';
 import { useEffect, useState } from "react";
 import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
 import { toast } from "sonner";
 
 function generateQuery1(selectedDataset: DatasetInterface): object {
+	const idPrefix = selectedDataset.id;
+
 	return {
 		WHERE: {},
 		OPTIONS: {
-			COLUMNS: ["sections_dept", "avgGrade"],
+			COLUMNS: [`${idPrefix}_dept`, "avgGrade"],
 			ORDER: {
 				dir: "DOWN",
 				keys: ["avgGrade"]
 			}
 		},
 		TRANSFORMATIONS: {
-			GROUP: ["sections_dept"],
-			APPLY: [{ avgGrade: { AVG: "sections_avg" } }]
+			GROUP: [`${idPrefix}_dept`],
+			APPLY: [{ avgGrade: { AVG: `${idPrefix}_avg` } }]
 		}
 	};
 }
 function generateQuery2(selectedDataset: DatasetInterface): object {
+	const idPrefix = selectedDataset.id;
 	return {
 		WHERE: {},
 		OPTIONS: {
-			COLUMNS: ["sections_dept", "courseCount"],
+			COLUMNS: [
+				`${idPrefix}_dept`,
+				"courseCount"
+			],
 			ORDER: {
 				dir: "DOWN",
 				keys: ["courseCount"]
 			}
 		},
 		TRANSFORMATIONS: {
-			GROUP: ["sections_dept"],
-			APPLY: [{ courseCount: { COUNT: "sections_uuid" } }]
+			GROUP: [`${idPrefix}_dept`],
+			APPLY: [{ courseCount: { COUNT: `${idPrefix}_uuid` } }]
 		}
 	};
 }
 
 function generateQuery3(selectedDataset: DatasetInterface): object {
+	const idPrefix = selectedDataset.id;
 	return {
 		WHERE: {},
 		OPTIONS: {
-			COLUMNS: ["sections_dept", "avgGrade"],
+			COLUMNS: [
+				`${idPrefix}_dept`,
+				"avgGrade"
+			],
 			ORDER: {
 				dir: "DOWN",
 				keys: ["avgGrade"]
 			},
-			LIMIT: 5
+			// LIMIT: 5
 		},
 		TRANSFORMATIONS: {
-			GROUP: ["sections_dept"],
-			APPLY: [{ avgGrade: { AVG: "sections_avg" } }]
+			GROUP: [`${idPrefix}_dept`],
+			APPLY: [{ avgGrade: { AVG: `${idPrefix}_avg` } }]
 		}
 	};
 }
+
+// function generateQuery3(selectedDataset: DatasetInterface): object {
+// 	return {
+// 		WHERE: {
+// 			AND: [
+// 				{
+// 					GT: {[`${selectedDataset.id}_year`]: 2000},
+// 				},
+// 				{
+// 					IS: {
+// 						[`${selectedDataset.id}_dept`]: "math",
+// 					},
+// 				},
+// 			],
+// 		},
+// 		OPTIONS: {
+// 			COLUMNS: [
+// 				`${selectedDataset.id}_id`,
+// 				`${selectedDataset.id}_title`,
+// 				`${selectedDataset.id}_year`,
+// 				`${selectedDataset.id}_pass`,
+// 				`${selectedDataset.id}_fail`,
+// 				`${selectedDataset.id}_audit`,
+// 			],
+// 			// ORDER: "${selectedDataset.id}_year",
+// 			ORDER: `${selectedDataset.id}_year`,
+// 		},
+// 	};
+// }
 
 export default function Graphs({selectedDataset, datasets}: {selectedDataset: DatasetInterface, datasets: DatasetInterface[]}) {
     const [queryResult1, setQueryResult1] = useState<Array<any> | null>(null);
@@ -64,7 +103,7 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 
     useEffect(() => {
         if (!selectedDataset) return;
-        
+
         for (const {s, q, n} of [
                 {s: setQueryResult1, q: generateQuery1, n: 1},
                 {s: setQueryResult2, q: generateQuery2, n: 2},
@@ -76,6 +115,9 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     headers: { "Content-Type": "application/json", },
                     body: JSON.stringify(q(selectedDataset)),
                 })
+
+				// const query = q(selectedDataset);
+				// console.log(query);
                 if(!res.ok) {
                     const clone = res.clone()
                     const data: {error: string} | string = await res.json().catch(async e => (await clone.text()).trim())
@@ -85,31 +127,73 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     return
                 }
                 const data: {result: Array<any>} = await res.json()
+				console.log(`Query ${n} result:`, data.result);
                 s(data.result)
             })();
         }
     }, [selectedDataset, datasets])
 
 	const formattedData = queryResult1?.map(item => ({
-		name: item.sections_dept, // X-axis label
+		name: item.x_dept, // X-axis label
 		value: item.avgGrade// Y-axis value
 	}));
 	console.log(formattedData);
 
+	const formattedData2 = queryResult2?.map(item => ({
+		name: item.x_dept, // X-axis label for second graph
+		value: item.courseCount // Y-axis value for second graph
+	}));
+
+	const formattedData3 = queryResult3?.map(item => ({
+		name: item.sections_dept, // X-axis label for third graph
+		value: item.avgGrade // Y-axis value for third graph
+	}));
+
+
     return (
-        <div>
+		<div className="graphs-container" style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
 			{formattedData && (
+				<div style={{ marginBottom: '20px' }}>
 				<BarChart width={600} height={300} data={formattedData}>
-					<CartesianGrid strokeDasharray="3 3" />
-					<XAxis dataKey="name" />
-					<YAxis />
-					<Tooltip />
-					<Legend />
-					<Bar dataKey="value" fill="#8884d8" />
+					<CartesianGrid strokeDasharray="3 3"/>
+					<XAxis dataKey="name">
+						<Label value="Department" offset={-5} position="insideBottom"/>
+					</XAxis>
+					<YAxis label={{value: 'Average Grade', angle: -90, position: 'insideLeft'}}/>
+					<Tooltip/>
+					<Legend verticalAlign="top" height={36}/>
+					<Bar dataKey="value" name="Avg Grade" fill="#8884d8"/>
 				</BarChart>
+				</div>
+			)}
+			{formattedData2 && (
+				<div style={{ marginBottom: '20px' }}>
+				<BarChart width={600} height={300} data={formattedData2}>
+					<CartesianGrid strokeDasharray="3 3"/>
+					<XAxis dataKey="name">
+						<Label value="Department" offset={-5} position="insideBottom"/>
+					</XAxis>
+					<YAxis label={{value: '# Courses', angle: -90, position: 'insideLeft'}}/>
+					<Tooltip/>
+					<Legend verticalAlign="top" height={36}/>
+					<Bar dataKey="value" fill="#4285F4" name="# Courses"/>
+				</BarChart>
+				</div>
+			)}
+			{formattedData3 && (
+				<div style={{ marginBottom: '20px' }}>
+				<BarChart width={600} height={300} data={formattedData3}>
+					<CartesianGrid strokeDasharray="3 3"/>
+					<XAxis dataKey="name"/>
+					<YAxis/>
+					<Tooltip/>
+					<Legend/>
+					<Bar dataKey="value" fill="#FFEB3B"/>
+				</BarChart>
+				</div>
 			)}
 		</div>
-    );
+	);
 }
 
 // export default function Graphs() {
