@@ -6,7 +6,7 @@ import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
 import { toast } from "sonner";
 
-//Query To See Enrollment Trends after 2000 In Math
+//Query to see avg grades for each department
 function generateQuery1(selectedDataset: DatasetInterface): object {
 	const idPrefix = selectedDataset.id;
 
@@ -25,6 +25,8 @@ function generateQuery1(selectedDataset: DatasetInterface): object {
 		}
 	};
 }
+
+//Query to see number of courses for each department
 function generateQuery2(selectedDataset: DatasetInterface): object {
 	const idPrefix = selectedDataset.id;
 	return {
@@ -46,6 +48,7 @@ function generateQuery2(selectedDataset: DatasetInterface): object {
 	};
 }
 
+//Query to see total number of students who failes for each year
 function generateQuery3(selectedDataset: DatasetInterface): object {
 	const idPrefix = selectedDataset.id;
 	return {
@@ -90,8 +93,6 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 					body: JSON.stringify(q(selectedDataset)),
 				})
 
-				// const query = q(selectedDataset);
-				// console.log(query);
 				if(!res.ok) {
 					const clone = res.clone()
 					const data: {error: string} | string = await res.json().catch(async e => (await clone.text()).trim())
@@ -108,19 +109,19 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 	}, [selectedDataset, datasets])
 
 	const formattedData3 = queryResult3?.map(item => ({
-		name: item[Object.keys(item)[0]], // X-axis label
-		value: item[Object.keys(item)[1]]// Y-axis value
+		name: item[Object.keys(item)[0]],
+		value: item[Object.keys(item)[1]]
 	}));
 
 	const formattedData = queryResult1?.map(item => ({
-		name: item.x_dept, // X-axis label
-		value: item.avgGrade// Y-axis value
+		name: item.x_dept,
+		value: item.avgGrade
 	}));
 	console.log(formattedData);
 
 	const formattedData2 = queryResult2?.map(item => ({
-		name: item.x_dept, // X-axis label for second graph
-		value: item.courseCount // Y-axis value for second graph
+		name: item.x_dept,
+		value: item.courseCount
 	}));
 
 
