@@ -29,7 +29,7 @@ function generateQuery1(selectedDataset: DatasetInterface): object {
 				`${selectedDataset.id}_fail`,
 				`${selectedDataset.id}_audit`,
 			],
-			ORDER: "${selectedDataset.id}_year",
+			ORDER: `${selectedDataset.id}_year`,
 		},
 	};
 }
