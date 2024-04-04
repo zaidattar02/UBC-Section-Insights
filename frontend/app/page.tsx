@@ -150,6 +150,7 @@ export default function Home() {
   const [selectedDataset, setSelectedDataset] = useState<DatasetInterface | null>(null);
   const [datasets, setDatasets] = useState<DatasetInterface[] | null>(null);
   async function updateDatasets() {
+    setDatasets(null)
     const res = await fetch(`${apiURL}/datasets`)
     if (!res.ok) {
       toast.error("Failed to load datasets")
@@ -175,9 +176,9 @@ export default function Home() {
         {/* Right */}
         <div className="flex-[3]">
           {
-            selectedDataset
-              ? <Graphs selectedDataset={selectedDataset} />
-              : <div>Select a dataset by clicking on "View Insights"</div>
+            selectedDataset && datasets && datasets.length > 0
+              ? <Graphs selectedDataset={selectedDataset} datasets={datasets} />
+              : <div>Add a dataset, then select a dataset by clicking on "View Insights"</div>
           }
         </div>
       </div>
