@@ -5,8 +5,33 @@ import { DatasetInterface } from "~/types/Dataset";
 import { apiURL } from "./const";
 import { toast } from "sonner";
 
+//Query To See Enrollment Trends after 2000 In Math
 function generateQuery1(selectedDataset: DatasetInterface): object {
-    return {}
+	return {
+		WHERE: {
+			AND: [
+				{
+					GT: {[`${selectedDataset.id}_year`]: 2000},
+				},
+				{
+					IS: {
+						[`${selectedDataset.id}_dept`]: "math",
+					},
+				},
+			],
+		},
+		OPTIONS: {
+			COLUMNS: [
+				`${selectedDataset.id}_id`,
+				`${selectedDataset.id}_title`,
+				`${selectedDataset.id}_year`,
+				`${selectedDataset.id}_pass`,
+				`${selectedDataset.id}_fail`,
+				`${selectedDataset.id}_audit`,
+			],
+			ORDER: "${selectedDataset.id}_year",
+		},
+	};
 }
 function generateQuery2(selectedDataset: DatasetInterface): object {
     return {}
