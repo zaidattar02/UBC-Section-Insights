@@ -35,7 +35,7 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
                     body: JSON.stringify(q(selectedDataset)),
                 })
                 if(!res.ok) {
-                    const data = res.text()
+                    const data = (await res.text()).trim()
                     toast.error(data, {
                         description: `failed: \"${data}\"`
                     })
