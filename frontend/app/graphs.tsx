@@ -164,9 +164,9 @@ export default function Graphs({selectedDataset, datasets}: {selectedDataset: Da
 				<BarChart width={600} height={300} data={formattedData}>
 					<CartesianGrid strokeDasharray="3 3"/>
 					<XAxis dataKey="name">
-						<Label value="Department" offset={-5} position="insideBottom"/>
+						<Label value="Year" offset={-5} position="insideBottom"/>
 					</XAxis>
-					<YAxis label={{value: 'Average Grade', angle: -90, position: 'insideLeft'}}/>
+					<YAxis label={{value: '# Students Failed', angle: -90, position: 'insideLeft'}}/>
 					<Tooltip/>
 					<Legend verticalAlign="top" height={36}/>
 					<Bar dataKey="value" name="# Students Failed" fill="#8884d8"/>
