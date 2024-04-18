@@ -19,7 +19,7 @@ export default class Server {
 		// NOTE: you can serve static frontend files in from your express server
 		// by uncommenting the line below. This makes files in ./frontend/public
 		// accessible at http://localhost:<port>/
-		this.express.use(express.static("./frontend/public"));
+		// this.express.use(express.static("./frontend/public"));
 	}
 
 	/**
@@ -86,7 +86,7 @@ export default class Server {
 		this.express.get("/echo/:msg", InsightFacadeServer.echo);
 		this.express.put("/dataset/:id/:kind", InsightFacadeServer.addDataset);
 		this.express.delete("/dataset/:id", InsightFacadeServer.deleteDataset);
-		this.express.post("/dataset/query", InsightFacadeServer.queryDataset);
+		this.express.post("/query", InsightFacadeServer.queryDataset);
 		this.express.get("/datasets", InsightFacadeServer.getDatasets);
 
 	}
